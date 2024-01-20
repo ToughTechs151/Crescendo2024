@@ -13,8 +13,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
@@ -175,7 +178,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Resets the odometry to the specified pose.
+   * Resets the odometry to the specified pose (position and heading).
    *
    * @param pose The pose to which to set the odometry.
    */
@@ -185,6 +188,25 @@ public class DriveSubsystem extends SubsystemBase {
         frontLeftEncoder.getPosition(),
         frontRightEncoder.getPosition(),
         pose);
+
+    if (RobotBase.isSimulation()) {
+      // Using this command during simulation will cause the drive model to not be matched
+      // with the new robot pose, and boundary limits will not match the displayed field.
+      DataLogManager.log(
+          "Warning: Resetting odometry during simulation causes field boundary mismatch");
+    }
+  }
+
+  /** Returns a Command that resets robot position and heading to the start position. */
+  public Command resetOdometryToStart() {
+    return runOnce(
+            () ->
+                resetOdometry(
+                    new Pose2d(
+                        DriveConstants.startX,
+                        DriveConstants.startY,
+                        new Rotation2d(DriveConstants.startHeading))))
+        .withName("Reset Start Pose");
   }
 
   /** Resets the drive encoders to currently read a position of 0. */

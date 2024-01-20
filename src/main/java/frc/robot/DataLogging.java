@@ -100,8 +100,6 @@ public class DataLogging {
 
     /* Drivers tab */
     sbDriverTab = Shuffleboard.getTab("Driver");
-    sbField = new Field2d();
-    sbDriverTab.add("Field", sbField);
 
     DataLogManager.log(String.format("Brownout Voltage: %f", RobotController.getBrownoutVoltage()));
 
@@ -180,9 +178,15 @@ public class DataLogging {
     drive = robotContainer.getDriveSubsystem();
     arm = robotContainer.getArmSubsystem();
 
+    // Add widgets to the Commands tab
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
+
+    // Add widgets to the Driver tab
+    sbField = new Field2d();
+    sbDriverTab.add("Field", sbField).withSize(8, 4);
+    sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
 
     // Add hardware sendables here
     // sbRobotTab.add("PDP", pdp).withWidget(BuiltInWidgets.kPowerDistribution)
