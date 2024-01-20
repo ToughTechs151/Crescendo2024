@@ -80,6 +80,11 @@ public final class Constants {
         (WHEEL_DIAMETER_METERS * Math.PI) / GEAR_RATIO;
     public static final double ENCODER_VELOCITY_CONVERSION =
         (WHEEL_DIAMETER_METERS * Math.PI) / (GEAR_RATIO * 60);
+
+    // Starting field position for odometry
+    public static final double startX = 1.5;
+    public static final double startY = 2.5;
+    public static final double startHeading = Units.degreesToRadians(0.0);
   }
 
   /** Constants used for the Arm subsystem. */
