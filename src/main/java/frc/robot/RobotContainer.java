@@ -56,12 +56,13 @@ public class RobotContainer {
         // joystick, and right side controlled by the right joystick.
         new RunCommand(
                 () ->
-                    this.robotDrive.tankDrive(
+                    this.robotDrive.arcadeDrive(
                         -this.driverController.getLeftY(),
-                        -this.driverController.getRightY(),
+                        -this.driverController.getRightX(),
+                        true,
                         this.driverController.rightBumper().getAsBoolean()),
                 this.robotDrive)
-            .withName("Drive: Tank"));
+            .withName("Drive: Arcade"));
   }
 
   /**
