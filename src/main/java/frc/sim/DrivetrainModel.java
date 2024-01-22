@@ -30,7 +30,7 @@ public class DrivetrainModel {
   private double lastAngle = 0.0;
 
   // Range of pose positions within the field boundary (meters)
-  private static double fieldMinX = 1.5;
+  private static double fieldMinX = 0.5;
   private static double fieldMaxX = 16.3;
   private static double fieldMinY = 0.6;
   private static double fieldMaxY = 7.8;
