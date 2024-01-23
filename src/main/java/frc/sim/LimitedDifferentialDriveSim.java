@@ -33,11 +33,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * <p>Our state-space system is:
  *
- * <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r]]ᵀ in the field coordinate system (dist_* are
- * wheel distances.)
+ * <p>x = transpose([[x, y, theta, vel_l, vel_r, dist_l, dist_r]]) in the field coordinate system 
+ * (dist_* are wheel distances.)
  *
- * <p>u = [[voltage_l, voltage_r]]ᵀ This is typically the control input of the last timestep from a
- * LTVDiffDriveController.
+ * <p>u = transpose([[voltage_l, voltage_r]]) This is typically the control input of the last 
+ * timestep from a LTVDiffDriveController.
  *
  * <p>y = x
  */
@@ -70,11 +70,11 @@ public class LimitedDifferentialDriveSim {
    * @param massKg The mass of the drivebase.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
    * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
-   * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
-   *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
-   *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
-   *     point.
+   * @param measurementStdDevs Standard deviations for measurements, in the form transpose([x, y, 
+   *     heading, left velocity, right velocity, left distance, right distance]). Can be null if no 
+   *     noise is desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations 
+   *     of 0.05 m/s, and position measurement standard deviations of 0.005 meters are a reasonable 
+   *     starting point.
    * @param xMin The minimum X coordinate of the field boundary (meters)
    * @param xMax The maximum X coordinate of the field boundary (meters)
    * @param yMin The minimum Y coordinate of the field boundary (meters)
