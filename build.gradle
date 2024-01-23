@@ -219,5 +219,9 @@ spotbugsTest {
     }
 }
 
+javadoc {
+    options.addStringOption('encoding', 'UTF-8')
+}
+
 // Run spotlessApply before compiling to fix style errors.
 compileJava.dependsOn 'spotlessApply'
