@@ -4,13 +4,14 @@
 
 package frc.sim;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.sim.Constants.DriveSimConstants;
@@ -28,6 +29,12 @@ public class DrivetrainModel {
   private final ADXRS450_GyroSim gyroSim;
   private double lastAngle = 0.0;
 
+  // Range of pose positions within the field boundary (meters)
+  private static double fieldMinX = 0.5;
+  private static double fieldMaxX = 16.3;
+  private static double fieldMinY = 0.6;
+  private static double fieldMaxY = 7.8;
+
   private final LinearSystem<N2, N2, N2> drivetrainSystem =
       LinearSystemId.identifyDrivetrainSystem(
           DriveSimConstants.KV_LINEAR,
@@ -35,14 +42,18 @@ public class DrivetrainModel {
           DriveSimConstants.KV_ANGULAR,
           DriveSimConstants.KA_ANGULAR);
 
-  private final DifferentialDrivetrainSim drivetrainSimulator =
-      new DifferentialDrivetrainSim(
+  private final LimitedDifferentialDriveSim drivetrainSimulator =
+      new LimitedDifferentialDriveSim(
           drivetrainSystem,
           DCMotor.getNEO(DriveSimConstants.NUM_MOTORS),
           8,
           DriveConstants.TRACK_WIDTH_METERS,
           DriveConstants.WHEEL_DIAMETER_METERS / 2.0, // Wheel Radius
-          null);
+          null,
+          fieldMinX,
+          fieldMaxX,
+          fieldMinY,
+          fieldMaxY);
 
   /** Subsystem constructor. */
   public DrivetrainModel(DriveSubsystem driveSubsystemToSimulate) {
@@ -60,6 +71,13 @@ public class DrivetrainModel {
     rearLeftSparkSim = new CANSparkMaxSim(DriveConstants.REAR_LEFT_MOTOR_PORT);
     frontRightSparkSim = new CANSparkMaxSim(DriveConstants.FRONT_RIGHT_MOTOR_PORT);
     rearRightSparkSim = new CANSparkMaxSim(DriveConstants.REAR_RIGHT_MOTOR_PORT);
+
+    // Set the simulated robot to start at the same position as the real robot.
+    drivetrainSimulator.setPose(
+        new Pose2d(
+            DriveConstants.START_XPOS_METERS,
+            DriveConstants.START_YPOS_METERS,
+            new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
@@ -99,8 +117,8 @@ public class DrivetrainModel {
     double leftSimCurrent = drivetrainSimulator.getLeftCurrentDrawAmps();
     double rightSimCurrent = drivetrainSimulator.getRightCurrentDrawAmps();
 
-    /* Current in simulation is total per side so set individual motor current based on number of
-     * motors per side */
+    // Current in simulation is total per side so set individual motor current based on number of
+    // motors per side.
     frontLeftSparkSim.setCurrent(leftSimCurrent / DriveSimConstants.NUM_MOTORS);
     rearLeftSparkSim.setCurrent(leftSimCurrent / DriveSimConstants.NUM_MOTORS);
     frontRightSparkSim.setCurrent(rightSimCurrent / DriveSimConstants.NUM_MOTORS);
