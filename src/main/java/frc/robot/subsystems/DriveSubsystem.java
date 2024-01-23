@@ -83,10 +83,10 @@ public class DriveSubsystem extends SubsystemBase {
     rearRight.follow(frontRight);
 
     // Sets the distance per pulse for the encoders
-    this.frontLeftEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
-    this.rearLeftEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
-    this.frontRightEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
-    this.rearRightEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
+    this.frontLeftEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
+    this.rearLeftEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
+    this.frontRightEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
+    this.rearRightEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
     this.frontLeftEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
     this.rearLeftEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
     this.frontRightEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
@@ -136,14 +136,29 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Drives the robot using arcade controls.
+   * Drives the robot using tank controls.
    *
    * @param leftSpeed The left joystick controller speed -1 to 1
    * @param rightSpeed The right joystick controller speed -1 to 1
+   * @param isCrawl If set, decreases the speed to crawl
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean isCrawl) {
     speedMultiplier = isCrawl ? CRAWL : NORMAL;
     drive.tankDrive(leftSpeed * speedMultiplier, rightSpeed * speedMultiplier, true);
+  }
+
+  /**
+   * Arcade drive method for differential drive platform.
+   *
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
+   *     positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @param isCrawl If set, decreases the speed to crawl
+   */
+  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs, boolean isCrawl) {
+    speedMultiplier = isCrawl ? CRAWL : NORMAL;
+    drive.arcadeDrive(xSpeed * speedMultiplier, zRotation * speedMultiplier, squareInputs);
   }
 
   /**
