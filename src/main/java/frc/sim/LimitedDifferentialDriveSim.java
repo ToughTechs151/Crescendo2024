@@ -20,10 +20,11 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Adapted from DifferentialDrivetrainSim and modified to limit the robot to the field boundary.
+ * Adapted from DifferentialDrivetrainSim and modified to limit the robot to the rectangle
+ * representing the approximate field boundary. There are no collisions or limitations for field
+ * elements.
  *
  * <p>This class simulates the state of the drivetrain. In simulationPeriodic, users should first
  * set inputs from motors with {@link #setInputs(double, double)}, call {@link #update(double)} to
@@ -51,11 +52,11 @@ public class LimitedDifferentialDriveSim {
   private Matrix<N2, N1> m_u;
   private Matrix<N7, N1> m_x;
   private Matrix<N7, N1> m_y;
-  private Matrix<N7, N1> lastX;
+  private Matrix<N7, N1> lastX; // Place to save the last state in case we hit the boundary
 
   private final double m_rb;
   private final LinearSystem<N2, N2, N2> m_plant;
-  private final double m_xMin;
+  private final double m_xMin; // Added parameters to define the rectangular limits
   private final double m_xMax;
   private final double m_yMin;
   private final double m_yMax;
@@ -75,10 +76,10 @@ public class LimitedDifferentialDriveSim {
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
-   * @param xMin The minimum X coordinate of the field boundary (meters)
-   * @param xMax The maximum X coordinate of the field boundary (meters)
-   * @param yMin The minimum Y coordinate of the field boundary (meters)
-   * @param yMax The maximum Y coordinate of the field boundary (meters)
+   * @param xMin The minimum X coordinate of the robot center on the field (meters)
+   * @param xMax The maximum X coordinate of the robot center on the field (meters)
+   * @param yMin The minimum Y coordinate of the robot center on the field (meters)
+   * @param yMax The maximum Y coordinate of the robot center on the field (meters)
    */
   public LimitedDifferentialDriveSim(
       DCMotor driveMotor,
@@ -131,10 +132,10 @@ public class LimitedDifferentialDriveSim {
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
-   * @param xMin The minimum X coordinate of the field boundary (meters)
-   * @param xMax The maximum X coordinate of the field boundary (meters)
-   * @param yMin The minimum Y coordinate of the field boundary (meters)
-   * @param yMax The maximum Y coordinate of the field boundary (meters)
+   * @param xMin The minimum X coordinate of the robot center on the field (meters)
+   * @param xMax The maximum X coordinate of the robot center on the field (meters)
+   * @param yMin The minimum Y coordinate of the robot center on the field (meters)
+   * @param yMax The maximum Y coordinate of the robot center on the field (meters)
    */
   public LimitedDifferentialDriveSim(
       LinearSystem<N2, N2, N2> plant,
@@ -193,15 +194,10 @@ public class LimitedDifferentialDriveSim {
         || (newPose.getX() > m_xMax)
         || (newPose.getY() < m_yMin)
         || (newPose.getY() > m_yMax)) {
-      // System.out.println("Exceeded Limit");
       m_x = lastX;
       m_x.set(State.kLeftVelocity.value, 0, 0);
       m_x.set(State.kRightVelocity.value, 0, 0);
     }
-    SmartDashboard.putNumber("SimX: ", m_x.get(State.kX.value, 0));
-    SmartDashboard.putNumber("SimY: ", m_x.get(State.kY.value, 0));
-    SmartDashboard.putNumber("SimL: ", m_x.get(State.kLeftPosition.value, 0));
-    SmartDashboard.putNumber("SimR: ", m_x.get(State.kRightPosition.value, 0));
 
     // Save the new state, update the output and add simulated measurement noise
     lastX = m_x;

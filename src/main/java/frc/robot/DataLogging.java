@@ -170,13 +170,14 @@ public class DataLogging {
     sbCommandsTab.add(arm).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
 
-    // Add widgets to the Driver tab
+    // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
+    // Start Pose command.  Using that command in simulation mode will cause the robot position
+    // to be displayed incorrectly on the field.
     sbField = new Field2d();
     sbDriverTab.add("Field", sbField).withSize(8, 4);
     sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
 
     // Add hardware sendables here
-    // sbRobotTab.add("PDP", pdp).withWidget(BuiltInWidgets.kPowerDistribution)
     pdpWidget.add("PDP", pdp);
 
     // Log configuration info here

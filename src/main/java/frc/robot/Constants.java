@@ -83,10 +83,13 @@ public final class Constants {
     public static final double ENCODER_VELOCITY_CONVERSION =
         (WHEEL_DIAMETER_METERS * Math.PI) / (GEAR_RATIO * 60);
 
-    // Starting field position for odometry
-    public static final double startX = 0.5;
-    public static final double startY = 2.5;
-    public static final double startHeading = Units.degreesToRadians(0.0);
+    // Starting field pose (position and heading) for odometry which tracks movements from this
+    // position. The pose is applied at initialization and can be set back to this position
+    // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
+    // is the start for trajectories.
+    public static final double START_XPOS_METERS = 0.5;
+    public static final double START_YPOS_METERS = 2.5;
+    public static final double START_HEADING_RADIANS = Units.degreesToRadians(0.0);
   }
 
   /** Constants used for the Arm subsystem. */

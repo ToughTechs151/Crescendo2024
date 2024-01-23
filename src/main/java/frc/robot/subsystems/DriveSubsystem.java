@@ -97,12 +97,12 @@ public class DriveSubsystem extends SubsystemBase {
     // gearbox is constructed, you might have to invert the left side instead.
     frontRight.setInverted(true);
 
-    // Set starting pose
+    // Set starting pose (position and heading)
     resetOdometry(
         new Pose2d(
-            DriveConstants.startX,
-            DriveConstants.startY,
-            new Rotation2d(DriveConstants.startHeading)));
+            DriveConstants.START_XPOS_METERS,
+            DriveConstants.START_YPOS_METERS,
+            new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
 
     SmartDashboard.putData(this.drive);
   }
@@ -218,9 +218,9 @@ public class DriveSubsystem extends SubsystemBase {
             () ->
                 resetOdometry(
                     new Pose2d(
-                        DriveConstants.startX,
-                        DriveConstants.startY,
-                        new Rotation2d(DriveConstants.startHeading))))
+                        DriveConstants.START_XPOS_METERS,
+                        DriveConstants.START_YPOS_METERS,
+                        new Rotation2d(DriveConstants.START_HEADING_RADIANS))))
         .withName("Reset Start Pose");
   }
 

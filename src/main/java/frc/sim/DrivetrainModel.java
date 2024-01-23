@@ -72,11 +72,12 @@ public class DrivetrainModel {
     frontRightSparkSim = new CANSparkMaxSim(DriveConstants.FRONT_RIGHT_MOTOR_PORT);
     rearRightSparkSim = new CANSparkMaxSim(DriveConstants.REAR_RIGHT_MOTOR_PORT);
 
+    // Set the simulated robot to start at the same position as the real robot.
     drivetrainSimulator.setPose(
         new Pose2d(
-            DriveConstants.startX,
-            DriveConstants.startY,
-            new Rotation2d(DriveConstants.startHeading)));
+            DriveConstants.START_XPOS_METERS,
+            DriveConstants.START_YPOS_METERS,
+            new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
@@ -116,8 +117,8 @@ public class DrivetrainModel {
     double leftSimCurrent = drivetrainSimulator.getLeftCurrentDrawAmps();
     double rightSimCurrent = drivetrainSimulator.getRightCurrentDrawAmps();
 
-    /* Current in simulation is total per side so set individual motor current based on number of
-     * motors per side */
+    // Current in simulation is total per side so set individual motor current based on number of
+    // motors per side.
     frontLeftSparkSim.setCurrent(leftSimCurrent / DriveSimConstants.NUM_MOTORS);
     rearLeftSparkSim.setCurrent(leftSimCurrent / DriveSimConstants.NUM_MOTORS);
     frontRightSparkSim.setCurrent(rightSimCurrent / DriveSimConstants.NUM_MOTORS);
@@ -128,8 +129,6 @@ public class DrivetrainModel {
     gyroSim.setAngle(newAngle);
     gyroSim.setRate(((newAngle - lastAngle) / 0.02));
     lastAngle = newAngle;
-
-    // drivetrainSimulator.setPose(driveSubsystem.getPose());
   }
 
   /** Return the left side total simulated current. */
