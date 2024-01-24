@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.RobotPreferences.PreferenceKeyValue;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -104,30 +105,23 @@ public final class Constants {
     // These are fake gains; in actuality these must be determined individually for each robot
 
     // Constants tunable through preferences
-    public static final String ARM_KP_KEY = "ArmKP"; // The P gain for the PID controller
-    public static final double DEFAULT_ARM_KP = 3.0;
-    public static final String ARM_KS_KEY = "ArmKS"; // Static motor gain
-    public static final double DEFAULT_KS_VOLTS = 0.5;
-    public static final String ARM_KG_KEY = "ArmKG"; // Gravity gain
-    public static final double DEFAULT_KG_VOLTS = 1.25;
-    public static final String ARM_KV_KEY = "ArmKV"; // Velocity gain
-    public static final double DEFAULT_KV_VOLTS_PER_SEC_PER_RAD = 0.8;
-    public static final String ARM_VELOCITY_MAX_KEY = "ArmVelocityMax";
-    public static final double DEFAULT_MAX_VELOCITY_RAD_PER_SEC = Units.degreesToRadians(90);
-    public static final String ARM_ACCELERATION_MAX_KEY = "ArmAccelerationMax";
-    public static final double DEFAULT_MAX_ACCELERATION_RAD_PER_SEC = Units.degreesToRadians(360);
+    public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 3.0);
+    public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.5);
+    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 1.25);
+    public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
+        new PreferenceKeyValue("ArmKV", 0.8);
+    public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
+        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
+    public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
+        new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
 
-    public static final String[] ARM_PREF_KEYS = {
-      ARM_KP_KEY, ARM_KS_KEY, ARM_KG_KEY, ARM_KV_KEY, ARM_VELOCITY_MAX_KEY, ARM_ACCELERATION_MAX_KEY
-    };
-    
-    public static final double[] ARM_PREF_DEFAULTS = {
-      DEFAULT_ARM_KP,
-      DEFAULT_KS_VOLTS,
-      DEFAULT_KG_VOLTS,
-      DEFAULT_KV_VOLTS_PER_SEC_PER_RAD,
-      DEFAULT_MAX_VELOCITY_RAD_PER_SEC,
-      DEFAULT_MAX_ACCELERATION_RAD_PER_SEC
+    public static final PreferenceKeyValue[] ARM_PREFERENCES = {
+      ARM_KP,
+      ARM_KS,
+      ARM_KG,
+      ARM_KV_VOLTS_PER_RAD_PER_SEC,
+      ARM_MAX_VELOCITY_RAD_PER_SEC,
+      ARM_MAX_ACCELERATION_RAD_PER_SEC2
     };
 
     public static final double GEAR_RATIO = 1.0d / 200;

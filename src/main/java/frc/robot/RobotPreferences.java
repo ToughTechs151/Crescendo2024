@@ -20,18 +20,40 @@ public class RobotPreferences {
     throw new IllegalStateException("RobotPreferences Utility class");
   }
 
+  /** Key - default value pair to support initialization and reset of groups of preferences. */
+  public static class PreferenceKeyValue {
+    String keyString;
+    double defaultValue;
+
+    public PreferenceKeyValue(String keyString, double defaultValue) {
+      this.keyString = keyString;
+      this.defaultValue = defaultValue;
+    }
+
+    public String getKey() {
+      return this.keyString;
+    }
+
+    public double getDefault() {
+      return this.defaultValue;
+    }
+
+    public double getValue() {
+      return Preferences.getDouble(this.keyString, this.defaultValue);
+    }
+  }
+
   /** Reset the Preferences table to default values. */
   public static void resetPreferences() {
 
     // Reset the arm subsystem preferences
-    resetPreferencesArray(
-        Constants.ArmConstants.ARM_PREF_KEYS, Constants.ArmConstants.ARM_PREF_DEFAULTS);
+    resetPreferencesArray(Constants.ArmConstants.ARM_PREFERENCES);
   }
 
   /** Reset an array of Preferences to default values. */
-  public static void resetPreferencesArray(String[] prefKeys, double[] prefDefaultValues) {
-    for (int i = 0; i < prefKeys.length; i++) {
-      Preferences.setDouble(prefKeys[i], prefDefaultValues[i]);
+  public static void resetPreferencesArray(PreferenceKeyValue[] prefPairs) {
+    for (PreferenceKeyValue keyValue : prefPairs) {
+      Preferences.setDouble(keyValue.getKey(), keyValue.getDefault());
     }
   }
 
@@ -39,9 +61,9 @@ public class RobotPreferences {
    * Put tunable values into the Preferences table using default values, if the keys don't already
    * exist.
    */
-  public static void initPreferencesArray(String[] prefKeys, double[] prefDefaultValues) {
-    for (int i = 0; i < prefKeys.length; i++) {
-      Preferences.initDouble(prefKeys[i], prefDefaultValues[i]);
+  public static void initPreferencesArray(PreferenceKeyValue[] prefPairs) {
+    for (PreferenceKeyValue keyValue : prefPairs) {
+      Preferences.initDouble(keyValue.getKey(), keyValue.getDefault());
     }
   }
 
