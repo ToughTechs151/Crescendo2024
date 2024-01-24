@@ -24,25 +24,25 @@ public class RobotPreferences {
   public static void resetPreferences() {
 
     // Reset the arm subsystem preferences
+    resetPreferencesArray(
+        Constants.ArmConstants.ARM_PREF_KEYS, Constants.ArmConstants.ARM_PREF_DEFAULTS);
+  }
 
-    // Preferences for PID controller
-    Preferences.setDouble(Constants.ArmConstants.ARM_KP_KEY, Constants.ArmConstants.DEFAULT_ARM_KP);
+  /** Reset an array of Preferences to default values. */
+  public static void resetPreferencesArray(String[] prefKeys, double[] prefDefaultValues) {
+    for (int i = 0; i < prefKeys.length; i++) {
+      Preferences.setDouble(prefKeys[i], prefDefaultValues[i]);
+    }
+  }
 
-    // Preferences for Trapezoid Profile
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_VELOCITY_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_VELOCITY_RAD_PER_SEC);
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_ACCELERATION_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_ACCELERATION_RAD_PER_SEC);
-
-    // Preferences for Feedforward
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_KS_KEY, Constants.ArmConstants.DEFAULT_KS_VOLTS);
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_KG_KEY, Constants.ArmConstants.DEFAULT_KG_VOLTS);
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_KV_KEY, Constants.ArmConstants.DEFAULT_KV_VOLTS_PER_SEC_PER_RAD);
+  /**
+   * Put tunable values into the Preferences table using default values, if the keys don't already
+   * exist.
+   */
+  public static void initPreferencesArray(String[] prefKeys, double[] prefDefaultValues) {
+    for (int i = 0; i < prefKeys.length; i++) {
+      Preferences.initDouble(prefKeys[i], prefDefaultValues[i]);
+    }
   }
 
   /** Log the values of all entries in the Preferences table. */

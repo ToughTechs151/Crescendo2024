@@ -117,6 +117,19 @@ public final class Constants {
     public static final String ARM_ACCELERATION_MAX_KEY = "ArmAccelerationMax";
     public static final double DEFAULT_MAX_ACCELERATION_RAD_PER_SEC = Units.degreesToRadians(360);
 
+    public static final String[] ARM_PREF_KEYS = {
+      ARM_KP_KEY, ARM_KS_KEY, ARM_KG_KEY, ARM_KV_KEY, ARM_VELOCITY_MAX_KEY, ARM_ACCELERATION_MAX_KEY
+    };
+    
+    public static final double[] ARM_PREF_DEFAULTS = {
+      DEFAULT_ARM_KP,
+      DEFAULT_KS_VOLTS,
+      DEFAULT_KG_VOLTS,
+      DEFAULT_KV_VOLTS_PER_SEC_PER_RAD,
+      DEFAULT_MAX_VELOCITY_RAD_PER_SEC,
+      DEFAULT_MAX_ACCELERATION_RAD_PER_SEC
+    };
+
     public static final double GEAR_RATIO = 1.0d / 200;
     public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;

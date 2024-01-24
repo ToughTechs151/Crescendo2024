@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.RobotPreferences;
 
 /**
  * The {@code ArmSubsystem} class is a subsystem that controls the movement of an arm using a
@@ -140,7 +141,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private void initializeArm() {
 
-    initPreferences();
+    RobotPreferences.initPreferencesArray(
+        ArmConstants.ARM_PREF_KEYS, ArmConstants.ARM_PREF_DEFAULTS);
     initEncoder();
     initMotor();
 
@@ -352,33 +354,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns the Motor Commanded Voltage. */
   public double getVoltageCommand() {
     return voltageCommand;
-  }
-
-  /**
-   * Put tunable values in the Preferences table using default values, if the keys don't already
-   * exist.
-   */
-  private void initPreferences() {
-
-    // Preferences for PID controller
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KP_KEY, Constants.ArmConstants.DEFAULT_ARM_KP);
-
-    // Preferences for Trapezoid Profile
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_VELOCITY_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_VELOCITY_RAD_PER_SEC);
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_ACCELERATION_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_ACCELERATION_RAD_PER_SEC);
-
-    // Preferences for Feedforward
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KS_KEY, Constants.ArmConstants.DEFAULT_KS_VOLTS);
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KG_KEY, Constants.ArmConstants.DEFAULT_KG_VOLTS);
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KV_KEY, Constants.ArmConstants.DEFAULT_KV_VOLTS_PER_SEC_PER_RAD);
   }
 
   /**
