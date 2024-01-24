@@ -140,7 +140,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private void initializeArm() {
 
-    RobotPreferences.initPreferencesArray(ArmConstants.ARM_PREFERENCES);
+    RobotPreferences.initPreferencesArray(ArmConstants.getArmPreferences());
     initEncoder();
     initMotor();
 

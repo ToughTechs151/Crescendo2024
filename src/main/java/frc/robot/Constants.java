@@ -115,7 +115,7 @@ public final class Constants {
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
         new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
 
-    public static final PreferenceKeyValue[] ARM_PREFERENCES = {
+    private static final PreferenceKeyValue[] ARM_PREFERENCES = {
       ARM_KP,
       ARM_KS,
       ARM_KG,
@@ -123,6 +123,10 @@ public final class Constants {
       ARM_MAX_VELOCITY_RAD_PER_SEC,
       ARM_MAX_ACCELERATION_RAD_PER_SEC2
     };
+
+    public static PreferenceKeyValue[] getArmPreferences() {
+      return ARM_PREFERENCES;
+    }
 
     public static final double GEAR_RATIO = 1.0d / 200;
     public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
