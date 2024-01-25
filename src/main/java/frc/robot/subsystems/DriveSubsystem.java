@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -211,10 +210,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (RobotBase.isSimulation()) {
       odometryReset = true;
-      // Using this command during simulation will cause the drive model to not be matched
-      // with the new robot pose, and boundary limits will not match the displayed field.
-      DataLogManager.log(
-          "Warning: Resetting odometry during simulation causes field boundary mismatch");
     }
   }
 
