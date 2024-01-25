@@ -62,22 +62,22 @@ public final class Constants {
       throw new IllegalStateException("DriveConstants Utility class");
     }
 
-    public static final int FRONT_LEFT_MOTOR_PORT = 4;
-    public static final int REAR_LEFT_MOTOR_PORT = 1;
-    public static final int FRONT_RIGHT_MOTOR_PORT = 2;
-    public static final int REAR_RIGHT_MOTOR_PORT = 3;
+    public static final int FRONT_LEFT_MOTOR_PORT = 1;
+    public static final int REAR_LEFT_MOTOR_PORT = 2;
+    public static final int FRONT_RIGHT_MOTOR_PORT = 3;
+    public static final int REAR_RIGHT_MOTOR_PORT = 4;
 
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = 0.7;
+    public static final double WHEEL_BASE_METERS = 0.7;
     // Distance between centers of front and back wheels on robot
 
     public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(22);
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
 
-    public static final double GEAR_RATIO = 10.71;
+    public static final double GEAR_RATIO = 8.45;
     public static final double WHEEL_DIAMETER_METERS = 0.15;
-    public static final double ENCODER_DISTANCE_PER_REV =
+    public static final double ENCODER_DISTANCE_METERS_PER_REV =
         // Assumes the encoders are directly mounted on the wheel shafts
         (WHEEL_DIAMETER_METERS * Math.PI) / GEAR_RATIO;
     public static final double ENCODER_VELOCITY_CONVERSION =
