@@ -82,19 +82,31 @@ public class DrivetrainModel {
 
   /** Update our simulation. This should be run every robot loop in simulation. */
   public void updateSim() {
-    // To update our simulation, we set motor voltage inputs, update the
-    // simulation, and write the simulated positions and velocities to our
-    // simulated encoder and gyro. We negate the right side so that positive
-    // voltages make the right side move forward.
-    drivetrainSimulator.setInputs(
-        driveSubsystem.getLeftMotorVolts()
-            * RobotController.getInputVoltage()
-            * DriveSimConstants.VOLT_SCALE_FACTOR,
-        driveSubsystem.getRightMotorVolts()
-            * RobotController.getInputVoltage()
-            * DriveSimConstants.VOLT_SCALE_FACTOR);
+    // If the drive subsystem odometry has been reset, then reset the simulator to match
+    if (driveSubsystem.odometryWasReset()) {
+      drivetrainSimulator.setPose(
+          new Pose2d(
+              DriveConstants.START_XPOS_METERS,
+              DriveConstants.START_YPOS_METERS,
+              new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
 
-    drivetrainSimulator.update(0.02);
+      driveSubsystem.clearOdometryReset();
+
+    } else {
+      // To update our simulation, we set motor voltage inputs, update the
+      // simulation, and write the simulated positions and velocities to our
+      // simulated encoder and gyro. We negate the right side so that positive
+      // voltages make the right side move forward.
+      drivetrainSimulator.setInputs(
+          driveSubsystem.getLeftMotorVolts()
+              * RobotController.getInputVoltage()
+              * DriveSimConstants.VOLT_SCALE_FACTOR,
+          driveSubsystem.getRightMotorVolts()
+              * RobotController.getInputVoltage()
+              * DriveSimConstants.VOLT_SCALE_FACTOR);
+
+      drivetrainSimulator.update(0.02);
+    }
 
     // Set our simulated encoder's position and rate
     double leftSimPosition = drivetrainSimulator.getLeftPositionMeters();

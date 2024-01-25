@@ -13,10 +13,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -34,10 +32,6 @@ public class RobotContainer {
       new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
   // Now all the subsystems.
-  // The Example.
-  private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
-  private final ExampleCommand autoCommand =
-      new ExampleCommand("ExampleCommand", this.exampleSubsystem);
   // The Arm.
   private final ArmSubsystem robotArm = new ArmSubsystem(ArmSubsystem.initializeHardware());
   // The drive.
@@ -117,8 +111,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return this.autoCommand;
+    // Drive forward slowly unitl the robot moves 1 meter
+    return new RunCommand(
+            () -> this.robotDrive.arcadeDrive(0.1, 0.0, false, false), this.robotDrive)
+        .until(() -> robotDrive.getAverageDistanceMeters() > 0.5)
+        .withTimeout(5)
+        .andThen(() -> this.robotDrive.tankDriveVolts(0, 0))
+        .withName("Drive Forward 1m");
   }
 
   /**
