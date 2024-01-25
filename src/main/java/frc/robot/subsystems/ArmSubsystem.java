@@ -15,7 +15,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.RobotPreferences;
 
 /**
  * The {@code ArmSubsystem} class is a subsystem that controls the movement of an arm using a
@@ -110,18 +110,18 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private ProfiledPIDController armController =
       new ProfiledPIDController(
-          Constants.ArmConstants.DEFAULT_ARM_KP,
+          ArmConstants.ARM_KP.getValue(),
           0,
           0,
           new TrapezoidProfile.Constraints(
-              ArmConstants.DEFAULT_MAX_VELOCITY_RAD_PER_SEC,
-              ArmConstants.DEFAULT_MAX_ACCELERATION_RAD_PER_SEC));
+              ArmConstants.ARM_MAX_VELOCITY_RAD_PER_SEC.getValue(),
+              ArmConstants.ARM_MAX_ACCELERATION_RAD_PER_SEC2.getValue()));
 
   private ArmFeedforward feedforward =
       new ArmFeedforward(
-          ArmConstants.DEFAULT_KS_VOLTS,
-          ArmConstants.DEFAULT_KG_VOLTS,
-          ArmConstants.DEFAULT_KV_VOLTS_PER_SEC_PER_RAD,
+          ArmConstants.ARM_KS.getValue(),
+          ArmConstants.ARM_KG.getValue(),
+          ArmConstants.ARM_KV_VOLTS_PER_RAD_PER_SEC.getValue(),
           0.0); // Acceleration is not used in this implementation
 
   private double output = 0.0;
@@ -140,7 +140,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private void initializeArm() {
 
-    initPreferences();
+    RobotPreferences.initPreferencesArray(ArmConstants.getArmPreferences());
     initEncoder();
     initMotor();
 
@@ -355,66 +355,23 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Put tunable values in the Preferences table using default values, if the keys don't already
-   * exist.
-   */
-  private void initPreferences() {
-
-    // Preferences for PID controller
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KP_KEY, Constants.ArmConstants.DEFAULT_ARM_KP);
-
-    // Preferences for Trapezoid Profile
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_VELOCITY_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_VELOCITY_RAD_PER_SEC);
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_ACCELERATION_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_ACCELERATION_RAD_PER_SEC);
-
-    // Preferences for Feedforward
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KS_KEY, Constants.ArmConstants.DEFAULT_KS_VOLTS);
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KG_KEY, Constants.ArmConstants.DEFAULT_KG_VOLTS);
-    Preferences.initDouble(
-        Constants.ArmConstants.ARM_KV_KEY, Constants.ArmConstants.DEFAULT_KV_VOLTS_PER_SEC_PER_RAD);
-  }
-
-  /**
    * Load Preferences for values that can be tuned at runtime. This should only be called when the
    * controller is disabled - for example from enable().
    */
   private void loadPreferences() {
 
     // Read Preferences for PID controller
-    armController.setP(
-        Preferences.getDouble(
-            Constants.ArmConstants.ARM_KP_KEY, Constants.ArmConstants.DEFAULT_ARM_KP));
+    armController.setP(ArmConstants.ARM_KP.getValue());
 
     // Read Preferences for Trapezoid Profile and update
-    double velocityMax =
-        Preferences.getDouble(
-            Constants.ArmConstants.ARM_VELOCITY_MAX_KEY,
-            Constants.ArmConstants.DEFAULT_MAX_VELOCITY_RAD_PER_SEC);
-    double accelerationMax =
-        Preferences.getDouble(
-            Constants.ArmConstants.ARM_ACCELERATION_MAX_KEY,
-            Constants.ArmConstants.DEFAULT_MAX_ACCELERATION_RAD_PER_SEC);
+    double velocityMax = ArmConstants.ARM_MAX_VELOCITY_RAD_PER_SEC.getValue();
+    double accelerationMax = ArmConstants.ARM_MAX_ACCELERATION_RAD_PER_SEC2.getValue();
     armController.setConstraints(new TrapezoidProfile.Constraints(velocityMax, accelerationMax));
 
     // Read Preferences for Feedforward and create a new instance
-    double staticGain =
-        Preferences.getDouble(
-            Constants.ArmConstants.ARM_KS_KEY, Constants.ArmConstants.DEFAULT_KS_VOLTS);
-    double gravityGain =
-        Preferences.getDouble(
-            Constants.ArmConstants.ARM_KG_KEY, Constants.ArmConstants.DEFAULT_KG_VOLTS);
-    double velocityGain =
-        Preferences.getDouble(
-            Constants.ArmConstants.ARM_KV_KEY,
-            Constants.ArmConstants.DEFAULT_KV_VOLTS_PER_SEC_PER_RAD);
-
+    double staticGain = ArmConstants.ARM_KS.getValue();
+    double gravityGain = ArmConstants.ARM_KG.getValue();
+    double velocityGain = ArmConstants.ARM_KV_VOLTS_PER_RAD_PER_SEC.getValue();
     feedforward = new ArmFeedforward(staticGain, gravityGain, velocityGain, 0);
   }
 

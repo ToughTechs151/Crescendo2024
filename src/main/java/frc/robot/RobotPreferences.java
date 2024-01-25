@@ -20,29 +20,51 @@ public class RobotPreferences {
     throw new IllegalStateException("RobotPreferences Utility class");
   }
 
+  /** Key - default value pair to support initialization and reset of groups of preferences. */
+  public static class PreferenceKeyValue {
+    String keyString;
+    double defaultValue;
+
+    public PreferenceKeyValue(String keyString, double defaultValue) {
+      this.keyString = keyString;
+      this.defaultValue = defaultValue;
+    }
+
+    public String getKey() {
+      return this.keyString;
+    }
+
+    public double getDefault() {
+      return this.defaultValue;
+    }
+
+    public double getValue() {
+      return Preferences.getDouble(this.keyString, this.defaultValue);
+    }
+  }
+
   /** Reset the Preferences table to default values. */
   public static void resetPreferences() {
 
     // Reset the arm subsystem preferences
+    resetPreferencesArray(Constants.ArmConstants.getArmPreferences());
+  }
 
-    // Preferences for PID controller
-    Preferences.setDouble(Constants.ArmConstants.ARM_KP_KEY, Constants.ArmConstants.DEFAULT_ARM_KP);
+  /** Reset an array of Preferences to default values. */
+  public static void resetPreferencesArray(PreferenceKeyValue[] prefPairs) {
+    for (PreferenceKeyValue keyValue : prefPairs) {
+      Preferences.setDouble(keyValue.getKey(), keyValue.getDefault());
+    }
+  }
 
-    // Preferences for Trapezoid Profile
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_VELOCITY_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_VELOCITY_RAD_PER_SEC);
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_ACCELERATION_MAX_KEY,
-        Constants.ArmConstants.DEFAULT_MAX_ACCELERATION_RAD_PER_SEC);
-
-    // Preferences for Feedforward
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_KS_KEY, Constants.ArmConstants.DEFAULT_KS_VOLTS);
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_KG_KEY, Constants.ArmConstants.DEFAULT_KG_VOLTS);
-    Preferences.setDouble(
-        Constants.ArmConstants.ARM_KV_KEY, Constants.ArmConstants.DEFAULT_KV_VOLTS_PER_SEC_PER_RAD);
+  /**
+   * Put tunable values into the Preferences table using default values, if the keys don't already
+   * exist.
+   */
+  public static void initPreferencesArray(PreferenceKeyValue[] prefPairs) {
+    for (PreferenceKeyValue keyValue : prefPairs) {
+      Preferences.initDouble(keyValue.getKey(), keyValue.getDefault());
+    }
   }
 
   /** Log the values of all entries in the Preferences table. */
