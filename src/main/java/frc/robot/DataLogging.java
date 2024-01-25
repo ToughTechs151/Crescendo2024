@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.Map;
@@ -169,6 +170,16 @@ public class DataLogging {
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
+
+    // Add buttons to reset preferences to the default constant values
+    sbCommandsTab
+        .add(
+            new InstantCommand(
+                    () ->
+                        RobotPreferences.resetPreferencesArray(
+                            Constants.ArmConstants.getArmPreferences()))
+                .withName("Reset Arm Preferences"))
+        .withSize(2, 1);
 
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
     // Start Pose command.  Using that command in simulation mode will cause the robot position
