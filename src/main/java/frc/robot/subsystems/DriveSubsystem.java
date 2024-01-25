@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -66,6 +65,9 @@ public class DriveSubsystem extends SubsystemBase {
   /** The scale factor for crawl mode. */
   private static final double CRAWL = 0.3;
 
+  // Flag to let simulation know when odometry was reset
+  boolean odometryReset = false;
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
 
@@ -113,10 +115,10 @@ public class DriveSubsystem extends SubsystemBase {
     this.odometry.update(
         this.gyro.getRotation2d(), frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
 
-    SmartDashboard.putNumber("temp left pos", frontLeftEncoder.getPosition());
-    SmartDashboard.putNumber("temp right pos", frontRightEncoder.getPosition());
-    SmartDashboard.putNumber("temp gyro angle", gyro.getAngle());
-    SmartDashboard.putNumber("temp gyro rate", gyro.getRate());
+    SmartDashboard.putNumber("Left pos", frontLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Right pos", frontRightEncoder.getPosition());
+    SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
+    SmartDashboard.putNumber("Gyro rate", gyro.getRate());
 
     SmartDashboard.putNumber("FL-Voltage", frontLeft.getBusVoltage());
     SmartDashboard.putNumber("FL-Current", frontLeft.getOutputCurrent());
@@ -198,6 +200,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    gyro.reset();
     this.odometry.resetPosition(
         this.gyro.getRotation2d(),
         frontLeftEncoder.getPosition(),
@@ -205,10 +209,7 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
 
     if (RobotBase.isSimulation()) {
-      // Using this command during simulation will cause the drive model to not be matched
-      // with the new robot pose, and boundary limits will not match the displayed field.
-      DataLogManager.log(
-          "Warning: Resetting odometry during simulation causes field boundary mismatch");
+      odometryReset = true;
     }
   }
 
@@ -251,6 +252,33 @@ public class DriveSubsystem extends SubsystemBase {
     this.drive.setMaxOutput(maxOutput);
   }
 
+  /**
+   * Gets the distance the left side wheels have moved since the encoder was last reset.
+   *
+   * @return the left wheel distance in meters.
+   */
+  public double getLeftDistanceMeters() {
+    return frontLeftEncoder.getPosition();
+  }
+
+  /**
+   * Gets the distance the right side wheels have moved since the encoder was last reset.
+   *
+   * @return the right wheel distance in meters.
+   */
+  public double getRightDistanceMeters() {
+    return frontRightEncoder.getPosition();
+  }
+
+  /**
+   * Gets the average distance the wheels have moved since the encoder was last reset.
+   *
+   * @return the average wheel distance in meters.
+   */
+  public double getAverageDistanceMeters() {
+    return (frontLeftEncoder.getPosition() + frontRightEncoder.getPosition()) / 2.0;
+  }
+
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     this.gyro.reset();
@@ -288,6 +316,17 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Disable the drive by setting motor output to zero. Any PID controllers should also be disabled
+   * here. NOTE: In this state the drive will roll to a stop if using coast mode. Using EMF braking
+   * mode will cause drive to stop quickly.
+   */
+  public void disable() {
+    tankDriveVolts(0, 0);
+  }
+
+  // The following methods are used for the simulation to get drive state
+
+  /**
    * Get the voltage command to the left motor.
    *
    * @return command to the left motor controller group in volts
@@ -306,11 +345,17 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Disable the drive by setting motor output to zero. Any PID controllers should also be disabled
-   * here. NOTE: In this state the drive will roll to a stop if using coast mode. Using EMF braking
-   * mode will cause drive to stop quickly.
+   * Get the state of odometry reset. This is used by simulation to determine when the drive model
+   * also needs to be reset to match.
+   *
+   * @return a flag indicating odometry was reset
    */
-  public void disable() {
-    tankDriveVolts(0, 0);
+  public boolean odometryWasReset() {
+    return odometryReset;
+  }
+
+  /** Clear the state of odometry reset. */
+  public void clearOdometryReset() {
+    odometryReset = false;
   }
 }
