@@ -31,6 +31,9 @@ public class RobotContainer {
   // The driver's controller
   private CommandXboxController driverController =
       new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
+  // The operator's controller
+  private CommandXboxController operatorController =
+      new CommandXboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
   // Now all the subsystems.
   // The Arm.
@@ -70,52 +73,51 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Move the arm to the low position when the 'A' button is pressed.
-    driverController
+    // Move the arm to the low position when the 'A' button is pressed on the operator's controller.
+    operatorController
         .a()
         .onTrue(
             robotArm
                 .moveToPosition(Constants.ArmConstants.ARM_LOW_POSITION)
                 .withName("Arm: Move to Low Position"));
 
-    // Move the arm to the high position when the 'B' button is pressed.
-    driverController
+    // Move the arm to the high position when the 'B' button is pressed on the operator's
+    // controller.
+    operatorController
         .b()
         .onTrue(
             robotArm
                 .moveToPosition(Constants.ArmConstants.ARM_HIGH_POSITION)
                 .withName("Arm: Move to High Position"));
 
-    // Shift position down a small amount when the POV Down is pressed.
-    driverController.povDown().onTrue(robotArm.shiftDown());
+    // Shift position down a small amount when the POV Down is pressed on the operator's controller.
+    operatorController.povDown().onTrue(robotArm.shiftDown());
 
-    // Shift position up a small amount when the POV Down is pressed.
-    driverController.povUp().onTrue(robotArm.shiftUp());
+    // Shift position up a small amount when the POV Down is pressed on the operator's controller.
+    operatorController.povUp().onTrue(robotArm.shiftUp());
 
-    // Disable the arm controller when the 'X' button is pressed.
+    // Disable the arm controller when the 'X' button is pressed on the operator's controller.
     // NOTE: This is intended for initial arm testing and should be removed in the final robot
     // to prevent accidental disable resulting in lowering of the arm.
-    driverController.x().onTrue(Commands.runOnce(robotArm::disable));
+    operatorController.x().onTrue(Commands.runOnce(robotArm::disable));
 
     // Move the elevator to the low position when the 'A' button is pressed.
     driverController
-        .povLeft()
+        .a()
         .onTrue(
             robotElevator
                 .moveToPosition(Constants.ElevatorConstants.ELEVATOR_LOW_POSITION)
                 .withName("Elevator: Move to Low Position"));
 
-    // Move the elevator to the high position when the 'B' button is pressed.
+    // Move the elevator to the high position when the 'Y' button is pressed.
     driverController
-        .povRight()
+        .y()
         .onTrue(
             robotElevator
                 .moveToPosition(Constants.ElevatorConstants.ELEVATOR_HIGH_POSITION)
                 .withName("Elevator: Move to High Position"));
 
     // Disable the elevator controller when the 'X' button is pressed.
-    // NOTE: This is intended for initial elevator testing and should be removed in the final robot
-    // to prevent accidental disable resulting in lowering of the elevator.
     driverController.x().onTrue(Commands.runOnce(robotElevator::disable));
   }
 

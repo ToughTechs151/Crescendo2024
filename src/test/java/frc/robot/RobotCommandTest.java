@@ -27,7 +27,8 @@ class RobotCommandTest {
   private RobotContainer container;
   private Thread competitionThread;
 
-  private XboxControllerSim xboxControllerSim;
+  private XboxControllerSim xboxDriverSim;
+  private XboxControllerSim xboxOperatorSim;
   private static final double POS_DELTA = 0.5;
   private static final double TIME_STEP = 0.05;
 
@@ -39,7 +40,8 @@ class RobotCommandTest {
     DriverStationSim.resetData();
     robot = new Robot();
     competitionThread = new Thread(robot::startCompetition);
-    xboxControllerSim = new XboxControllerSim(Constants.OIConstants.DRIVER_CONTROLLER_PORT);
+    xboxDriverSim = new XboxControllerSim(Constants.OIConstants.DRIVER_CONTROLLER_PORT);
+    xboxOperatorSim = new XboxControllerSim(Constants.OIConstants.OPERATOR_CONTROLLER_PORT);
 
     competitionThread.start();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
@@ -89,11 +91,11 @@ class RobotCommandTest {
     assertThat(arm.getVoltageCommand()).isZero();
 
     // Press and then release the B button to reach goal high position
-    xboxControllerSim.setBButton(true);
-    xboxControllerSim.notifyNewData();
+    xboxOperatorSim.setBButton(true);
+    xboxOperatorSim.notifyNewData();
     SimHooks.stepTiming(0.1);
-    xboxControllerSim.setBButton(false);
-    xboxControllerSim.notifyNewData();
+    xboxOperatorSim.setBButton(false);
+    xboxOperatorSim.notifyNewData();
 
     // advance to let arm reach the new goal
     SimHooks.stepTiming(3.0);
