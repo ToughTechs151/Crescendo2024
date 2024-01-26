@@ -103,18 +103,11 @@ public class ArmModel implements AutoCloseable {
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     mechArm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
-
-    updateShuffleboard();
   }
 
   /** Return the simulated current. */
   public double getSimCurrent() {
     return simCurrent;
-  }
-
-  public void updateShuffleboard() {
-
-    SmartDashboard.putNumber("Arm Sim Angle", Units.radiansToDegrees(armSim.getAngleRads())); // sim
   }
 
   @Override

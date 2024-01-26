@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import java.util.Map;
 
 /** The DataLogging class contains all the logic for using telemetry. */
@@ -37,7 +38,6 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
-  private ArmSubsystem arm;
 
   private DataLogging() {
     // Starts recording to data log
@@ -161,14 +161,14 @@ public class DataLogging {
    */
   public void dataLogRobotContainerInit(RobotContainer robotContainer) {
 
-    PowerDistribution pdp;
-    pdp = robotContainer.getPdp();
     drive = robotContainer.getDriveSubsystem();
-    arm = robotContainer.getArmSubsystem();
+    ArmSubsystem arm = robotContainer.getArmSubsystem();
+    ElevatorSubsystem elevator = robotContainer.getElevatorSubsystem();
 
     // Add widgets to the Commands tab
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
+    sbCommandsTab.add(elevator).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
 
     // Add buttons to reset preferences to the default constant values
@@ -181,6 +181,15 @@ public class DataLogging {
                 .withName("Reset Arm Preferences"))
         .withSize(2, 1);
 
+    sbCommandsTab
+        .add(
+            new InstantCommand(
+                    () ->
+                        RobotPreferences.resetPreferencesArray(
+                            Constants.ElevatorConstants.getElevatorPreferences()))
+                .withName("Reset Elevator Preferences"))
+        .withSize(2, 1);
+
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
     // Start Pose command.  Using that command in simulation mode will cause the robot position
     // to be displayed incorrectly on the field.
@@ -189,6 +198,7 @@ public class DataLogging {
     sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
 
     // Add hardware sendables here
+    PowerDistribution pdp = robotContainer.getPdp();
     pdpWidget.add("PDP", pdp);
 
     // Log configuration info here

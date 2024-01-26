@@ -6,7 +6,6 @@ package frc.sim;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -71,7 +70,6 @@ public class ElevatorModel implements AutoCloseable {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
     elevatorSim.setInput(elevatorSubsystem.getVoltageCommand());
-    SmartDashboard.putNumber("Elevator Sim Voltage", elevatorSubsystem.getVoltageCommand()); // sim
 
     // Next, we update it. The standard loop time is 20ms.
     elevatorSim.update(0.020);
@@ -89,18 +87,11 @@ public class ElevatorModel implements AutoCloseable {
 
     // Update elevator visualization with position
     elevatorMech2d.setLength(elevatorSim.getPositionMeters());
-    updateShuffleboard();
   }
 
   /** Return the simulated current. */
   public double getSimCurrent() {
     return simCurrent;
-  }
-
-  public void updateShuffleboard() {
-
-    SmartDashboard.putNumber(
-        "Elevator Sim Pos", Units.radiansToDegrees(elevatorSim.getPositionMeters())); // sim
   }
 
   @Override

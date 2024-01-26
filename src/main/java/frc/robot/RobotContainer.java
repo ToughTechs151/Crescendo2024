@@ -129,6 +129,7 @@ public class RobotContainer {
   public void disableSubsystems() {
     robotArm.disable();
     robotDrive.disable();
+    robotElevator.disable();
     DataLogManager.log("disableSubsystems");
   }
 
