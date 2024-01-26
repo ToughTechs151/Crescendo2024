@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -34,6 +35,9 @@ public class RobotContainer {
   // Now all the subsystems.
   // The Arm.
   private final ArmSubsystem robotArm = new ArmSubsystem(ArmSubsystem.initializeHardware());
+  // The Elevator.
+  private final ElevatorSubsystem robotElevator =
+      new ElevatorSubsystem(ElevatorSubsystem.initializeHardware());
   // The drive.
   private final DriveSubsystem robotDrive = new DriveSubsystem();
 
@@ -92,6 +96,27 @@ public class RobotContainer {
     // NOTE: This is intended for initial arm testing and should be removed in the final robot
     // to prevent accidental disable resulting in lowering of the arm.
     driverController.x().onTrue(Commands.runOnce(robotArm::disable));
+
+    // Move the elevator to the low position when the 'A' button is pressed.
+    driverController
+        .povLeft()
+        .onTrue(
+            robotElevator
+                .moveToPosition(Constants.ElevatorConstants.ELEVATOR_LOW_POSITION)
+                .withName("Elevator: Move to Low Position"));
+
+    // Move the elevator to the high position when the 'B' button is pressed.
+    driverController
+        .povRight()
+        .onTrue(
+            robotElevator
+                .moveToPosition(Constants.ElevatorConstants.ELEVATOR_HIGH_POSITION)
+                .withName("Elevator: Move to High Position"));
+
+    // Disable the elevator controller when the 'X' button is pressed.
+    // NOTE: This is intended for initial elevator testing and should be removed in the final robot
+    // to prevent accidental disable resulting in lowering of the elevator.
+    driverController.x().onTrue(Commands.runOnce(robotElevator::disable));
   }
 
   /**
@@ -145,5 +170,14 @@ public class RobotContainer {
    */
   public DriveSubsystem getDriveSubsystem() {
     return robotDrive;
+  }
+
+  /**
+   * Use this to get the Elevator Subsystem.
+   *
+   * @return the command to run in autonomous
+   */
+  public ElevatorSubsystem getElevatorSubsystem() {
+    return robotElevator;
   }
 }
