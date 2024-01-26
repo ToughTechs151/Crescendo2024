@@ -77,7 +77,8 @@ public class RobotContainer {
                 .moveToPosition(Constants.ArmConstants.ARM_LOW_POSITION)
                 .withName("Arm: Move to Low Position"));
 
-    // Move the arm to the high position when the 'B' button is pressed on the operator's controller.
+    // Move the arm to the high position when the 'B' button is pressed on the operator's
+    // controller.
     operatorController
         .b()
         .onTrue(
