@@ -28,6 +28,7 @@ class RobotCommandTest {
   private Thread competitionThread;
 
   private XboxControllerSim xboxControllerSim;
+  private XboxControllerSim xboxOperatorSim;
   private static final double POS_DELTA = 0.5;
   private static final double TIME_STEP = 0.05;
 
@@ -40,6 +41,7 @@ class RobotCommandTest {
     robot = new Robot();
     competitionThread = new Thread(robot::startCompetition);
     xboxControllerSim = new XboxControllerSim(Constants.OIConstants.DRIVER_CONTROLLER_PORT);
+    xboxOperatorSim = new XboxControllerSim(Constants.OIConstants.OPERATOR_CONTROLLER_PORT);
 
     competitionThread.start();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
