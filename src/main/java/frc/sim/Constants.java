@@ -42,7 +42,7 @@ public final class Constants {
     // Gain to apply to voltage command to get realistic current (0-1)
     public static final double VOLT_SCALE_FACTOR = 0.7;
   }
-  
+
   /** Elevator simulation constants. */
   public static final class ElevatorSimConstants {
     private ElevatorSimConstants() {

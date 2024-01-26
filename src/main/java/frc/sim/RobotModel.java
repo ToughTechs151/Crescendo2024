@@ -1,6 +1,6 @@
 package frc.sim;
 
-/* Code poached from https://github.com/RobotCasserole1736/TheBestSwerve2021 */
+/* PDP sim code poached from https://github.com/RobotCasserole1736/TheBestSwerve2021 */
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -16,6 +16,10 @@ public class RobotModel {
   // Mechanical arm driven by motor with gear reduction for simulation purposes.
   // Works in conjunction with ArmSubsystem
   ArmModel simArm;
+
+  // Mechanical elevator driven by motor with gear reduction for simulation purposes.
+  // Works in conjunction with ElevatorSubsystem
+  ElevatorModel simElevator;
 
   // Differential drive simulation. Works in conjunction with DriveSubsystem
   DrivetrainModel simDrivetrain;
@@ -44,6 +48,8 @@ public class RobotModel {
 
     simArm = new ArmModel(robot.getRobotContainer().getArmSubsystem());
 
+    simElevator = new ElevatorModel(robot.getRobotContainer().getElevatorSubsystem());
+
     simDrivetrain = new DrivetrainModel(robot.getRobotContainer().getDriveSubsystem());
 
     simpdp = new PDPSim(robot.getRobotContainer().getPdp());
@@ -58,13 +64,15 @@ public class RobotModel {
 
     // Update subsystem simulations
     simArm.updateSim();
+    simElevator.updateSim();
     simDrivetrain.updateSim();
 
     // Simulate battery voltage drop based on total simulated current
     double armCurrent = Math.abs(simArm.getSimCurrent());
+    double elevatorCurrent = Math.abs(simElevator.getSimCurrent());
     double leftDriveCurrent = Math.abs(simDrivetrain.getLeftSimCurrent());
     double rightDriveCurrent = Math.abs(simDrivetrain.getRightSimCurrent());
-    double[] simCurrents = {armCurrent, leftDriveCurrent, rightDriveCurrent};
+    double[] simCurrents = {armCurrent, elevatorCurrent, leftDriveCurrent, rightDriveCurrent};
 
     double unloadedVoltage = batteryVoltageV * 0.98 + ((random.nextDouble() / 10) - 0.05);
     double loadedVoltage =
@@ -75,6 +83,7 @@ public class RobotModel {
     simpdp.setVoltage(loadedVoltage);
     simpdp.setCurrent(0, currentDrawA + random.nextDouble());
     simpdp.setCurrent(7, armCurrent);
+    simpdp.setCurrent(8, elevatorCurrent);
     simpdp.setCurrent(10, leftDriveCurrent / 2);
     simpdp.setCurrent(11, leftDriveCurrent / 2);
     simpdp.setCurrent(12, rightDriveCurrent / 2);
