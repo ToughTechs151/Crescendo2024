@@ -2,6 +2,7 @@ package frc.sim;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 
 /** Constants utility class for the arm simulation. */
 public final class Constants {
@@ -40,5 +41,16 @@ public final class Constants {
     public static final double KA_ANGULAR = 0.3;
     // Gain to apply to voltage command to get realistic current (0-1)
     public static final double VOLT_SCALE_FACTOR = 0.7;
+  }
+
+  /** Elevator simulation constants. */
+  public static final class ElevatorSimConstants {
+    private ElevatorSimConstants() {
+      throw new IllegalStateException("ElevatorSimConstants Utility Class");
+    }
+
+    public static final double ELEVATOR_REDUCTION = 1 / ElevatorConstants.GEAR_RATIO;
+    public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(2.0);
+    public static final double CARRIAGE_MASS = 4.0; // kg
   }
 }
