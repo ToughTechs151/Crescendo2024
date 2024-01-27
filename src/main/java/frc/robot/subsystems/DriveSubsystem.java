@@ -85,10 +85,14 @@ public class DriveSubsystem extends SubsystemBase {
     rearRight.follow(frontRight);
 
     // Sets the distance per pulse for the encoders
-    this.frontLeftEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
-    this.rearLeftEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
-    this.frontRightEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
-    this.rearRightEncoder.setPositionConversionFactor(DriveConstants.ENCODER_DISTANCE_PER_REV);
+    this.frontLeftEncoder.setPositionConversionFactor(
+        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
+    this.rearLeftEncoder.setPositionConversionFactor(
+        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
+    this.frontRightEncoder.setPositionConversionFactor(
+        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
+    this.rearRightEncoder.setPositionConversionFactor(
+        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
     this.frontLeftEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
     this.rearLeftEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
     this.frontRightEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
@@ -152,15 +156,15 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Arcade drive method for differential drive platform.
    *
-   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
+   * @param speed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param rotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    * @param isCrawl If set, decreases the speed to crawl
    */
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs, boolean isCrawl) {
+  public void arcadeDrive(double speed, double rotation, boolean squareInputs, boolean isCrawl) {
     speedMultiplier = isCrawl ? CRAWL : NORMAL;
-    drive.arcadeDrive(xSpeed * speedMultiplier, zRotation * speedMultiplier, squareInputs);
+    drive.arcadeDrive(speed * speedMultiplier, rotation * speedMultiplier, squareInputs);
   }
 
   /**
