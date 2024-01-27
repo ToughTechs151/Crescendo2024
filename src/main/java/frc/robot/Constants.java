@@ -63,9 +63,10 @@ public final class Constants {
       throw new IllegalStateException("DriveConstants Utility class");
     }
 
-    public static final int FRONT_LEFT_MOTOR_PORT = 1;
-    public static final int REAR_LEFT_MOTOR_PORT = 2;
-    public static final int FRONT_RIGHT_MOTOR_PORT = 3;
+    // Motor Ports
+    public static final int FRONT_LEFT_MOTOR_PORT = 2;
+    public static final int REAR_LEFT_MOTOR_PORT = 3;
+    public static final int FRONT_RIGHT_MOTOR_PORT = 5;
     public static final int REAR_RIGHT_MOTOR_PORT = 4;
 
     // Distance between centers of right and left wheels on robot
