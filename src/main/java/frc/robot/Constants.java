@@ -70,9 +70,6 @@ public final class Constants {
     public static final int REAR_RIGHT_MOTOR_PORT = 4;
 
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE_METERS = 0.7;
-    // Distance between centers of front and back wheels on robot
-
     public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(22);
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
