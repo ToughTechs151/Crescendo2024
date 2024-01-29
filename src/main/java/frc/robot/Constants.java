@@ -126,16 +126,18 @@ public final class Constants {
       return ARM_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 1.0d / 200;
-    public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
+    // TO DO, Update this for the real design.
+    public static final double GEAR_RATIO = 12.0 * (46.0 / 18) * (46.0 / 18);
+    public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI / GEAR_RATIO;
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-45);
-    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(120);
+    public static final double ARM_FORWARD_POSITION = Units.degreesToRadians(-30);
+    public static final double ARM_BACK_POSITION =
+        ARM_FORWARD_POSITION + Units.degreesToRadians(191);
+    public static final double MIN_ANGLE_RADS = ARM_FORWARD_POSITION;
+    public static final double MAX_ANGLE_RADS = ARM_BACK_POSITION;
     public static final double ARM_OFFSET_RADS = MIN_ANGLE_RADS;
-    public static final double ARM_HIGH_POSITION = Units.degreesToRadians(45);
-    public static final double ARM_LOW_POSITION = Units.degreesToRadians(-40);
     public static final double POS_INCREMENT = Units.degreesToRadians(2); // For small adjustments
     public static final double POSITION_TOLERANCE = Units.degreesToRadians(1);
     public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1);

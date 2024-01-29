@@ -17,7 +17,7 @@ public final class Constants {
       throw new IllegalStateException("ArmSim Utility Class");
     }
 
-    public static final double ARM_REDUCTION = 1 / ArmConstants.GEAR_RATIO;
+    public static final double ARM_REDUCTION = ArmConstants.GEAR_RATIO;
     public static final double ARM_MASS_KG = 8.0;
     public static final double ARM_LENGTH_INCHES = 30;
     public static final double ARM_LENGTH_METERS = Units.inchesToMeters(ARM_LENGTH_INCHES);
@@ -25,7 +25,7 @@ public final class Constants {
     public static final int ENCODER_PRR =
         4096; // Only used to simulate noise in position measurement
     public static final double ENCODER_DISTANCE_PER_PULSE =
-        2.0 * Math.PI / ENCODER_PRR * ArmConstants.GEAR_RATIO;
+        2.0 * Math.PI / ENCODER_PRR / ArmConstants.GEAR_RATIO;
   }
 
   /** Drivetrain simulation constants. */
