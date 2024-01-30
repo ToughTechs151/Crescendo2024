@@ -154,6 +154,25 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Set the motor idle mode to brake or coast.
+   *
+   * @param enableBrake Enable motor braking when idle
+   */
+  public void setBrakeMode(boolean enableBrake) {
+    if (enableBrake) {
+      this.frontLeft.setIdleMode(IdleMode.kBrake);
+      this.frontRight.setIdleMode(IdleMode.kBrake);
+      this.rearLeft.setIdleMode(IdleMode.kBrake);
+      this.rearRight.setIdleMode(IdleMode.kBrake);
+    } else {
+      this.frontLeft.setIdleMode(IdleMode.kCoast);
+      this.frontRight.setIdleMode(IdleMode.kCoast);
+      this.rearLeft.setIdleMode(IdleMode.kCoast);
+      this.rearRight.setIdleMode(IdleMode.kCoast);
+    }
+  }
+
+  /**
    * Arcade drive method for differential drive platform.
    *
    * @param speed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
