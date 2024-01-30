@@ -91,7 +91,7 @@ class ArmSubsystemTest {
     moveCommand.execute();
     arm.periodic();
     readTelemetry();
-    assertThat(telemetryDoubleMap.get("Arm Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Arm Voltage")).isNegative();
     assertThat(telemetryBooleanMap.get("Arm Enabled")).isTrue();
 
     // When disabled mMotor should be commanded to zero
@@ -116,13 +116,13 @@ class ArmSubsystemTest {
     when(mockEncoder.getVelocity()).thenReturn(fakeVelocity);
 
     // The motor voltage should be set twice: once to 0 when configured and once  to a
-    // positive value when controller is run.
+    // negative value when controller is run.
     Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
     moveCommand.initialize();
     moveCommand.execute();
     verify(mockMotor, times(2)).setVoltage(anyDouble());
     verify(mockMotor).setVoltage(0.0);
-    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
+    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
 
     // This unused code is provided as an example of looking for a specific value.
     // This value was cheated by running working code as an example since calculating actual
@@ -177,8 +177,8 @@ class ArmSubsystemTest {
     arm.periodic();
     readTelemetry();
 
-    // Motor command should be positive to move arm up.
-    assertThat(telemetryDoubleMap.get("Arm Voltage")).isPositive();
+    // Motor command should be negative to hold arm up.
+    assertThat(telemetryDoubleMap.get("Arm Voltage")).isNegative();
     assertThat(telemetryBooleanMap.get("Arm Enabled")).isTrue();
   }
 
