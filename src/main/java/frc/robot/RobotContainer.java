@@ -16,6 +16,8 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,8 +43,14 @@ public class RobotContainer {
   // The Elevator.
   private final ElevatorSubsystem robotElevator =
       new ElevatorSubsystem(ElevatorSubsystem.initializeHardware());
-  // The drive.
+  // The Drive.
   private final DriveSubsystem robotDrive = new DriveSubsystem();
+  // The Launcher.
+  private final LauncherSubsystem robotLauncher =
+      new LauncherSubsystem(LauncherSubsystem.initializeHardware());
+  // The Intake.
+  private final IntakeSubsystem robotIntake =
+      new IntakeSubsystem(IntakeSubsystem.initializeHardware());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -119,6 +127,25 @@ public class RobotContainer {
 
     // Disable the elevator controller when the 'X' button is pressed.
     driverController.x().onTrue(Commands.runOnce(robotElevator::disable));
+
+    // Run the launcher at the defined speed while the right trigger is held.
+    operatorController
+        .rightTrigger()
+        .whileTrue(
+            robotLauncher
+                .runLauncher(Constants.LauncherConstants.LAUNCHER_FULL_SPEED)
+                .withName("Launcher: Run Full Speed"));
+
+    // Start the intake when the left bumper is pressed.
+    operatorController
+        .leftBumper()
+        .onTrue(
+            robotIntake
+                .runIntake(Constants.IntakeConstants.INTAKE_COMMAND_VOLTS)
+                .withName("Intake: Run"));
+
+    // Stop the intake when the right bumper is pressed.
+    operatorController.rightBumper().onTrue(robotIntake.stopIntake().withName("Intake: Stop"));
   }
 
   /**
@@ -182,5 +209,23 @@ public class RobotContainer {
    */
   public ElevatorSubsystem getElevatorSubsystem() {
     return robotElevator;
+  }
+
+  /**
+   * Use this to get the Intake Subsystem.
+   *
+   * @return a reference to the Intake Subsystem
+   */
+  public IntakeSubsystem getIntakeSubsystem() {
+    return robotIntake;
+  }
+
+  /**
+   * Use this to get the Launcher Subsystem.
+   *
+   * @return a reference to the Launcher Subsystem
+   */
+  public LauncherSubsystem getLauncherSubsystem() {
+    return robotLauncher;
   }
 }

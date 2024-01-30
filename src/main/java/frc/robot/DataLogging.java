@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 import java.util.Map;
 
 /** The DataLogging class contains all the logic for using telemetry. */
@@ -164,12 +166,16 @@ public class DataLogging {
     drive = robotContainer.getDriveSubsystem();
     ArmSubsystem arm = robotContainer.getArmSubsystem();
     ElevatorSubsystem elevator = robotContainer.getElevatorSubsystem();
+    IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
+    LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
 
     // Add widgets to the Commands tab
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
     sbCommandsTab.add(elevator).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
+    sbCommandsTab.add(intake).withSize(3, 1);
+    sbCommandsTab.add(launcher).withSize(3, 1);
 
     // Add buttons to reset preferences to the default constant values
     sbCommandsTab
@@ -188,6 +194,15 @@ public class DataLogging {
                         RobotPreferences.resetPreferencesArray(
                             Constants.ElevatorConstants.getElevatorPreferences()))
                 .withName("Reset Elevator Preferences"))
+        .withSize(2, 1);
+        
+    sbCommandsTab
+        .add(
+            new InstantCommand(
+                    () ->
+                        RobotPreferences.resetPreferencesArray(
+                            Constants.LauncherConstants.getLauncherPreferences()))
+                .withName("Reset Launcher Preferences"))
         .withSize(2, 1);
 
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
