@@ -17,21 +17,21 @@ public final class Constants {
       throw new IllegalStateException("ArmSim Utility Class");
     }
 
-    public static final double ARM_REDUCTION = 1 / ArmConstants.GEAR_RATIO;
+    public static final double ARM_REDUCTION = ArmConstants.GEAR_RATIO;
     public static final double ARM_MASS_KG = 8.0;
-    public static final double ARM_LENGTH_INCHES = 30;
+    public static final double ARM_LENGTH_INCHES = 20;
     public static final double ARM_LENGTH_METERS = Units.inchesToMeters(ARM_LENGTH_INCHES);
-    public static final double START_ANGLE_RADS = ArmConstants.MIN_ANGLE_RADS;
+    public static final double START_ANGLE_RADS = ArmConstants.MAX_ANGLE_RADS;
     public static final int ENCODER_PRR =
         4096; // Only used to simulate noise in position measurement
     public static final double ENCODER_DISTANCE_PER_PULSE =
-        2.0 * Math.PI / ENCODER_PRR * ArmConstants.GEAR_RATIO;
+        2.0 * Math.PI / ENCODER_PRR / ArmConstants.GEAR_RATIO;
   }
 
   /** Drivetrain simulation constants. */
   public static final class DriveSimConstants {
     private DriveSimConstants() {
-      throw new IllegalStateException("ArmSim Utility Class");
+      throw new IllegalStateException("DriveSim Utility Class");
     }
 
     public static final int NUM_MOTORS = 2;
@@ -49,7 +49,7 @@ public final class Constants {
       throw new IllegalStateException("ElevatorSimConstants Utility Class");
     }
 
-    public static final double ELEVATOR_REDUCTION = 1 / ElevatorConstants.GEAR_RATIO;
+    public static final double ELEVATOR_REDUCTION = ElevatorConstants.GEAR_RATIO;
     public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(2.0);
     public static final double CARRIAGE_MASS = 4.0; // kg
   }
