@@ -167,7 +167,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
     SmartDashboard.putBoolean("Launcher Enabled", launcherEnabled);
     SmartDashboard.putNumber("Launcher Setpoint", launcherController.getSetpoint());
-    SmartDashboard.putNumber("Launcher Velocity", launcherEncoder.getVelocity());
+    SmartDashboard.putNumber("Launcher Speed", launcherEncoder.getVelocity());
     SmartDashboard.putNumber("Launcher Voltage", launcherVoltageCommand);
     SmartDashboard.putNumber("Launcher Current", launcherMotor.getOutputCurrent());
     SmartDashboard.putNumber("Launcher Feedforward", newFeedforward);

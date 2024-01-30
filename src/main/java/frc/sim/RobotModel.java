@@ -25,7 +25,7 @@ public class RobotModel {
   DrivetrainModel simDrivetrain;
 
   // Mechanical intake driven by motor with gear reduction for simulation purposes.
-  // Works in conjunction with LauncherSubsystem
+  // Works in conjunction with IntakeSubsystem
   IntakeModel simIntake;
 
   // Mechanical launcher driven by motor with gear reduction for simulation purposes.
@@ -88,7 +88,14 @@ public class RobotModel {
     double rightDriveCurrent = Math.abs(simDrivetrain.getRightSimCurrent());
     double launcherCurrent = Math.abs(simLauncher.getSimCurrent());
     double intakeCurrent = Math.abs(simIntake.getSimCurrent());
-    double[] simCurrents = {armCurrent, elevatorCurrent, leftDriveCurrent, rightDriveCurrent, launcherCurrent, intakeCurrent};
+    double[] simCurrents = {
+      armCurrent,
+      elevatorCurrent,
+      leftDriveCurrent,
+      rightDriveCurrent,
+      launcherCurrent,
+      intakeCurrent
+    };
 
     double unloadedVoltage = batteryVoltageV * 0.98 + ((random.nextDouble() / 10) - 0.05);
     double loadedVoltage =

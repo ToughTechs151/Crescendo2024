@@ -66,7 +66,7 @@ public final class Constants {
     public static final double INTAKE_MOI_IN_LBS2 = 1.0;
     public static final double INTAKE_MOI_KG_METERS2 = INTAKE_MOI_IN_LBS2 * POUND_IN2_TO_KG_METERS2;
   }
-  
+
   /** Launcher simulation constants. */
   public static final class LauncherSimConstants {
     private LauncherSimConstants() {

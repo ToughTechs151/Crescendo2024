@@ -195,7 +195,7 @@ public class DataLogging {
                             Constants.ElevatorConstants.getElevatorPreferences()))
                 .withName("Reset Elevator Preferences"))
         .withSize(2, 1);
-        
+
     sbCommandsTab
         .add(
             new InstantCommand(
