@@ -119,6 +119,14 @@ public class Robot extends TimedRobot {
     if (this.autonomousCommand != null) {
       this.autonomousCommand.cancel();
     }
+
+    // Get selected drive mode and deadband from the SmartDashboard
+    Command driveCommand = robotContainer.getDriveCommand();
+
+    // schedule the drive command
+    if (driveCommand != null) {
+      driveCommand.schedule();
+    }
   }
 
   /** This function is called periodically during operator control. */

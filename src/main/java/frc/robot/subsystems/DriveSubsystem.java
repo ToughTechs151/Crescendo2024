@@ -55,16 +55,6 @@ public class DriveSubsystem extends SubsystemBase {
           frontLeftEncoder.getPosition(),
           frontRightEncoder.getPosition());
 
-  // drive constants
-  /** The scaling factor between the joystick value and the speed controller. */
-  private double speedMultiplier = 0.5;
-
-  /** The scale factor for normal mode. */
-  private static final double NORMAL = 1.0;
-
-  /** The scale factor for crawl mode. */
-  private static final double CRAWL = 0.3;
-
   // Flag to let simulation know when odometry was reset
   boolean odometryReset = false;
 
@@ -76,10 +66,10 @@ public class DriveSubsystem extends SubsystemBase {
     this.rearLeft.restoreFactoryDefaults();
     this.rearRight.restoreFactoryDefaults();
 
-    this.frontLeft.setIdleMode(IdleMode.kCoast);
-    this.frontRight.setIdleMode(IdleMode.kCoast);
-    this.rearLeft.setIdleMode(IdleMode.kCoast);
-    this.rearRight.setIdleMode(IdleMode.kCoast);
+    // Set the default brake mode to coast and disable the built in deadband since we will apply our
+    // own
+    setBrakeMode(false);
+    drive.setDeadband(0.0);
 
     rearLeft.follow(frontLeft);
     rearRight.follow(frontRight);
@@ -146,30 +136,10 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @param leftSpeed The left joystick controller speed -1 to 1
    * @param rightSpeed The right joystick controller speed -1 to 1
-   * @param isCrawl If set, decreases the speed to crawl
+   * @param squareInputs Enable squaring of the inputs
    */
-  public void tankDrive(double leftSpeed, double rightSpeed, boolean isCrawl) {
-    speedMultiplier = isCrawl ? CRAWL : NORMAL;
-    drive.tankDrive(leftSpeed * speedMultiplier, rightSpeed * speedMultiplier, true);
-  }
-
-  /**
-   * Set the motor idle mode to brake or coast.
-   *
-   * @param enableBrake Enable motor braking when idle
-   */
-  public void setBrakeMode(boolean enableBrake) {
-    if (enableBrake) {
-      this.frontLeft.setIdleMode(IdleMode.kBrake);
-      this.frontRight.setIdleMode(IdleMode.kBrake);
-      this.rearLeft.setIdleMode(IdleMode.kBrake);
-      this.rearRight.setIdleMode(IdleMode.kBrake);
-    } else {
-      this.frontLeft.setIdleMode(IdleMode.kCoast);
-      this.frontRight.setIdleMode(IdleMode.kCoast);
-      this.rearLeft.setIdleMode(IdleMode.kCoast);
-      this.rearRight.setIdleMode(IdleMode.kCoast);
-    }
+  public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
+    drive.tankDrive(leftSpeed, rightSpeed, squareInputs);
   }
 
   /**
@@ -179,11 +149,21 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rotation The robot's rotation rate around the Z axis [-1.0..1.0]. Counterclockwise is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @param isCrawl If set, decreases the speed to crawl
    */
-  public void arcadeDrive(double speed, double rotation, boolean squareInputs, boolean isCrawl) {
-    speedMultiplier = isCrawl ? CRAWL : NORMAL;
-    drive.arcadeDrive(speed * speedMultiplier, rotation * speedMultiplier, squareInputs);
+  public void arcadeDrive(double speed, double rotation, boolean squareInputs) {
+    drive.arcadeDrive(speed, rotation, squareInputs);
+  }
+
+  /**
+   * Controls the left and right sides of the drive directly with voltages.
+   *
+   * @param leftVolts the commanded left output
+   * @param rightVolts the commanded right output
+   */
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    frontLeft.setVoltage(leftVolts);
+    frontRight.setVoltage(rightVolts);
+    drive.feed();
   }
 
   /**
@@ -206,15 +186,22 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Controls the left and right sides of the drive directly with voltages.
+   * Set the motor idle mode to brake or coast.
    *
-   * @param leftVolts the commanded left output
-   * @param rightVolts the commanded right output
+   * @param enableBrake Enable motor braking when idle
    */
-  public void tankDriveVolts(double leftVolts, double rightVolts) {
-    frontLeft.setVoltage(leftVolts);
-    frontRight.setVoltage(rightVolts);
-    drive.feed();
+  public void setBrakeMode(boolean enableBrake) {
+    if (enableBrake) {
+      this.frontLeft.setIdleMode(IdleMode.kBrake);
+      this.frontRight.setIdleMode(IdleMode.kBrake);
+      this.rearLeft.setIdleMode(IdleMode.kBrake);
+      this.rearRight.setIdleMode(IdleMode.kBrake);
+    } else {
+      this.frontLeft.setIdleMode(IdleMode.kCoast);
+      this.frontRight.setIdleMode(IdleMode.kCoast);
+      this.rearLeft.setIdleMode(IdleMode.kCoast);
+      this.rearRight.setIdleMode(IdleMode.kCoast);
+    }
   }
 
   /**

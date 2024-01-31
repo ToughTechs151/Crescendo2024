@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
@@ -31,9 +31,6 @@ import frc.robot.subsystems.ElevatorSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  private SendableChooser<String> autoChooser = new SendableChooser<>();
-  private SendableChooser<String> driveChooser = new SendableChooser<>();
-
   // First we do things that are in all Robots.
   private PowerDistribution pdp = new PowerDistribution();
   // The driver's controller
@@ -42,6 +39,9 @@ public class RobotContainer {
   // The operator's controller
   private CommandXboxController operatorController =
       new CommandXboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
+
+  private double normalSpeedMax = 1.0;
+  private double crawlSpeedMax = 0.5;
 
   // Now all the subsystems.
   // The Arm.
@@ -52,14 +52,6 @@ public class RobotContainer {
   // The drive.
   private final DriveSubsystem robotDrive = new DriveSubsystem();
 
-  private double fullSpeedMax = 1.0;
-  private double crawlSpeedMax = 0.5;
-
-  // Slew rate limiters for joystick inputs (units/sec)
-  private SlewRateLimiter leftLimiter;
-  private SlewRateLimiter rightLimiter;
-  private SlewRateLimiter turnLimiter;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -67,8 +59,12 @@ public class RobotContainer {
     configureButtonBindings();
 
     this.robotDrive.setDefaultCommand(getDriveCommand());
+
+    // Disable the internal drive deadband so it can be applied directly to the joystick
+    this.robotDrive.setMaxOutput(normalSpeedMax);
   }
 
+  /** Setup the drive command using the tunable settings. */
   public Command getDriveCommand() {
 
     boolean squareInputs = SmartDashboard.getBoolean("Square Inputs", true);
@@ -77,27 +73,29 @@ public class RobotContainer {
     double turnFactor = SmartDashboard.getNumber("Turning Factor", 1.0);
     double slewLimitSpeed = SmartDashboard.getNumber("Slew Limit Speed", 100.0);
     double slewLimitTurn = SmartDashboard.getNumber("Slew Limit Turn", 100.0);
-    fullSpeedMax = SmartDashboard.getNumber("Full Speed", 1.0);
+    normalSpeedMax = SmartDashboard.getNumber("Normal Speed", 1.0);
     crawlSpeedMax = SmartDashboard.getNumber("Crawl Speed", 0.5);
 
-    leftLimiter = new SlewRateLimiter(slewLimitSpeed);
-    rightLimiter = new SlewRateLimiter(slewLimitSpeed);
-    turnLimiter = new SlewRateLimiter(slewLimitTurn);
+    // Slew rate limiters for joystick inputs (units/sec). For example if the limit=2.0, the input
+    // can go from 0 to 1 in 0.5 seconds.
+    SlewRateLimiter speedLimiter = new SlewRateLimiter(slewLimitSpeed);
+    SlewRateLimiter turnLimiter = new SlewRateLimiter(slewLimitTurn);
 
-    // A split-stick arcade command, with forward/backward controlled by the left
-    // hand, and turn rate controlled by the right. Right bumper enables
-    // crawl speed.
+    // A split-stick arcade command, with forward/backward controlled by the left hand, and turn
+    // rate controlled by the right. A deadband is applied to both joysticks to avoid creep due to
+    // off calibration. Slew rate limits are applied to speed and turn controls. An additional
+    // factor is used
+    // to desensitize turning. The motor brake mode is set when the command is initialized.
     return new FunctionalCommand(
             () -> this.robotDrive.setBrakeMode(enableBrake),
             () ->
                 this.robotDrive.arcadeDrive(
-                    -leftLimiter.calculate(
+                    -speedLimiter.calculate(
                         MathUtil.applyDeadband(this.driverController.getLeftY(), deadband)),
                     -turnFactor
                         * turnLimiter.calculate(
                             MathUtil.applyDeadband(this.driverController.getRightX(), deadband)),
-                    squareInputs,
-                    this.driverController.rightBumper().getAsBoolean()),
+                    squareInputs),
             interrupted -> {},
             () -> false,
             this.robotDrive)
@@ -111,6 +109,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Drive at low speed when the right bumper is held, otherwise allow normal speed.
+    driverController
+        .rightBumper()
+        .onTrue(new InstantCommand(() -> this.robotDrive.setMaxOutput(crawlSpeedMax)))
+        .onFalse(new InstantCommand(() -> this.robotDrive.setMaxOutput(normalSpeedMax)));
+
     // Move the arm to the low position when the 'A' button is pressed on the operator's controller.
     operatorController
         .a()
@@ -139,16 +143,14 @@ public class RobotContainer {
     // to prevent accidental disable resulting in lowering of the arm.
     operatorController.x().onTrue(Commands.runOnce(robotArm::disable));
 
-    // Put the choosers on the dashboard
-    SmartDashboard.putData(autoChooser);
-    SmartDashboard.putData(driveChooser);
+    // Put the tunable variables on the dashboard with default values
     SmartDashboard.putBoolean("Enable Brake", true);
     SmartDashboard.putBoolean("Square Inputs", true);
     SmartDashboard.putNumber("Deadband", 0.05);
     SmartDashboard.putNumber("Turning Factor", 1.0);
     SmartDashboard.putNumber("Slew Limit Speed", 100.0);
     SmartDashboard.putNumber("Slew Limit Turn", 100.0);
-    SmartDashboard.putNumber("Full Speed", 1.0);
+    SmartDashboard.putNumber("Normal Speed", 1.0);
     SmartDashboard.putNumber("Crawl Speed", 0.5);
 
     // Move the elevator to the low position when the 'A' button is pressed.
@@ -190,9 +192,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // Drive forward slowly unitl the robot moves 1 meter
-    return new RunCommand(
-            () -> this.robotDrive.arcadeDrive(0.1, 0.0, false, false), this.robotDrive)
-        .until(() -> robotDrive.getAverageDistanceMeters() > 0.5)
+    return new RunCommand(() -> this.robotDrive.arcadeDrive(0.3, 0.0, false), this.robotDrive)
+        .until(() -> robotDrive.getAverageDistanceMeters() > 1.0)
         .withTimeout(5)
         .andThen(() -> this.robotDrive.tankDriveVolts(0, 0))
         .withName("Drive Forward 1m");
