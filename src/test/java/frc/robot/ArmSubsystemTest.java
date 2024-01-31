@@ -75,7 +75,7 @@ class ArmSubsystemTest {
   void testMoveCommand() {
 
     // Create a command to move the arm then initialize
-    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_LOW_POSITION);
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
     moveCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
@@ -83,7 +83,7 @@ class ArmSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        Units.radiansToDegrees(ArmConstants.ARM_LOW_POSITION),
+        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION),
         telemetryDoubleMap.get("Arm Goal"),
         DELTA);
 
@@ -91,7 +91,7 @@ class ArmSubsystemTest {
     moveCommand.execute();
     arm.periodic();
     readTelemetry();
-    assertThat(telemetryDoubleMap.get("Arm Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Arm Voltage")).isNegative();
     assertThat(telemetryBooleanMap.get("Arm Enabled")).isTrue();
 
     // When disabled mMotor should be commanded to zero
@@ -116,13 +116,13 @@ class ArmSubsystemTest {
     when(mockEncoder.getVelocity()).thenReturn(fakeVelocity);
 
     // The motor voltage should be set twice: once to 0 when configured and once  to a
-    // positive value when controller is run.
-    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_LOW_POSITION);
+    // negative value when controller is run.
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
     moveCommand.initialize();
     moveCommand.execute();
     verify(mockMotor, times(2)).setVoltage(anyDouble());
     verify(mockMotor).setVoltage(0.0);
-    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
+    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
 
     // This unused code is provided as an example of looking for a specific value.
     // This value was cheated by running working code as an example since calculating actual
@@ -169,7 +169,7 @@ class ArmSubsystemTest {
         DELTA);
 
     // Verify that the hold command runs the controller
-    Command moveCommandHigh = arm.moveToPosition(Constants.ArmConstants.ARM_HIGH_POSITION);
+    Command moveCommandHigh = arm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION);
     Command holdCommand = arm.holdPosition();
     // Initialize to set goal but don't execute so hold can be checked
     moveCommandHigh.initialize();
@@ -177,15 +177,15 @@ class ArmSubsystemTest {
     arm.periodic();
     readTelemetry();
 
-    // Motor command should be positive to move arm up.
-    assertThat(telemetryDoubleMap.get("Arm Voltage")).isPositive();
+    // Motor command should be negative to hold arm up.
+    assertThat(telemetryDoubleMap.get("Arm Voltage")).isNegative();
     assertThat(telemetryBooleanMap.get("Arm Enabled")).isTrue();
   }
 
   @Test
   @DisplayName("Test shift down and up commands.")
   void testShiftDownCommand() {
-    Command moveCommand = arm.moveToPositionOrig(Constants.ArmConstants.ARM_LOW_POSITION);
+    Command moveCommand = arm.moveToPositionOrig(Constants.ArmConstants.ARM_FORWARD_POSITION);
     Command upCommand = arm.shiftUp();
 
     // Command to a position and then shift up
@@ -194,7 +194,7 @@ class ArmSubsystemTest {
     arm.periodic();
     readTelemetry();
     assertEquals(
-        Units.radiansToDegrees(ArmConstants.ARM_LOW_POSITION + ArmConstants.POS_INCREMENT),
+        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION + ArmConstants.POS_INCREMENT),
         telemetryDoubleMap.get("Arm Goal"),
         DELTA);
 
@@ -206,7 +206,7 @@ class ArmSubsystemTest {
     // Currently up and down increments are the same. Update if that changes.
     assertEquals(
         Units.radiansToDegrees(
-            ArmConstants.ARM_LOW_POSITION
+            ArmConstants.ARM_FORWARD_POSITION
                 + ArmConstants.POS_INCREMENT
                 - ArmConstants.POS_INCREMENT),
         telemetryDoubleMap.get("Arm Goal"),

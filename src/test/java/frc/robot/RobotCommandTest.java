@@ -100,13 +100,13 @@ class RobotCommandTest {
     // advance to let arm reach the new goal
     SimHooks.stepTiming(3.0);
 
-    assertEquals(Constants.ArmConstants.ARM_HIGH_POSITION, arm.getMeasurement(), POS_DELTA);
+    assertEquals(Constants.ArmConstants.ARM_BACK_POSITION, arm.getMeasurement(), POS_DELTA);
     assertTrue(arm.atGoalPosition());
 
     // advance further to see that arm is held.
     SimHooks.stepTiming(0.5);
 
-    assertEquals(Constants.ArmConstants.ARM_HIGH_POSITION, arm.getMeasurement(), POS_DELTA);
+    assertEquals(Constants.ArmConstants.ARM_BACK_POSITION, arm.getMeasurement(), POS_DELTA);
 
     // Disable the robot and check that motor command is 0
     DriverStationSim.setAutonomous(false);
