@@ -4,12 +4,17 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
@@ -37,6 +42,9 @@ public class RobotContainer {
   private CommandXboxController operatorController =
       new CommandXboxController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
+  private double normalSpeedMax = 1.0;
+  private double crawlSpeedMax = 0.5;
+
   // Now all the subsystems.
   // The Arm.
   private final ArmSubsystem robotArm = new ArmSubsystem(ArmSubsystem.initializeHardware());
@@ -58,20 +66,48 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Configure default commands
-    // Set the default drive command to split-stick tank drive
-    this.robotDrive.setDefaultCommand(
-        // A split-stick tank command, with left side forward/backward controlled by the left
-        // joystick, and right side controlled by the right joystick.
-        new RunCommand(
-                () ->
-                    this.robotDrive.arcadeDrive(
-                        -this.driverController.getLeftY(),
-                        -this.driverController.getRightX(),
-                        true,
-                        this.driverController.rightBumper().getAsBoolean()),
-                this.robotDrive)
-            .withName("Drive: Arcade"));
+    this.robotDrive.setDefaultCommand(getDriveCommand());
+
+    // Disable the internal drive deadband so it can be applied directly to the joystick
+    this.robotDrive.setMaxOutput(normalSpeedMax);
+  }
+
+  /** Setup the drive command using the tunable settings. */
+  public Command getDriveCommand() {
+
+    boolean squareInputs = SmartDashboard.getBoolean("Square Inputs", true);
+    boolean enableBrake = SmartDashboard.getBoolean("Enable Brake", true);
+    double deadband = SmartDashboard.getNumber("Deadband", 0.05);
+    double turnFactor = SmartDashboard.getNumber("Turning Factor", 1.0);
+    double slewLimitSpeed = SmartDashboard.getNumber("Slew Limit Speed", 100.0);
+    double slewLimitTurn = SmartDashboard.getNumber("Slew Limit Turn", 100.0);
+    normalSpeedMax = SmartDashboard.getNumber("Normal Speed", 1.0);
+    crawlSpeedMax = SmartDashboard.getNumber("Crawl Speed", 0.5);
+
+    // Slew rate limiters for joystick inputs (units/sec). For example if the limit=2.0, the input
+    // can go from 0 to 1 in 0.5 seconds.
+    SlewRateLimiter speedLimiter = new SlewRateLimiter(slewLimitSpeed);
+    SlewRateLimiter turnLimiter = new SlewRateLimiter(slewLimitTurn);
+
+    // A split-stick arcade command, with forward/backward controlled by the left hand, and turn
+    // rate controlled by the right. A deadband is applied to both joysticks to avoid creep due to
+    // off calibration. Slew rate limits are applied to speed and turn controls. An additional
+    // factor is used
+    // to desensitize turning. The motor brake mode is set when the command is initialized.
+    return new FunctionalCommand(
+            () -> this.robotDrive.setBrakeMode(enableBrake),
+            () ->
+                this.robotDrive.arcadeDrive(
+                    -speedLimiter.calculate(
+                        MathUtil.applyDeadband(this.driverController.getLeftY(), deadband)),
+                    -turnFactor
+                        * turnLimiter.calculate(
+                            MathUtil.applyDeadband(this.driverController.getRightX(), deadband)),
+                    squareInputs),
+            interrupted -> {},
+            () -> false,
+            this.robotDrive)
+        .withName("Arcade");
   }
 
   /**
@@ -81,6 +117,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Drive at low speed when the right bumper is held, otherwise allow normal speed.
+    driverController
+        .rightBumper()
+        .onTrue(new InstantCommand(() -> this.robotDrive.setMaxOutput(crawlSpeedMax)))
+        .onFalse(new InstantCommand(() -> this.robotDrive.setMaxOutput(normalSpeedMax)));
+
     // Move the arm to the low position when the 'A' button is pressed on the operator's controller.
     operatorController
         .a()
@@ -108,6 +150,16 @@ public class RobotContainer {
     // NOTE: This is intended for initial arm testing and should be removed in the final robot
     // to prevent accidental disable resulting in lowering of the arm.
     operatorController.x().onTrue(Commands.runOnce(robotArm::disable));
+
+    // Put the tunable variables on the dashboard with default values
+    SmartDashboard.putBoolean("Enable Brake", true);
+    SmartDashboard.putBoolean("Square Inputs", true);
+    SmartDashboard.putNumber("Deadband", 0.05);
+    SmartDashboard.putNumber("Turning Factor", 1.0);
+    SmartDashboard.putNumber("Slew Limit Speed", 100.0);
+    SmartDashboard.putNumber("Slew Limit Turn", 100.0);
+    SmartDashboard.putNumber("Normal Speed", 1.0);
+    SmartDashboard.putNumber("Crawl Speed", 0.5);
 
     // Move the elevator to the low position when the 'A' button is pressed.
     driverController
@@ -169,9 +221,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // Drive forward slowly unitl the robot moves 1 meter
-    return new RunCommand(
-            () -> this.robotDrive.arcadeDrive(0.1, 0.0, false, false), this.robotDrive)
-        .until(() -> robotDrive.getAverageDistanceMeters() > 0.5)
+    return new RunCommand(() -> this.robotDrive.arcadeDrive(0.3, 0.0, false), this.robotDrive)
+        .until(() -> robotDrive.getAverageDistanceMeters() > 1.0)
         .withTimeout(5)
         .andThen(() -> this.robotDrive.tankDriveVolts(0, 0))
         .withName("Drive Forward 1m");
