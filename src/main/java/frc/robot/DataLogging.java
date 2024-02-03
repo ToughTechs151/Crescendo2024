@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 import java.util.Map;
 
 /** The DataLogging class contains all the logic for using telemetry. */
@@ -163,7 +163,7 @@ public class DataLogging {
 
     drive = robotContainer.getDriveSubsystem();
     ArmSubsystem arm = robotContainer.getArmSubsystem();
-    ElevatorSubsystem elevator = robotContainer.getElevatorSubsystem();
+    ClimberSubsystem elevator = robotContainer.getElevatorSubsystem();
 
     // Add widgets to the Commands tab
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
@@ -186,7 +186,7 @@ public class DataLogging {
             new InstantCommand(
                     () ->
                         RobotPreferences.resetPreferencesArray(
-                            Constants.ElevatorConstants.getElevatorPreferences()))
+                            Constants.ClimberConstants.getClimberPreferences()))
                 .withName("Reset Elevator Preferences"))
         .withSize(2, 1);
 

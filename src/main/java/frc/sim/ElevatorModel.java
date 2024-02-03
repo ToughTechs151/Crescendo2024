@@ -13,14 +13,14 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants.ClimberConstants;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.sim.Constants.ElevatorSimConstants;
 
 /** A robot arm simulation based on a linear system model with Mech2d display. */
 public class ElevatorModel implements AutoCloseable {
 
-  private final ElevatorSubsystem elevatorSubsystem;
+  private final ClimberSubsystem elevatorSubsystem;
   private double simCurrent = 0.0;
   private CANSparkMaxSim sparkSim;
 
@@ -35,8 +35,8 @@ public class ElevatorModel implements AutoCloseable {
           ElevatorSimConstants.ELEVATOR_REDUCTION,
           ElevatorSimConstants.CARRIAGE_MASS,
           ElevatorSimConstants.ELEVATOR_DRUM_RADIUS,
-          ElevatorConstants.ELEVATOR_MIN_HEIGHT_METERS,
-          ElevatorConstants.ELEVATOR_MAX_HEIGHT_METERS,
+          ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
+          ClimberConstants.CLIMBER_MAX_HEIGHT_METERS,
           true,
           0,
           VecBuilder.fill(0.002));
@@ -48,7 +48,7 @@ public class ElevatorModel implements AutoCloseable {
       mech2dRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90));
 
   /** Create a new ElevatorModel. */
-  public ElevatorModel(ElevatorSubsystem elevatorSubsystemToSimulate) {
+  public ElevatorModel(ClimberSubsystem elevatorSubsystemToSimulate) {
 
     elevatorSubsystem = elevatorSubsystemToSimulate;
     simulationInit();
@@ -62,7 +62,7 @@ public class ElevatorModel implements AutoCloseable {
   public void simulationInit() {
 
     // Setup a simulation of the CANSparkMax and methods to set values
-    sparkSim = new CANSparkMaxSim(ElevatorConstants.MOTOR_PORT);
+    sparkSim = new CANSparkMaxSim(ClimberConstants.MOTOR_PORT);
   }
 
   /** Update the simulation model. */

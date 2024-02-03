@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -39,8 +39,8 @@ public class RobotContainer {
   // The Arm.
   private final ArmSubsystem robotArm = new ArmSubsystem(ArmSubsystem.initializeHardware());
   // The Elevator.
-  private final ElevatorSubsystem robotElevator =
-      new ElevatorSubsystem(ElevatorSubsystem.initializeHardware());
+  private final ClimberSubsystem robotElevator =
+      new ClimberSubsystem(ClimberSubsystem.initializeHardware());
   // The drive.
   private final DriveSubsystem robotDrive = new DriveSubsystem();
 
@@ -106,7 +106,7 @@ public class RobotContainer {
         .a()
         .onTrue(
             robotElevator
-                .moveToPosition(Constants.ElevatorConstants.ELEVATOR_LOW_POSITION)
+                .moveToPosition(Constants.ClimberConstants.CLIMBER_LOW_POSITION)
                 .withName("Elevator: Move to Low Position"));
 
     // Move the elevator to the high position when the 'Y' button is pressed.
@@ -114,7 +114,7 @@ public class RobotContainer {
         .y()
         .onTrue(
             robotElevator
-                .moveToPosition(Constants.ElevatorConstants.ELEVATOR_HIGH_POSITION)
+                .moveToPosition(Constants.ClimberConstants.CLIMBER_HIGH_POSITION)
                 .withName("Elevator: Move to High Position"));
 
     // Disable the elevator controller when the 'X' button is pressed.
@@ -180,7 +180,7 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public ElevatorSubsystem getElevatorSubsystem() {
+  public ClimberSubsystem getElevatorSubsystem() {
     return robotElevator;
   }
 }

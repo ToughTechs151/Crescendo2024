@@ -142,10 +142,10 @@ public final class Constants {
   }
 
   /** Constants used for the Elevator subsystem. */
-  public static final class ElevatorConstants {
+  public static final class ClimberConstants {
 
-    private ElevatorConstants() {
-      throw new IllegalStateException("ElevatorConstants Utility Class");
+    private ClimberConstants() {
+      throw new IllegalStateException("ClimberConstants Utility Class");
     }
 
     // These are fake gains; in actuality these must be determined individually for each robot
@@ -154,39 +154,39 @@ public final class Constants {
     public static final int ENCODER_B_CHANNEL = 1;
 
     // Constants tunable through preferences
-    public static final PreferenceKeyValue ELEVATOR_KP = new PreferenceKeyValue("ElevatorKP", 15.0);
-    public static final PreferenceKeyValue ELEVATOR_KS = new PreferenceKeyValue("ElevatorKS", 0.1);
-    public static final PreferenceKeyValue ELEVATOR_KG = new PreferenceKeyValue("ElevatorKG", 0.55);
-    public static final PreferenceKeyValue ELEVATOR_KV_VOLTS_PER_METER_PER_SEC =
-        new PreferenceKeyValue("ElevatorKV", 12.0);
-    public static final PreferenceKeyValue ELEVATOR_MAX_VELOCITY_METERS_PER_SEC =
-        new PreferenceKeyValue("ElevatorVelocityMax", 0.2);
-    public static final PreferenceKeyValue ELEVATOR_MAX_ACCELERATION_METERS_PER_SEC2 =
-        new PreferenceKeyValue("ElevatorAccelerationMax", 0.5);
+    public static final PreferenceKeyValue CLIMBER_KP = new PreferenceKeyValue("ClimberKP", 15.0);
+    public static final PreferenceKeyValue CLIMBER_KS = new PreferenceKeyValue("ClimberKS", 0.1);
+    public static final PreferenceKeyValue CLIMBER_KG = new PreferenceKeyValue("ClimberKG", 0.55);
+    public static final PreferenceKeyValue CLIMBER_KV_VOLTS_PER_METER_PER_SEC =
+        new PreferenceKeyValue("ClimberKV", 12.0);
+    public static final PreferenceKeyValue CLIMBER_MAX_VELOCITY_METERS_PER_SEC =
+        new PreferenceKeyValue("ClimberVelocityMax", 0.2);
+    public static final PreferenceKeyValue CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2 =
+        new PreferenceKeyValue("ClimberAccelerationMax", 0.5);
 
-    private static final PreferenceKeyValue[] ELEVATOR_PREFERENCES = {
-      ELEVATOR_KP,
-      ELEVATOR_KS,
-      ELEVATOR_KG,
-      ELEVATOR_KV_VOLTS_PER_METER_PER_SEC,
-      ELEVATOR_MAX_VELOCITY_METERS_PER_SEC,
-      ELEVATOR_MAX_ACCELERATION_METERS_PER_SEC2
+    private static final PreferenceKeyValue[] CLIMBER_PREFERENCES = {
+      CLIMBER_KP,
+      CLIMBER_KS,
+      CLIMBER_KG,
+      CLIMBER_KV_VOLTS_PER_METER_PER_SEC,
+      CLIMBER_MAX_VELOCITY_METERS_PER_SEC,
+      CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2
     };
 
-    public static PreferenceKeyValue[] getElevatorPreferences() {
-      return ELEVATOR_PREFERENCES;
+    public static PreferenceKeyValue[] getClimberPreferences() {
+      return CLIMBER_PREFERENCES;
     }
 
     public static final double GEAR_RATIO = 1.0d / 32;
-    public static final double ELEVATOR_METERS_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
-    public static final double RPM_TO_METERS_PER_SEC = ELEVATOR_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double ELEVATOR_HIGH_POSITION = 0.8;
-    public static final double ELEVATOR_LOW_POSITION = 0.2;
-    public static final double ELEVATOR_OFFSET_RADS = 0.0;
+    public static final double CLIMBER_METERS_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
+    public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
+    public static final double CLIMBER_HIGH_POSITION = 0.8;
+    public static final double CLIMBER_LOW_POSITION = 0.2;
+    public static final double CLIMBER_OFFSET_RADS = 0.0;
 
     // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-    public static final double ELEVATOR_MIN_HEIGHT_METERS = 0.0;
-    public static final double ELEVATOR_MAX_HEIGHT_METERS = 1.25;
+    public static final double CLIMBER_MIN_HEIGHT_METERS = 0.0;
+    public static final double CLIMBER_MAX_HEIGHT_METERS = 1.25;
 
     public static final double POSITION_TOLERANCE_METERS = 0.03;
     public static final double VELOCITY_TOLERANCE_METERS = 0.01;
