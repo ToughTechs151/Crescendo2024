@@ -126,21 +126,22 @@ public final class Constants {
       return ARM_PREFERENCES;
     }
 
-    // TO DO, Update this for the real design.
-    public static final double GEAR_RATIO = 12.0 * (46.0 / 18) * (46.0 / 18);
+    // Use this for the arm test rig
+    // public static final double GEAR_RATIO = 12.0 * (46.0 / 18) * (46.0 / 18);
+
+    public static final double GEAR_RATIO = 100;
     public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI / GEAR_RATIO;
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double ARM_FORWARD_POSITION = Units.degreesToRadians(-25);
-    public static final double ARM_BACK_POSITION =
-        ARM_FORWARD_POSITION + Units.degreesToRadians(180);
-    public static final double MIN_ANGLE_RADS = ARM_FORWARD_POSITION - Units.degreesToRadians(5.0);
-    public static final double MAX_ANGLE_RADS = ARM_BACK_POSITION + Units.degreesToRadians(5.0);
+    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(0.0);
+    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(130.0);
+    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-5.0);
+    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(155.0);
     public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
-    public static final double POS_INCREMENT = Units.degreesToRadians(2); // For small adjustments
-    public static final double POSITION_TOLERANCE = Units.degreesToRadians(1);
-    public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1);
+    public static final double POS_INCREMENT = Units.degreesToRadians(2.0); // For small adjustments
+    public static final double POSITION_TOLERANCE = Units.degreesToRadians(1.0);
+    public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1.0);
   }
   /** Constants used for the Launcher subsystem. */
   public static final class IntakeConstants {
@@ -149,7 +150,7 @@ public final class Constants {
       throw new IllegalStateException("IntakeConstants Utility Class");
     }
 
-    public static final int INTAKE_MOTOR_PORT = 8;
+    public static final int INTAKE_MOTOR_PORT = 7;
     public static final double INTAKE_GEAR_RATIO =
         1.0; // Ratio of motor rotations to output rotations
     public static final double INTAKE_COMMAND_VOLTS = 12.0;
@@ -161,8 +162,8 @@ public final class Constants {
     private LauncherConstants() {
       throw new IllegalStateException("LauncherConstants Utility Class");
     }
-
-    public static final int LAUNCHER_MOTOR_PORT = 9;
+    // TEMPORARY FOR TESTING
+    public static final int LAUNCHER_MOTOR_PORT = 10;
 
     // These are fake gains; in actuality these must be determined individually for each robot
     // Constants tunable through preferences
@@ -183,8 +184,9 @@ public final class Constants {
       return LAUNCHER_PREFERENCES;
     }
 
+    // TEMPORARY FOR TESTING
     public static final double LAUNCHER_GEAR_RATIO =
-        3.0; // Ratio of motor rotations to output rotations
+        12.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0d / LAUNCHER_GEAR_RATIO;
     public static final double LAUNCHER_TOLERANCE_RPM = 20;
     public static final double LAUNCHER_FULL_SPEED = 600;

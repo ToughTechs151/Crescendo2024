@@ -128,7 +128,7 @@ public class RobotContainer {
         .a()
         .onTrue(
             robotArm
-                .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION)
+                .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                 .withName("Arm: Move to Forward Position"));
 
     // Move the arm to the high position when the 'B' button is pressed on the operator's
@@ -137,7 +137,7 @@ public class RobotContainer {
         .b()
         .onTrue(
             robotArm
-                .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION)
+                .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
                 .withName("Arm: Move to Back Position"));
 
     // Shift position down a small amount when the POV Down is pressed on the operator's controller.

@@ -121,8 +121,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
     RobotPreferences.initPreferencesArray(LauncherConstants.getLauncherPreferences());
 
-    initLauncherEncoder();
     initLauncherMotor();
+    initLauncherEncoder();
 
     // Set tolerances that will be used to determine when the launcher is at the goal velocity.
     launcherController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);

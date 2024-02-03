@@ -140,8 +140,8 @@ public class ElevatorSubsystem extends SubsystemBase implements AutoCloseable {
 
     RobotPreferences.initPreferencesArray(ElevatorConstants.getElevatorPreferences());
 
-    initEncoder();
     initMotor();
+    initEncoder();
 
     // Set tolerances that will be used to determine when the elevator is at the goal position.
     elevatorController.setTolerance(
