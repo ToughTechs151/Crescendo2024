@@ -22,26 +22,6 @@ public final class Constants {
     throw new IllegalStateException("Utility class");
   }
 
-  // Joystick Axes
-  public static final int LEFT_X = 0;
-  public static final int LEFT_Y = 1;
-  public static final int LEFT_TRIGGER = 2;
-  public static final int RIGHT_TRIGGER = 3;
-  public static final int RIGHT_X = 4;
-  public static final int RIGHT_Y = 5;
-
-  // Joystick Buttons
-  public static final int JS_A = 1;
-  public static final int JS_B = 2;
-  public static final int JS_X = 3;
-  public static final int JS_Y = 4;
-  public static final int JS_LB = 5;
-  public static final int JS_RB = 6;
-  public static final int JS_BACK = 7;
-  public static final int JS_START = 8;
-  public static final int JS_L_STICK = 9;
-  public static final int JS_R_STICK = 10;
-
   // Run time options
 
   // Set to true to log Joystick data. To false otherwise.
@@ -104,10 +84,10 @@ public final class Constants {
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 3.0);
-    public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.5);
-    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 1.25);
+    public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.2);
+    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 2.15);
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmKV", 0.8);
+        new PreferenceKeyValue("ArmKV", 0.6);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
         new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
@@ -126,22 +106,71 @@ public final class Constants {
       return ARM_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 1.0d / 200;
-    public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
+    // TO DO, Update this for the real design.
+    public static final double GEAR_RATIO = 12.0 * (46.0 / 18) * (46.0 / 18);
+    public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI / GEAR_RATIO;
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-45);
-    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(120);
-    public static final double ARM_OFFSET_RADS = MIN_ANGLE_RADS;
-    public static final double ARM_HIGH_POSITION = Units.degreesToRadians(45);
-    public static final double ARM_LOW_POSITION = Units.degreesToRadians(-40);
+    public static final double ARM_FORWARD_POSITION = Units.degreesToRadians(-25);
+    public static final double ARM_BACK_POSITION =
+        ARM_FORWARD_POSITION + Units.degreesToRadians(180);
+    public static final double MIN_ANGLE_RADS = ARM_FORWARD_POSITION - Units.degreesToRadians(5.0);
+    public static final double MAX_ANGLE_RADS = ARM_BACK_POSITION + Units.degreesToRadians(5.0);
+    public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
     public static final double POS_INCREMENT = Units.degreesToRadians(2); // For small adjustments
     public static final double POSITION_TOLERANCE = Units.degreesToRadians(1);
     public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1);
   }
+  /** Constants used for the Launcher subsystem. */
+  public static final class IntakeConstants {
 
-  /** Constants used for the Elevator subsystem. */
+    private IntakeConstants() {
+      throw new IllegalStateException("IntakeConstants Utility Class");
+    }
+
+    public static final int INTAKE_MOTOR_PORT = 7;
+    public static final double INTAKE_GEAR_RATIO =
+        1.0; // Ratio of motor rotations to output rotations
+    public static final double INTAKE_COMMAND_VOLTS = 12.0;
+  }
+
+  /** Constants used for the Launcher subsystem. */
+  public static final class LauncherConstants {
+
+    private LauncherConstants() {
+      throw new IllegalStateException("LauncherConstants Utility Class");
+    }
+
+    public static final int LAUNCHER_MOTOR_PORT = 10;
+
+    // These are fake gains; in actuality these must be determined individually for each robot
+    // Constants tunable through preferences
+    public static final PreferenceKeyValue LAUNCHER_KP =
+        new PreferenceKeyValue("LauncherKP", 6.0d / 1000);
+    public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
+        new PreferenceKeyValue("LauncherKS", 0.0);
+    public static final PreferenceKeyValue LAUNCHER_KV_VOLTS_PER_RPM =
+        new PreferenceKeyValue("LauncherKV", 6.0d / 1000);
+    public static final PreferenceKeyValue LAUNCHER_KA_VOLTS_PER_RPM2 =
+        new PreferenceKeyValue("LauncherKA", 0.0d / 1000);
+
+    private static final PreferenceKeyValue[] LAUNCHER_PREFERENCES = {
+      LAUNCHER_KP, LAUNCHER_KS_VOLTS, LAUNCHER_KV_VOLTS_PER_RPM, LAUNCHER_KA_VOLTS_PER_RPM2
+    };
+
+    public static PreferenceKeyValue[] getLauncherPreferences() {
+      return LAUNCHER_PREFERENCES;
+    }
+
+    public static final double LAUNCHER_GEAR_RATIO =
+        3.0; // Ratio of motor rotations to output rotations
+    public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0d / LAUNCHER_GEAR_RATIO;
+    public static final double LAUNCHER_TOLERANCE_RPM = 20;
+    public static final double LAUNCHER_FULL_SPEED = 600;
+  }
+
+  /** Constants used for the Climber subsystem. */
   public static final class ClimberConstants {
 
     private ClimberConstants() {
@@ -149,9 +178,8 @@ public final class Constants {
     }
 
     // These are fake gains; in actuality these must be determined individually for each robot
-    public static final int MOTOR_PORT = 8;
-    public static final int ENCODER_A_CHANNEL = 0;
-    public static final int ENCODER_B_CHANNEL = 1;
+    public static final int LEFT_MOTOR_PORT = 8;
+    public static final int RIGHT_MOTOR_PORT = 9;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue CLIMBER_KP = new PreferenceKeyValue("ClimberKP", 15.0);
@@ -177,7 +205,7 @@ public final class Constants {
       return CLIMBER_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 1.0d / 32;
+    public static final double GEAR_RATIO = 32.0;
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
     public static final double CLIMBER_HIGH_POSITION = 0.8;

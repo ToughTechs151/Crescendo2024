@@ -195,8 +195,9 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
    * @return Hardware object containing all necessary devices for this subsystem
    */
   public static Hardware initializeHardware() {
-    CANSparkMax motorLeft = new CANSparkMax(ClimberConstants.MOTOR_PORT, MotorType.kBrushless);
-    CANSparkMax motorRight = new CANSparkMax(ClimberConstants.MOTOR_PORT, MotorType.kBrushless);
+    CANSparkMax motorLeft = new CANSparkMax(ClimberConstants.LEFT_MOTOR_PORT, MotorType.kBrushless);
+    CANSparkMax motorRight =
+        new CANSparkMax(ClimberConstants.RIGHT_MOTOR_PORT, MotorType.kBrushless);
     RelativeEncoder encoderLeft = motorLeft.getEncoder();
     RelativeEncoder encoderRight = motorRight.getEncoder();
 
