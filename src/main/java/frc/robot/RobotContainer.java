@@ -48,10 +48,10 @@ public class RobotContainer {
   // Now all the subsystems.
   // The Arm.
   private final ArmSubsystem robotArm = new ArmSubsystem(ArmSubsystem.initializeHardware());
-  // The Elevator.
-  private final ClimberSubsystem robotElevator =
+  // The Climber.
+  private final ClimberSubsystem robotClimber =
       new ClimberSubsystem(ClimberSubsystem.initializeHardware());
-  // The drive.
+  // The Drive.
   private final DriveSubsystem robotDrive = new DriveSubsystem();
   // The Launcher.
   private final LauncherSubsystem robotLauncher =
@@ -161,24 +161,24 @@ public class RobotContainer {
     SmartDashboard.putNumber("Normal Speed", 1.0);
     SmartDashboard.putNumber("Crawl Speed", 0.5);
 
-    // Move the elevator to the low position when the 'A' button is pressed.
+    // Move the climber to the low position when the 'A' button is pressed.
     driverController
         .a()
         .onTrue(
-            robotElevator
+            robotClimber
                 .moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS)
                 .withName("Climber: Lower"));
 
-    // Move the elevator to the high position when the 'Y' button is pressed.
+    // Move the climber to the high position when the 'Y' button is pressed.
     driverController
         .y()
         .onTrue(
-            robotElevator
+            robotClimber
                 .moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS)
                 .withName("Climber: Pull Up"));
 
-    // Disable the elevator controller when the 'X' button is pressed.
-    driverController.x().onTrue(Commands.runOnce(robotElevator::disable));
+    // Disable the climber controller when the 'X' button is pressed.
+    driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
 
     // Run the launcher at the defined speed while the right trigger is held.
     operatorController
@@ -208,7 +208,7 @@ public class RobotContainer {
   public void disableSubsystems() {
     robotArm.disable();
     robotDrive.disable();
-    robotElevator.disable();
+    robotClimber.disable();
     robotIntake.disableIntake();
     robotLauncher.disableLauncher();
     DataLogManager.log("disableSubsystems");
@@ -256,12 +256,12 @@ public class RobotContainer {
   }
 
   /**
-   * Use this to get the Elevator Subsystem.
+   * Use this to get the Climber Subsystem.
    *
-   * @return the command to run in autonomous
+   * @return a reference to the Climber Subsystem
    */
-  public ClimberSubsystem getElevatorSubsystem() {
-    return robotElevator;
+  public ClimberSubsystem getClimberSubsystem() {
+    return robotClimber;
   }
 
   /**

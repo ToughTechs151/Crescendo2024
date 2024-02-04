@@ -165,14 +165,14 @@ public class DataLogging {
 
     drive = robotContainer.getDriveSubsystem();
     ArmSubsystem arm = robotContainer.getArmSubsystem();
-    ClimberSubsystem elevator = robotContainer.getElevatorSubsystem();
+    ClimberSubsystem climber = robotContainer.getClimberSubsystem();
     IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
 
     // Add widgets to the Commands tab
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
-    sbCommandsTab.add(elevator).withSize(3, 1);
+    sbCommandsTab.add(climber).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
     sbCommandsTab.add(intake).withSize(3, 1);
     sbCommandsTab.add(launcher).withSize(3, 1);
@@ -193,7 +193,7 @@ public class DataLogging {
                     () ->
                         RobotPreferences.resetPreferencesArray(
                             Constants.ClimberConstants.getClimberPreferences()))
-                .withName("Reset Elevator Preferences"))
+                .withName("Reset Climber Preferences"))
         .withSize(2, 1);
 
     sbCommandsTab

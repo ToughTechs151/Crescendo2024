@@ -56,7 +56,7 @@ public class RobotModel {
 
     simArm = new ArmModel(robot.getRobotContainer().getArmSubsystem());
 
-    simClimber = new ClimberModel(robot.getRobotContainer().getElevatorSubsystem());
+    simClimber = new ClimberModel(robot.getRobotContainer().getClimberSubsystem());
 
     simDrivetrain = new DrivetrainModel(robot.getRobotContainer().getDriveSubsystem());
 

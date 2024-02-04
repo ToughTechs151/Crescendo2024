@@ -79,24 +79,25 @@ class ClimberSubsystemTest {
   }
 
   @Test
-  @DisplayName("Test move command and disable.")
+  @DisplayName("Test retract command and disable.")
   void testMoveCommand() {
 
-    // Create a command to move the elevator then initialize
-    Command moveCommand = climber.moveToPosition(ClimberConstants.CLIMBER_EXTEND_POSITION_METERS);
-    moveCommand.initialize();
+    // Create a command to retract the climber then initialize
+    Command retractCommand =
+        climber.moveToPosition(ClimberConstants.CLIMBER_RETRACT_POSITION_METERS);
+    retractCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
     climber.periodic();
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        ClimberConstants.CLIMBER_EXTEND_POSITION_METERS,
+        ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
         telemetryDoubleMap.get("Climber Goal"),
         DELTA);
 
     // Execute the command to run the controller
-    moveCommand.execute();
+    retractCommand.execute();
     climber.periodic();
     readTelemetry();
     assertThat(telemetryDoubleMap.get("Climber Left Voltage")).isPositive();
@@ -193,7 +194,7 @@ class ClimberSubsystemTest {
     climber.periodic();
     readTelemetry();
 
-    // Motor command should be positive to move elevator up.
+    // Motor command should be positive to pull the robot up with the climber mechanisms.
     assertThat(telemetryDoubleMap.get("Climber Left Voltage")).isPositive();
     assertThat(telemetryDoubleMap.get("Climber Right Voltage")).isPositive();
     assertThat(telemetryBooleanMap.get("Climber Enabled")).isTrue();
