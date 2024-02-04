@@ -70,7 +70,8 @@ class ClimberSubsystemTest {
     // We haven't enabled it yet, so command to motor and saved value should be zero.
     verify(mockMotorLeft).setVoltage(0.0);
     verify(mockMotorRight).setVoltage(0.0);
-    assertThat(climber.getVoltageCommand()).isZero();
+    assertThat(climber.getLeftVoltageCommand()).isZero();
+    assertThat(climber.getRightVoltageCommand()).isZero();
 
     // Position should be set to starting position
     assertThat(climber.getMeasurementLeft()).isEqualTo(ClimberConstants.CLIMBER_OFFSET_RADS);
@@ -97,6 +98,7 @@ class ClimberSubsystemTest {
     climber.periodic();
     readTelemetry();
     assertThat(telemetryDoubleMap.get("Climber Left Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Climber Right Voltage")).isPositive();
     assertThat(telemetryBooleanMap.get("Climber Enabled")).isTrue();
 
     // When disabled mMotor should be commanded to zero
@@ -106,6 +108,7 @@ class ClimberSubsystemTest {
     verify(mockMotorLeft, times(2)).setVoltage(0.0);
     verify(mockMotorRight, times(2)).setVoltage(0.0);
     assertThat(telemetryDoubleMap.get("Climber Left Voltage")).isZero();
+    assertThat(telemetryDoubleMap.get("Climber Right Voltage")).isZero();
     assertThat(telemetryBooleanMap.get("Climber Enabled")).isFalse();
   }
 
@@ -138,24 +141,6 @@ class ClimberSubsystemTest {
     verify(mockMotorRight).setVoltage(0.0);
     verify(mockMotorRight, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
 
-    // This unused code is provided as an example of looking for a specific value.
-    // This value was cheated by running working code as an example since calculating actual
-    // controller expected values is difficult.  Instead the test above just checks direction
-    // of the command, and controller response tests are done in simulation by checking desired
-    // response over time.
-    //
-    // final double expectedCommand = 0.34092;
-    // verify(mockMotorLeft, times(1)).setVoltage(AdditionalMatchers.eq(expectedCommand, DELTA));
-    //  verify(mockMotorRight, times(1)).setVoltage(AdditionalMatchers.eq(expectedCommand, DELTA));
-
-    // Alternative method: capture values and then use them in a test criteria
-    // ArgumentCaptor<Double> argument = ArgumentCaptor.forClass(Double.class);
-    // verify(mockMotorLeft).setVoltage(argument.capture()); // Can use this if only called once
-    // verify(mockMotorLeft, times(2)).setVoltage(argument.capture());
-    // verify(mockMotorRight).setVoltage(argument.capture()); // Can use this if only called once
-    // verify(mockMotorRight, times(2)).setVoltage(argument.capture());
-    // assertEquals(expectedCommand, argument.getValue(), DELTA);
-
     // Test position measurements from the encoder
     assertThat(climber.getMeasurementLeft())
         .isEqualTo(ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition);
@@ -167,33 +152,19 @@ class ClimberSubsystemTest {
     climber.periodic();
     readTelemetry();
 
-    /*
-    SmartDashboard.putBoolean("Climber Enabled", climberEnabled);
-    SmartDashboard.putNumber("Climber Goal", climberController.getGoal().position);
-    SmartDashboard.putNumber("Climber Left Position", getMeasurementLeft());
-    SmartDashboard.putNumber("Climber Right Position", getMeasurementLeft());
-    SmartDashboard.putNumber("Climber Left Velocity", encoderLeft.getVelocity());
-    SmartDashboard.putNumber("Climber Right Velocity", encoderRight.getVelocity());
-    SmartDashboard.putNumber("Climber Left Voltage", voltageCommand);
-    SmartDashboard.putNumber("Climber Right Voltage", voltageCommand);
-    SmartDashboard.putNumber("Climber Left Current", motorLeft.getOutputCurrent());
-    SmartDashboard.putNumber("Climber Right Current", motorRight.getOutputCurrent());
-    SmartDashboard.putNumber("Climber Left Feedforward", newFeedforward);
-    SmartDashboard.putNumber("Climber Right Feedforward", newFeedforward);
-    SmartDashboard.putNumber("Climber Left PID output", output);
-    SmartDashboard.putNumber("Climber Right PID output", output);
-    SmartDashboard.putNumber("Climber Left SetPt Pos", setpoint.position);
-    SmartDashboard.putNumber("Climber Right SetPt Vel", setpoint.velocity);
-    SmartDashboard.putNumber("Climber Left SetPt Pos", setpoint.position);
-    SmartDashboard.putNumber("Climber Right SetPt Vel", setpoint.velocity);
-
-    */
     assertEquals(fakeCurrent, telemetryDoubleMap.get("Climber Left Current"), DELTA);
     assertEquals(
         ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition,
         telemetryDoubleMap.get("Climber Left Position"),
         DELTA);
     assertEquals(fakeVelocity, telemetryDoubleMap.get("Climber Left Velocity"), DELTA);
+
+    assertEquals(fakeCurrent, telemetryDoubleMap.get("Climber Right Current"), DELTA);
+    assertEquals(
+        ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition,
+        telemetryDoubleMap.get("Climber Right Position"),
+        DELTA);
+    assertEquals(fakeVelocity, telemetryDoubleMap.get("Climber Right Velocity"), DELTA);
   }
 
   @Test
@@ -221,6 +192,7 @@ class ClimberSubsystemTest {
 
     // Motor command should be positive to move elevator up.
     assertThat(telemetryDoubleMap.get("Climber Left Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Climber Right Voltage")).isPositive();
     assertThat(telemetryBooleanMap.get("Climber Enabled")).isTrue();
   }
 

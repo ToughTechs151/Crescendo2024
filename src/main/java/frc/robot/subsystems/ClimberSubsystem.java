@@ -64,7 +64,8 @@ import frc.robot.RobotPreferences;
  * - Methods:
  *   - {@code periodic()}: Updates the SmartDashboard with information about the climber's state.
  *   - {@code useOutput()}: Generates the motor command using the PID controller and feedforward.
- *   - {@code moveToPosition(double goal)}: Returns a Command that moves the climber to a new position.
+ *   - {@code moveToPosition(double goal)}: Returns a Command that moves the climber to a new
+ *   - position.
  *   - {@code holdPosition()}: Returns a Command that holds the climber at the last goal position.
  *   - {@code setGoalPosition(double goal)}: Sets the goal state for the subsystem.
  *   - {@code atGoalPosition()}: Returns whether the climber has reached the goal position.
@@ -92,13 +93,14 @@ import frc.robot.RobotPreferences;
  */
 public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
-  /** Hardware components for the climber subsystem with left and right motors */
+  /** Hardware components for the climber subsystem with left and right motors. */
   public static class Hardware {
     CANSparkMax motorLeft;
     CANSparkMax motorRight;
     RelativeEncoder encoderLeft;
     RelativeEncoder encoderRight;
 
+    /** Save the hardware components when the object is constructed. */
     public Hardware(
         CANSparkMax motorLeft,
         CANSparkMax motorRight,
@@ -116,7 +118,16 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   private final RelativeEncoder encoderLeft;
   private final RelativeEncoder encoderRight;
 
-  private ProfiledPIDController climberController =
+  private ProfiledPIDController climberLeftController =
+      new ProfiledPIDController(
+          ClimberConstants.CLIMBER_KP.getValue(),
+          0.0,
+          0.0,
+          new TrapezoidProfile.Constraints(
+              ClimberConstants.CLIMBER_MAX_VELOCITY_METERS_PER_SEC.getValue(),
+              ClimberConstants.CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2.getValue()));
+
+  private ProfiledPIDController climberRightController =
       new ProfiledPIDController(
           ClimberConstants.CLIMBER_KP.getValue(),
           0.0,
@@ -132,11 +143,15 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
           ClimberConstants.CLIMBER_KV_VOLTS_PER_METER_PER_SEC.getValue(),
           0.0); // Acceleration is not used in this implementation
 
-  private double output = 0.0;
-  private TrapezoidProfile.State setpoint = new State();
-  private double newFeedforward = 0;
+  private double leftPidOutput = 0.0;
+  private double rightPidOutput = 0.0;
+  private TrapezoidProfile.State leftSetpoint = new State();
+  private TrapezoidProfile.State rightSetpoint = new State();
+  private double leftFeedforward = 0;
+  private double rightFeedforward = 0;
   private boolean climberEnabled;
-  private double voltageCommand = 0.0;
+  private double leftVoltageCommand = 0.0;
+  private double rightVoltageCommand = 0.0;
 
   /** Create a new ClimberSubsystem controlled by a Profiled PID COntroller . */
   public ClimberSubsystem(Hardware climberHardware) {
@@ -152,11 +167,13 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
     RobotPreferences.initPreferencesArray(ClimberConstants.getClimberPreferences());
 
-    initEncoders();
     initMotors();
+    initEncoders();
 
     // Set tolerances that will be used to determine when the climber is at the goal position.
-    climberController.setTolerance(
+    climberLeftController.setTolerance(
+        ClimberConstants.POSITION_TOLERANCE_METERS, ClimberConstants.VELOCITY_TOLERANCE_METERS);
+    climberRightController.setTolerance(
         ClimberConstants.POSITION_TOLERANCE_METERS, ClimberConstants.VELOCITY_TOLERANCE_METERS);
 
     disable();
@@ -208,23 +225,23 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
 
     SmartDashboard.putBoolean("Climber Enabled", climberEnabled);
-    SmartDashboard.putNumber("Climber Goal", climberController.getGoal().position);
+    SmartDashboard.putNumber("Climber Goal", climberLeftController.getGoal().position);
     SmartDashboard.putNumber("Climber Left Position", getMeasurementLeft());
-    SmartDashboard.putNumber("Climber Right Position", getMeasurementLeft());
+    SmartDashboard.putNumber("Climber Right Position", getMeasurementRight());
     SmartDashboard.putNumber("Climber Left Velocity", encoderLeft.getVelocity());
     SmartDashboard.putNumber("Climber Right Velocity", encoderRight.getVelocity());
-    SmartDashboard.putNumber("Climber Left Voltage", voltageCommand);
-    SmartDashboard.putNumber("Climber Right Voltage", voltageCommand);
+    SmartDashboard.putNumber("Climber Left Voltage", leftVoltageCommand);
+    SmartDashboard.putNumber("Climber Right Voltage", leftVoltageCommand);
     SmartDashboard.putNumber("Climber Left Current", motorLeft.getOutputCurrent());
     SmartDashboard.putNumber("Climber Right Current", motorRight.getOutputCurrent());
-    SmartDashboard.putNumber("Climber Left Feedforward", newFeedforward);
-    SmartDashboard.putNumber("Climber Right Feedforward", newFeedforward);
-    SmartDashboard.putNumber("Climber Left PID output", output);
-    SmartDashboard.putNumber("Climber Right PID output", output);
-    SmartDashboard.putNumber("Climber Left SetPt Pos", setpoint.position);
-    SmartDashboard.putNumber("Climber Right SetPt Vel", setpoint.velocity);
-    SmartDashboard.putNumber("Climber Left SetPt Pos", setpoint.position);
-    SmartDashboard.putNumber("Climber Right SetPt Vel", setpoint.velocity);
+    SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
+    SmartDashboard.putNumber("Climber Right Feedforward", rightFeedforward);
+    SmartDashboard.putNumber("Climber Left PID output", leftPidOutput);
+    SmartDashboard.putNumber("Climber Right PID output", rightPidOutput);
+    SmartDashboard.putNumber("Climber Left SetPt Pos", leftSetpoint.position);
+    SmartDashboard.putNumber("Climber Left SetPt Vel", leftSetpoint.velocity);
+    SmartDashboard.putNumber("Climber Right SetPt Pos", rightSetpoint.position);
+    SmartDashboard.putNumber("Climber Right SetPt Vel", rightSetpoint.velocity);
   }
 
   /** Generate the motor command using the PID controller output and feedforward. */
@@ -232,26 +249,33 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     if (climberEnabled) {
       // Calculate the next set point along the profile to the goal and the next PID output based
       // on the set point and current position.
-      output = climberController.calculate(getMeasurementLeft());
-      setpoint = climberController.getSetpoint();
+      leftPidOutput = climberLeftController.calculate(getMeasurementLeft());
+      rightPidOutput = climberRightController.calculate(getMeasurementRight());
+      leftSetpoint = climberLeftController.getSetpoint();
+      rightSetpoint = climberRightController.getSetpoint();
 
       // Calculate the feedforward to move the climber at the desired velocity and offset
       // the effect of gravity. Voltage for acceleration is not used.
-      newFeedforward = feedforward.calculate(setpoint.velocity);
+      leftFeedforward = feedforward.calculate(leftSetpoint.velocity);
+      rightFeedforward = feedforward.calculate(rightSetpoint.velocity);
 
       // Add the feedforward to the PID output to get the motor output
-      voltageCommand = output + newFeedforward;
+      leftVoltageCommand = leftPidOutput + leftFeedforward;
+      rightVoltageCommand = rightPidOutput + rightFeedforward;
 
     } else {
       // If the climber isn't enabled, set the motor command to 0. In this state the climber
       // will move down until it hits the rest position. Motor EMF braking will slow movement
       // if that mode is used.
-      output = 0;
-      newFeedforward = 0;
-      voltageCommand = 0;
+      leftPidOutput = 0;
+      rightPidOutput = 0;
+      leftFeedforward = 0;
+      rightFeedforward = 0;
+      leftVoltageCommand = 0;
+      rightVoltageCommand = 0;
     }
-    motorLeft.setVoltage(voltageCommand);
-    motorRight.setVoltage(voltageCommand);
+    motorLeft.setVoltage(leftVoltageCommand);
+    motorRight.setVoltage(rightVoltageCommand);
   }
 
   /** Returns a Command that moves the climber to a new position. */
@@ -277,7 +301,15 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
    * The ProfiledPIDController drives the climber to this position and holds it there.
    */
   private void setGoalPosition(double goal) {
-    climberController.setGoal(
+    climberLeftController.setGoal(
+        new TrapezoidProfile.State(
+            MathUtil.clamp(
+                goal,
+                Constants.ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
+                Constants.ClimberConstants.CLIMBER_MAX_HEIGHT_METERS),
+            0));
+
+    climberRightController.setGoal(
         new TrapezoidProfile.State(
             MathUtil.clamp(
                 goal,
@@ -291,7 +323,7 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Returns whether the climber has reached the goal position and velocity is within limits. */
   public boolean atGoalPosition() {
-    return climberController.atGoal();
+    return (climberLeftController.atGoal() && climberRightController.atGoal());
   }
 
   /**
@@ -306,20 +338,23 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
       setDefaultCommand(holdPosition());
 
       // Reset the PID controller to clear any previous state
-      climberController.reset(getMeasurementLeft());
+      climberLeftController.reset(getMeasurementLeft());
+      climberRightController.reset(getMeasurementRight());
       climberEnabled = true;
 
       DataLogManager.log(
           "Climber Enabled - kP="
-              + climberController.getP()
+              + climberLeftController.getP()
               + " kI="
-              + climberController.getI()
+              + climberLeftController.getI()
               + " kD="
-              + climberController.getD()
+              + climberLeftController.getD()
               + " PosGoal="
-              + climberController.getGoal().position
-              + " CurPos="
-              + getMeasurementLeft());
+              + climberLeftController.getGoal().position
+              + " LeftPos="
+              + getMeasurementLeft()
+              + " RightPos="
+              + getMeasurementRight());
     }
   }
 
@@ -341,15 +376,13 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
       CommandScheduler.getInstance().cancel(currentCommand);
     }
     DataLogManager.log(
-        "Climber Left Disabled CurPos="
+        "Climber Disabled: LeftPos="
             + getMeasurementLeft()
-            + " CurVel="
-            + encoderLeft.getVelocity());
-
-    DataLogManager.log(
-        "Climber Right Disabled CurPos="
+            + " LeftVel="
+            + encoderLeft.getVelocity()
+            + " RightPos="
             + getMeasurementRight()
-            + " CurVel="
+            + " RightVel="
             + encoderRight.getVelocity());
   }
 
@@ -373,9 +406,14 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     return encoderRight.getPosition() + ClimberConstants.CLIMBER_OFFSET_RADS;
   }
 
-  /** Returns the Motor Commanded Voltage. */
-  public double getVoltageCommand() {
-    return voltageCommand;
+  /** Returns the Left Motor Commanded Voltage. */
+  public double getLeftVoltageCommand() {
+    return leftVoltageCommand;
+  }
+
+  /** Returns the Right Motor Commanded Voltage. */
+  public double getRightVoltageCommand() {
+    return rightVoltageCommand;
   }
 
   /**
@@ -385,12 +423,15 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   private void loadPreferences() {
 
     // Read Preferences for PID controller
-    climberController.setP(ClimberConstants.CLIMBER_KP.getValue());
+    climberLeftController.setP(ClimberConstants.CLIMBER_KP.getValue());
+    climberRightController.setP(ClimberConstants.CLIMBER_KP.getValue());
 
     // Read Preferences for Trapezoid Profile and update
     double velocityMax = ClimberConstants.CLIMBER_MAX_VELOCITY_METERS_PER_SEC.getValue();
     double accelerationMax = ClimberConstants.CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2.getValue();
-    climberController.setConstraints(
+    climberLeftController.setConstraints(
+        new TrapezoidProfile.Constraints(velocityMax, accelerationMax));
+    climberRightController.setConstraints(
         new TrapezoidProfile.Constraints(velocityMax, accelerationMax));
 
     // Read Preferences for Feedforward and create a new instance

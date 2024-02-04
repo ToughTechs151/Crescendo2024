@@ -17,9 +17,9 @@ public class RobotModel {
   // Works in conjunction with ArmSubsystem
   ArmModel simArm;
 
-  // Mechanical elevator driven by motor with gear reduction for simulation purposes.
-  // Works in conjunction with ElevatorSubsystem
-  ClimberModel simElevator;
+  // Dual mechanical climber driven by motors with gear reduction for simulation purposes.
+  // Works in conjunction with ClimberSubsystem
+  ClimberModel simClimber;
 
   // Differential drive simulation. Works in conjunction with DriveSubsystem
   DrivetrainModel simDrivetrain;
@@ -56,7 +56,7 @@ public class RobotModel {
 
     simArm = new ArmModel(robot.getRobotContainer().getArmSubsystem());
 
-    simElevator = new ClimberModel(robot.getRobotContainer().getElevatorSubsystem());
+    simClimber = new ClimberModel(robot.getRobotContainer().getElevatorSubsystem());
 
     simDrivetrain = new DrivetrainModel(robot.getRobotContainer().getDriveSubsystem());
 
@@ -76,21 +76,24 @@ public class RobotModel {
 
     // Update subsystem simulations
     simArm.updateSim();
-    simElevator.updateSim();
+    simClimber.updateSim();
     simDrivetrain.updateSim();
     simIntake.updateSim();
     simLauncher.updateSim();
 
     // Simulate battery voltage drop based on total simulated current
     double armCurrent = Math.abs(simArm.getSimCurrent());
-    double elevatorCurrent = Math.abs(simElevator.getSimCurrent());
+    double leftClimberCurrent = Math.abs(simClimber.getSimCurrentLeft());
+    double rightClimberCurrent = Math.abs(simClimber.getSimCurrentRight());
     double leftDriveCurrent = Math.abs(simDrivetrain.getLeftSimCurrent());
     double rightDriveCurrent = Math.abs(simDrivetrain.getRightSimCurrent());
     double launcherCurrent = Math.abs(simLauncher.getSimCurrent());
     double intakeCurrent = Math.abs(simIntake.getSimCurrent());
+
     double[] simCurrents = {
       armCurrent,
-      elevatorCurrent,
+      leftClimberCurrent,
+      rightClimberCurrent,
       leftDriveCurrent,
       rightDriveCurrent,
       launcherCurrent,
@@ -106,7 +109,8 @@ public class RobotModel {
     simpdp.setVoltage(loadedVoltage);
     simpdp.setCurrent(0, currentDrawA + random.nextDouble());
     simpdp.setCurrent(7, armCurrent);
-    simpdp.setCurrent(8, elevatorCurrent);
+    simpdp.setCurrent(8, leftClimberCurrent);
+    simpdp.setCurrent(9, rightClimberCurrent);
     simpdp.setCurrent(4, launcherCurrent);
     simpdp.setCurrent(5, intakeCurrent);
     simpdp.setCurrent(10, leftDriveCurrent / 2);
