@@ -83,7 +83,7 @@ class ClimberSubsystemTest {
   void testMoveCommand() {
 
     // Create a command to move the elevator then initialize
-    Command moveCommand = climber.moveToPosition(ClimberConstants.CLIMBER_LOW_POSITION);
+    Command moveCommand = climber.moveToPosition(ClimberConstants.CLIMBER_EXTEND_POSITION_METERS);
     moveCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
@@ -91,7 +91,9 @@ class ClimberSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        ClimberConstants.CLIMBER_LOW_POSITION, telemetryDoubleMap.get("Climber Goal"), DELTA);
+        ClimberConstants.CLIMBER_EXTEND_POSITION_METERS,
+        telemetryDoubleMap.get("Climber Goal"),
+        DELTA);
 
     // Execute the command to run the controller
     moveCommand.execute();
@@ -130,7 +132,8 @@ class ClimberSubsystemTest {
     // The two motor voltages should be set twice for each motor: once to 0 when configured and once
     //  to a
     // positive value when controller is run.
-    Command moveCommand = climber.moveToPosition(Constants.ClimberConstants.CLIMBER_LOW_POSITION);
+    Command moveCommand =
+        climber.moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS);
     moveCommand.initialize();
     moveCommand.execute();
     verify(mockMotorLeft, times(2)).setVoltage(anyDouble());
@@ -173,16 +176,16 @@ class ClimberSubsystemTest {
 
     // Try a command to move the climber above the limit
     Command moveCommand =
-        climber.moveToPosition(Constants.ClimberConstants.CLIMBER_MAX_HEIGHT_METERS + 0.1);
+        climber.moveToPosition(Constants.ClimberConstants.CLIMBER_MAX_PULL_METERS + 0.1);
     moveCommand.initialize();
     climber.periodic();
     readTelemetry();
     assertEquals(
-        ClimberConstants.CLIMBER_MAX_HEIGHT_METERS, telemetryDoubleMap.get("Climber Goal"), DELTA);
+        ClimberConstants.CLIMBER_MAX_PULL_METERS, telemetryDoubleMap.get("Climber Goal"), DELTA);
 
     // Verify that the hold command runs the controller
     Command moveCommandHigh =
-        climber.moveToPosition(Constants.ClimberConstants.CLIMBER_HIGH_POSITION);
+        climber.moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS);
     Command holdCommand = climber.holdPosition();
     // Initialize to set goal but don't execute so hold can be checked
     moveCommandHigh.initialize();

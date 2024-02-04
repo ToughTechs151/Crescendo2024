@@ -208,13 +208,13 @@ public final class Constants {
     public static final double GEAR_RATIO = 32.0;
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_HIGH_POSITION = 0.8;
-    public static final double CLIMBER_LOW_POSITION = 0.2;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.7;
+    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
     public static final double CLIMBER_OFFSET_RADS = 0.0;
 
-    // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-    public static final double CLIMBER_MIN_HEIGHT_METERS = 0.0;
-    public static final double CLIMBER_MAX_HEIGHT_METERS = 1.25;
+    // Encoder is reset to measure 0 at the top, so minimum pull is 0.
+    public static final double CLIMBER_MIN_PULL_METERS = 0.0;
+    public static final double CLIMBER_MAX_PULL_METERS = 0.8;
 
     public static final double POSITION_TOLERANCE_METERS = 0.03;
     public static final double VELOCITY_TOLERANCE_METERS = 0.01;

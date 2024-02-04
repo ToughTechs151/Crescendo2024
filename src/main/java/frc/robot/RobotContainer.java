@@ -166,16 +166,16 @@ public class RobotContainer {
         .a()
         .onTrue(
             robotElevator
-                .moveToPosition(Constants.ClimberConstants.CLIMBER_LOW_POSITION)
-                .withName("Elevator: Move to Low Position"));
+                .moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS)
+                .withName("Climber: Lower"));
 
     // Move the elevator to the high position when the 'Y' button is pressed.
     driverController
         .y()
         .onTrue(
             robotElevator
-                .moveToPosition(Constants.ClimberConstants.CLIMBER_HIGH_POSITION)
-                .withName("Elevator: Move to High Position"));
+                .moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS)
+                .withName("Climber: Pull Up"));
 
     // Disable the elevator controller when the 'X' button is pressed.
     driverController.x().onTrue(Commands.runOnce(robotElevator::disable));

@@ -40,10 +40,10 @@ public class ClimberModel implements AutoCloseable {
           ClimberSimConstants.CLIMBER_REDUCTION,
           ClimberSimConstants.CARRIAGE_MASS,
           ClimberSimConstants.CLIMBER_DRUM_RADIUS,
-          ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
-          ClimberConstants.CLIMBER_MAX_HEIGHT_METERS,
+          ClimberConstants.CLIMBER_MIN_PULL_METERS,
+          ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
-          ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
+          ClimberConstants.CLIMBER_MIN_PULL_METERS,
           VecBuilder.fill(0.002));
 
   private final ElevatorSim climberRightSim =
@@ -52,23 +52,29 @@ public class ClimberModel implements AutoCloseable {
           ClimberSimConstants.CLIMBER_REDUCTION,
           ClimberSimConstants.CARRIAGE_MASS,
           ClimberSimConstants.CLIMBER_DRUM_RADIUS,
-          ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
-          ClimberConstants.CLIMBER_MAX_HEIGHT_METERS,
+          ClimberConstants.CLIMBER_MIN_PULL_METERS,
+          ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
-          ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
+          ClimberConstants.CLIMBER_MIN_PULL_METERS,
           VecBuilder.fill(0.002));
 
   // Create Mechanism2d visualizations of the climber mechanisms
   private final Mechanism2d mech2dLeft = new Mechanism2d(2, 2);
   private final Mechanism2d mech2dRight = new Mechanism2d(2, 2);
-  private final MechanismRoot2d mech2dRootLeft = mech2dLeft.getRoot("Climber Root", 1.0, 0.5);
-  private final MechanismRoot2d mech2dRootRight = mech2dRight.getRoot("Climber Root", 1.0, 0.5);
+  private final MechanismRoot2d mech2dRootLeft = mech2dLeft.getRoot("Climber Root", 1.0, 0.2);
+  private final MechanismRoot2d mech2dRootRight = mech2dRight.getRoot("Climber Root", 1.0, 0.2);
   private final MechanismLigament2d climberMech2dLeft =
       mech2dRootLeft.append(
-          new MechanismLigament2d("Climber Left", climberLeftSim.getPositionMeters(), 90));
+          new MechanismLigament2d(
+              "Climber Left",
+              ClimberConstants.CLIMBER_MAX_PULL_METERS - climberLeftSim.getPositionMeters(),
+              90));
   private final MechanismLigament2d climberMech2dRight =
       mech2dRootRight.append(
-          new MechanismLigament2d("Climber Right", climberRightSim.getPositionMeters(), 90));
+          new MechanismLigament2d(
+              "Climber Right",
+              ClimberConstants.CLIMBER_MAX_PULL_METERS - climberRightSim.getPositionMeters(),
+              90));
 
   /** Create a new Climber Model. */
   public ClimberModel(ClimberSubsystem climberSubsystemToSimulate) {
@@ -120,8 +126,10 @@ public class ClimberModel implements AutoCloseable {
             climberLeftSim.getCurrentDrawAmps() + climberRightSim.getCurrentDrawAmps()));
 
     // Update climber visualizations with position
-    climberMech2dLeft.setLength(climberLeftSim.getPositionMeters());
-    climberMech2dRight.setLength(climberRightSim.getPositionMeters());
+    climberMech2dLeft.setLength(
+        ClimberConstants.CLIMBER_MAX_PULL_METERS - climberLeftSim.getPositionMeters());
+    climberMech2dRight.setLength(
+        ClimberConstants.CLIMBER_MAX_PULL_METERS - climberRightSim.getPositionMeters());
   }
 
   /** Return the left side simulated current. */

@@ -305,16 +305,16 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
         new TrapezoidProfile.State(
             MathUtil.clamp(
                 goal,
-                Constants.ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
-                Constants.ClimberConstants.CLIMBER_MAX_HEIGHT_METERS),
+                Constants.ClimberConstants.CLIMBER_MIN_PULL_METERS,
+                Constants.ClimberConstants.CLIMBER_MAX_PULL_METERS),
             0));
 
     climberRightController.setGoal(
         new TrapezoidProfile.State(
             MathUtil.clamp(
                 goal,
-                Constants.ClimberConstants.CLIMBER_MIN_HEIGHT_METERS,
-                Constants.ClimberConstants.CLIMBER_MAX_HEIGHT_METERS),
+                Constants.ClimberConstants.CLIMBER_MIN_PULL_METERS,
+                Constants.ClimberConstants.CLIMBER_MAX_PULL_METERS),
             0));
 
     // Call enable() to configure and start the controller in case it is not already enabled.
