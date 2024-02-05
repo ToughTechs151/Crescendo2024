@@ -48,7 +48,7 @@ public class RobotPreferences {
 
     // Reset the subsystem preferences
     resetPreferencesArray(Constants.ArmConstants.getArmPreferences());
-    resetPreferencesArray(Constants.ElevatorConstants.getElevatorPreferences());
+    resetPreferencesArray(Constants.ClimberConstants.getClimberPreferences());
     resetPreferencesArray(Constants.LauncherConstants.getLauncherPreferences());
   }
 

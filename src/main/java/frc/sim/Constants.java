@@ -2,7 +2,7 @@ package frc.sim;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ClimberConstants;
 
 /** Constants utility class for the arm simulation. */
 public final class Constants {
@@ -44,13 +44,13 @@ public final class Constants {
   }
 
   /** Elevator simulation constants. */
-  public static final class ElevatorSimConstants {
-    private ElevatorSimConstants() {
-      throw new IllegalStateException("ElevatorSimConstants Utility Class");
+  public static final class ClimberSimConstants {
+    private ClimberSimConstants() {
+      throw new IllegalStateException("ClimberSimConstants Utility Class");
     }
 
-    public static final double ELEVATOR_REDUCTION = ElevatorConstants.GEAR_RATIO;
-    public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(2.0);
+    public static final double CLIMBER_REDUCTION = ClimberConstants.GEAR_RATIO;
+    public static final double CLIMBER_DRUM_RADIUS = Units.inchesToMeters(2.0);
     public static final double CARRIAGE_MASS = 4.0; // kg
   }
 

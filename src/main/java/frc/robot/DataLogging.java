@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import java.util.Map;
@@ -165,14 +165,14 @@ public class DataLogging {
 
     drive = robotContainer.getDriveSubsystem();
     ArmSubsystem arm = robotContainer.getArmSubsystem();
-    ElevatorSubsystem elevator = robotContainer.getElevatorSubsystem();
+    ClimberSubsystem climber = robotContainer.getClimberSubsystem();
     IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
 
     // Add widgets to the Commands tab
     sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
-    sbCommandsTab.add(elevator).withSize(3, 1);
+    sbCommandsTab.add(climber).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
     sbCommandsTab.add(intake).withSize(3, 1);
     sbCommandsTab.add(launcher).withSize(3, 1);
@@ -192,8 +192,8 @@ public class DataLogging {
             new InstantCommand(
                     () ->
                         RobotPreferences.resetPreferencesArray(
-                            Constants.ElevatorConstants.getElevatorPreferences()))
-                .withName("Reset Elevator Preferences"))
+                            Constants.ClimberConstants.getClimberPreferences()))
+                .withName("Reset Climber Preferences"))
         .withSize(2, 1);
 
     sbCommandsTab
