@@ -24,14 +24,14 @@ import frc.robot.Constants.ClimberConstants;
 import frc.robot.RobotPreferences;
 
 /**
- * The {@code ClimberSubsystem} class is a subsystem that controls the movement of a dual climber 
- * mechanism using Profiled PID Controllers. It uses CANSparkMax motors and RelativeEncoders to 
- * measure the climber's position. The class provides methods to move the climber to a specific 
+ * The {@code ClimberSubsystem} class is a subsystem that controls the movement of a dual climber
+ * mechanism using Profiled PID Controllers. It uses CANSparkMax motors and RelativeEncoders to
+ * measure the climber's position. The class provides methods to move the climber to a specific
  * position, and hold the climber at the current position.
  *
- * <p>The ClimberSubsystem class provides a constructor where hardware dependencies are passed in
- * to allow access for testing. There is also a method provided to create default hardware when
- * those details are not needed outside of the subsystem.
+ * <p>The ClimberSubsystem class provides a constructor where hardware dependencies are passed in to
+ * allow access for testing. There is also a method provided to create default hardware when those
+ * details are not needed outside of the subsystem.
  *
  * <p>Example Usage:
  *
@@ -41,7 +41,7 @@ import frc.robot.RobotPreferences;
  * CANSparkMax motorRight = new CANSparkMax(2, MotorType.kBrushless);
  * RelativeEncoder encoderLeft = motorLeft.getEncoder();
  * RelativeEncoder encoderRight = motorRight.getEncoder();
- * climberHardware = new ClimberSubsystem.Hardware(motorLeft, motorRight, encoderLeft, 
+ * climberHardware = new ClimberSubsystem.Hardware(motorLeft, motorRight, encoderLeft,
  *   encoderRight);
  * ClimberSubsystem climber = new ClimberSubsystem(climberHardware);
  *
@@ -75,7 +75,7 @@ import frc.robot.RobotPreferences;
  *   - {@code enable()}: Enables the PID control of the climber.
  *   - {@code disable()}: Disables the PID control of the climber.
  *   - {@code getMeasurementLeft()}: Returns the left climber position for PID control and logging.
- *   - {@code getMeasurementRight()}: Returns the right climber position for PID control and 
+ *   - {@code getMeasurementRight()}: Returns the right climber position for PID control and
  *     logging.
  *   - {@code getLeftVoltageCommand()}: Returns the left motor commanded voltage.
  *   - {@code getRightVoltageCommand()}: Returns the right motor commanded voltage.
@@ -97,7 +97,7 @@ import frc.robot.RobotPreferences;
  *   - {@code private double leftPidOutput}: The output of the left PID controller.
  *   - {@code private double rightPidOutput}: The output of the right PID controller.
  *   - {@code private TrapezoidProfile.State leftSetpoint}: The setpoint of the left PID controller.
- *   - {@code private TrapezoidProfile.State rightSetpoint}: The setpoint of the right PID 
+ *   - {@code private TrapezoidProfile.State rightSetpoint}: The setpoint of the right PID
  *     controller.
  *   - {@code private double leftFeedforward}: The calculated left feedforward value.
  *   - {@code private double rightFeedforward}: The calculated right feedforward value.
