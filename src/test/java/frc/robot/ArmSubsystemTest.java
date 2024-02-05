@@ -185,7 +185,7 @@ class ArmSubsystemTest {
   @Test
   @DisplayName("Test shift down and up commands.")
   void testShiftDownCommand() {
-    Command moveCommand = arm.moveToPositionOrig(Constants.ArmConstants.ARM_FORWARD_POSITION);
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
     Command upCommand = arm.shiftUp();
 
     // Command to a position and then shift up
