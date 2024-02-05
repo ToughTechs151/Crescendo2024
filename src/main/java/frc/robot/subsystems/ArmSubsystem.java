@@ -61,7 +61,7 @@ import frc.robot.RobotPreferences;
  *   - Hold the arm at the current position
  *   - Shift the arm's position up or down by a fixed increment
  * - Methods:
- *   - {@code periodic()}: Updates the SmartDashboard with information about the arm's state.
+ *   - {@code periodic()}: Published telemetry with information about the arm's state.
  *   - {@code useOutput()}: Generates the motor command using the PID controller and feedforward.
  *   - {@code moveToPosition(double goal)}: Returns a Command that moves the arm to a new position.
  *   - {@code holdPosition()}: Returns a Command that holds the arm at the last goal position.
@@ -74,7 +74,6 @@ import frc.robot.RobotPreferences;
  *   - {@code disable()}: Disables the PID control of the arm.
  *   - {@code getMeasurement()}: Returns the arm position for PID control and logging.
  *   - {@code getVoltageCommand()}: Returns the motor commanded voltage.
- *   - {@code initPreferences()}: Initializes the preferences for tuning the controller.
  *   - {@code loadPreferences()}: Loads the preferences for tuning the controller.
  *   - {@code close()}: Closes any objects that support it.
  * - Fields:
@@ -155,8 +154,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     motor.restoreFactoryDefaults();
     // Maybe we should print the faults if non-zero before clearing?
     motor.clearFaults();
-    // Configure the motor to use EMF braking when idle and set voltage to 0.
-    motor.setIdleMode(IdleMode.kBrake);
+    // Configure the motor to coast when idle and set voltage to 0.
+    motor.setIdleMode(IdleMode.kCoast);
     DataLogManager.log("Arm motor firmware version:" + motor.getFirmwareString());
   }
 
@@ -221,13 +220,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       voltageCommand = 0;
     }
     motor.setVoltage(voltageCommand);
-  }
-
-  /** Returns a Command that moves the arm to a new position. */
-  public Command moveToPositionOrig(double goal) {
-    return runOnce(() -> setGoalPosition(goal))
-        .andThen(run(this::useOutput))
-        .until(this::atGoalPosition);
   }
 
   /** Returns a Command that moves the arm to a new position. */

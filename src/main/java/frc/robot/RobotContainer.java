@@ -129,6 +129,7 @@ public class RobotContainer {
         .onTrue(
             robotArm
                 .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION)
+                .andThen(robotArm::disable)
                 .withName("Arm: Move to Forward Position"));
 
     // Move the arm to the high position when the 'B' button is pressed on the operator's
@@ -138,6 +139,7 @@ public class RobotContainer {
         .onTrue(
             robotArm
                 .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION)
+                .andThen(robotArm::disable)
                 .withName("Arm: Move to Back Position"));
 
     // Shift position down a small amount when the POV Down is pressed on the operator's controller.
