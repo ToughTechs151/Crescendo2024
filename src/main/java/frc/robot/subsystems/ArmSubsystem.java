@@ -140,8 +140,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private void initializeArm() {
 
     RobotPreferences.initPreferencesArray(ArmConstants.getArmPreferences());
-    initEncoder();
     initMotor();
+    initEncoder();
 
     // Set tolerances that will be used to determine when the arm is at the goal position.
     armController.setTolerance(
