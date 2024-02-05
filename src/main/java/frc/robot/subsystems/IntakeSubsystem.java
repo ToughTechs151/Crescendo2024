@@ -96,7 +96,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean intakeEnabled;
   private double intakeVoltageCommand = 0.0;
 
-  private double setpoint = 600;
+  private double setpoint;
 
   /** Create a new IntakeSubsystem controlled by a Profiled PID COntroller . */
   public IntakeSubsystem(Hardware intakeHardware) {
@@ -282,6 +282,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
    * controller is disabled - for example from enable().
    */
   private void loadPreferences() {
+
+    // Read the motor speed set point
+    setpoint = IntakeConstants.INTAKE_SET_POINT_RPM.getValue();
 
     // Read Preferences for PID controller
     intakeController.setP(IntakeConstants.INTAKE_KP.getValue());
