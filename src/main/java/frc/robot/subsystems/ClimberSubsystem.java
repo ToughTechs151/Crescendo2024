@@ -24,13 +24,12 @@ import frc.robot.Constants.ClimberConstants;
 import frc.robot.RobotPreferences;
 
 /**
- * The {@code ClimberSubsystem} class is a subsystem that controls the movement of an climber using
- * a Profiled PID Controller. It uses a CANSparkMax motor and a RelativeEncoder to measure the
- * climber's position. The class provides methods to move the climber to a specific position, hold
- * the climber at the current position, and shift the climber's position up or down by a fixed
- * increment.
+ * The {@code ClimberSubsystem} class is a subsystem that controls the movement of a dual climber 
+ * mechanism using Profiled PID Controllers. It uses CANSparkMax motors and RelativeEncoders to 
+ * measure the climber's position. The class provides methods to move the climber to a specific 
+ * position, and hold the climber at the current position.
  *
- * <p>The ClimberSubsystem class provides a constructor where hardware dependiencies are passed in
+ * <p>The ClimberSubsystem class provides a constructor where hardware dependencies are passed in
  * to allow access for testing. There is also a method provided to create default hardware when
  * those details are not needed outside of the subsystem.
  *
@@ -38,13 +37,16 @@ import frc.robot.RobotPreferences;
  *
  * <pre>{@code
  * // Create a new instance of ClimberSubsystem using specified hardware
- * CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
- * RelativeEncoder encoder = motor.getEncoder();
- * climberHardware = new ClimberSubsystem.Hardware(motor, encoder);
- * ClimberSubsystem ClimberSubsystem = new ClimberSubsystem(climberHardware);
+ * CANSparkMax motorLeft = new CANSparkMax(1, MotorType.kBrushless);
+ * CANSparkMax motorRight = new CANSparkMax(2, MotorType.kBrushless);
+ * RelativeEncoder encoderLeft = motorLeft.getEncoder();
+ * RelativeEncoder encoderRight = motorRight.getEncoder();
+ * climberHardware = new ClimberSubsystem.Hardware(motorLeft, motorRight, encoderLeft, 
+ *   encoderRight);
+ * ClimberSubsystem climber = new ClimberSubsystem(climberHardware);
  *
  * // Create a new instance of ClimberSubsystem using default hardware
- * ClimberSubsystem ClimberSubsystem = new ClimberSubsystem(initializeHardware());
+ * ClimberSubsystem climber = new ClimberSubsystem(initializeHardware());
  *
  * // Move the climber to a specific position
  * Command moveToPositionCommand = ClimberSubsystem.moveToPosition(1.0);
@@ -58,37 +60,50 @@ import frc.robot.RobotPreferences;
  *
  * Code Analysis:
  * - Main functionalities:
- *   - Control the movement of an climber using a Profiled PID Controller
+ *   - Control the movement of a dual climber using Profiled PID Controllers
  *   - Move the climber to a specific position
  *   - Hold the climber at the current position
  * - Methods:
- *   - {@code periodic()}: Updates the SmartDashboard with information about the climber's state.
- *   - {@code useOutput()}: Generates the motor command using the PID controller and feedforward.
+ *   - {@code initializeHardware()}: Initialize hardware devices for the climber subsystem.
+ *   - {@code periodic()}: Publish telemetry with information about the climber's state.
+ *   - {@code useOutput()}: Generates the motor commands using the PID controllers and feedforward.
  *   - {@code moveToPosition(double goal)}: Returns a Command that moves the climber to a new
- *   - position.
+ *     position.
  *   - {@code holdPosition()}: Returns a Command that holds the climber at the last goal position.
  *   - {@code setGoalPosition(double goal)}: Sets the goal state for the subsystem.
  *   - {@code atGoalPosition()}: Returns whether the climber has reached the goal position.
  *   - {@code enable()}: Enables the PID control of the climber.
  *   - {@code disable()}: Disables the PID control of the climber.
- *   - {@code getMeasurement()}: Returns the climber position for PID control and logging.
- *   - {@code getVoltageCommand()}: Returns the motor commanded voltage.
- *   - {@code initPreferences()}: Initializes the preferences for tuning the controller.
+ *   - {@code getMeasurementLeft()}: Returns the left climber position for PID control and logging.
+ *   - {@code getMeasurementRight()}: Returns the right climber position for PID control and 
+ *     logging.
+ *   - {@code getLeftVoltageCommand()}: Returns the left motor commanded voltage.
+ *   - {@code getRightVoltageCommand()}: Returns the right motor commanded voltage.
  *   - {@code loadPreferences()}: Loads the preferences for tuning the controller.
  *   - {@code close()}: Closes any objects that support it.
  *   - Fields:
- *   - {@code private final CANSparkMax motor}: The motor used to control the climber.
- *   - {@code private final RelativeEncoder encoder}: The encoder used to measure the climber's
- *     position.
- *   - {@code private ProfiledPIDController climberController}: The PID controller used to
- *     control the climber's movement.
+ *   - {@code private final CANSparkMax motorLeft}: The motor used to control the left climber.
+ *   - {@code private final CANSparkMax motorRight}: The motor used to control the right climber.
+ *   - {@code private final RelativeEncoder encoderLeft}: The encoder used to measure the climber's
+ *     left position.
+ *   - {@code private final RelativeEncoder encoderRight}: The encoder used to measure the climber's
+ *     right position.
+ *   - {@code private ProfiledPIDController climberLeftController}: The PID controller used to
+ *     control the left climber's movement.
+ *   - {@code private ProfiledPIDController climberRightController}: The PID controller used to
+ *     control the right climber's movement.
  *   - {@code private climberFeedforward feedforward}: The feedforward controller used to
  *     calculate the motor output.
- *   - {@code private double output}: The output of the PID controller.
- *   - {@code private TrapezoidProfile.State setpoint}: The setpoint of the PID controller.
- *   - {@code private double newFeedforward}: The calculated feedforward value.
+ *   - {@code private double leftPidOutput}: The output of the left PID controller.
+ *   - {@code private double rightPidOutput}: The output of the right PID controller.
+ *   - {@code private TrapezoidProfile.State leftSetpoint}: The setpoint of the left PID controller.
+ *   - {@code private TrapezoidProfile.State rightSetpoint}: The setpoint of the right PID 
+ *     controller.
+ *   - {@code private double leftFeedforward}: The calculated left feedforward value.
+ *   - {@code private double rightFeedforward}: The calculated right feedforward value.
  *   - {@code private boolean climberEnabled}: A flag indicating whether the climber is enabled.
- *   - {@code private double voltageCommand}: The motor commanded voltage.
+ *   - {@code private double leftVoltageCommand}: The left motor commanded voltage.
+ *   - {@code private double rightVoltageCommand}: The right motor commanded voltage.
  * </pre>
  */
 public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
@@ -153,7 +168,7 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   private double leftVoltageCommand = 0.0;
   private double rightVoltageCommand = 0.0;
 
-  /** Create a new ClimberSubsystem controlled by a Profiled PID COntroller . */
+  /** Create a new ClimberSubsystem controlled by Profiled PID COntrollers. */
   public ClimberSubsystem(Hardware climberHardware) {
     this.motorLeft = climberHardware.motorLeft;
     this.motorRight = climberHardware.motorRight;
@@ -244,7 +259,7 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Climber Right SetPt Vel", rightSetpoint.velocity);
   }
 
-  /** Generate the motor command using the PID controller output and feedforward. */
+  /** Generate the motor commands using the PID controller outputs and feedforward. */
   public void useOutput() {
     if (climberEnabled) {
       // Calculate the next set point along the profile to the goal and the next PID output based
