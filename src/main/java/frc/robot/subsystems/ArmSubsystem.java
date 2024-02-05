@@ -155,7 +155,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     // Maybe we should print the faults if non-zero before clearing?
     motor.clearFaults();
     // Configure the motor to coast when idle and set voltage to 0.
-    motor.setIdleMode(IdleMode.kCoast);
+    motor.setIdleMode(IdleMode.kBrake);
     DataLogManager.log("Arm motor firmware version:" + motor.getFirmwareString());
   }
 
