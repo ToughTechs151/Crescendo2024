@@ -20,50 +20,67 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.RobotPreferences;
 
 /**
- * The {@code IntakeIntakeSubsystem} class is a subsystem that runs an intake motor and no encoder
- * using an open loop voltage command. It uses a PWMSparkMax motor controller. The class provides
- * methods to return commands to run the intake at the specified voltage or to disable by setting
- * voltage to 0.
+ * The {@code IntakeSubsystem} class is a subsystem that controls the speed of an intake using a PID
+ * Controller and simple motor feedforward. It uses a CANSparkMax motor and a RelativeEncoder to
+ * measure the intake's speed. The class provides methods to return commands that run the intake at
+ * the specified speed or stop the motor.
  *
- * <p>The IntakeIntakeSubsystem class provides a constructor where hardware dependencies are passed
- * in to allow access for testing. There is also a method provided to create default hardware when
- * those details are not needed outside of the subsystem.
+ * <p>The IntakeSubsystem class provides a constructor where hardware dependencies are passed in to
+ * allow access for testing. There is also a method provided to create default hardware when those
+ * details are not needed outside of the subsystem.
  *
  * <p>Example Usage:
  *
  * <pre>{@code
- * // Create a new instance of IntakeIntakeSubsystem using specified hardware
- * PWMSparkMax motor = new PWMSparkMax(2);
- * intakeHardware = new IntakeIntakeSubsystem.Hardware(motor);
- * IntakeIntakeSubsystem intakeSubsystem = new IntakeIntakeSubsystem(intakeHardware);
+ * // Create a new instance of IntakeSubsystem using specified hardware
+ * CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
+ * RelativeEncoder encoder = motor.getEncoder();
+ * intakeHardware = new IntakeSubsystem.Hardware(motor, encoder);
+ * IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intakeHardware);
  *
- * // Create a new instance of IntakeIntakeSubsystem using default hardware
- * IntakeIntakeSubsystem intakeSubsystem = new IntakeIntakeSubsystem(initializeHardware());
+ * // Create a new instance of IntakeSubsystem using default hardware
+ * IntakeSubsystem intakeSubsystem = new IntakeSubsystem(initializeHardware());
  *
- * // Run the intake at a specific voltage
- * Command runIntakeCommand = intakeSubsystem.runIntake(7.5);
+ * // Run the intake at a specific speed
+ * Command runIntakeCommand = intakeSubsystem.runIntake(500.0);
  * runIntakeCommand.schedule();
  *
- * // Stop the intake
- * Command stopIntakeCommand = intakeSubsystem.stopIntake();
- * runIntakeCommand.schedule();
  * }
  *
  * Code Analysis:
  * - Main functionalities:
  *   - Control the speed of an intake using a PID Controller
  * - Methods:
- *   - {@code runIntake(double voltage)}: Returns a Command that runs the intake at the defined
- *      voltage.
- *   - {@code stopIntake()}: Returns a Command that stops the intake by setting voltage to 0.
+ *   - {@code periodic()}: Publish telemetry with information about the intake's state.
+ *   - {@code updateMotorController()}: Generates the motor command using the PID controller and
+ *     feedforward.
+ *   - {@code runForward()}: Returns a Command that runs the motor forward at the current set
+ *     speed.
+ *   - {@code runReverse()}: Returns a Command that runs the motor in reverse at the current set
+ *     speed.
+ *   - {@code setMotorSetPoint(double scale)}: Set the setpoint for the motor as a scale factor
+ *     applied to the setpoint value.
+ *   - {@code intakeAtSetpoint()}: Returns whether the intake has reached the set point velocity
+ *     within limits.
+ *   - {@code enableIntake()}: Enables the PID control of the intake.
+ *   - {@code disableIntake()}: Disables the PID control of the intake.
  *   - {@code getIntakeSpeed()}: Returns the intake position for PID control and logging.
- *   - {@code setIntakeVoltageCommand()}: Set the intake motor commanded voltage and log the new
- *      value.
- *   - {@code getIntakeVoltageCommand()}: Returns the intake motor commanded voltage.
- *   - {@code disableIntake()}: Disable the intake by setting voltage to 0.
+ *   - {@code getIntakeVoltageCommand()}: Returns the motor commanded voltage.
+ *   - {@code loadPreferences()}: Loads the preferences for tuning the controller.
  *   - {@code close()}: Closes any objects that support it.
  *   - Fields:
- *   - {@code private final PWMSparkMax motor}: The motor used to control the intake.
+ *   - {@code private final CANSparkMax motor}: The motor used to control the intake.
+ *   - {@code private final RelativeEncoder encoder}: The encoder used to measure the intake's
+ *     position.
+ *   - {@code private PIDController intakeController}: The PID controller used to
+ *     control the intake's speed.
+ *   - {@code private Feedforward feedforward}: The feedforward controller used to
+ *     calculate the motor output.
+ *   - {@code private double pidOutput}: The output of the PID controller.
+ *   - {@code private double newFeedforward}: The calculated feedforward value.
+ *   - {@code private boolean intakeEnabled}: A flag indicating whether the intake is enabled.
+ *   - {@code private double intakeVoltageCommand}: The motor commanded voltage.
+ *   - {@code private double setSpeed}: The setpoint speed for the controller.
  * </pre>
  */
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
@@ -96,7 +113,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean intakeEnabled;
   private double intakeVoltageCommand = 0.0;
 
-  private double setpoint;
+  private double setSpeed;
 
   /** Create a new IntakeSubsystem controlled by a Profiled PID COntroller . */
   public IntakeSubsystem(Hardware intakeHardware) {
@@ -151,6 +168,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     return new Hardware(intakeMotor, intakeEncoder);
   }
 
+  /** Publish telemetry with information about the intake's state. */
   @Override
   public void periodic() {
 
@@ -204,12 +222,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Set the setpoint for the motor. The PIDController drives the motor to this speed and holds it
-   * there.
+   * Set the setpoint for the motor as a scale factor applied to the setpoint value. The
+   * PIDController drives the motor to this speed and holds it there.
    */
   private void setMotorSetPoint(double scale) {
     loadPreferences();
-    intakeController.setSetpoint(scale * setpoint);
+    intakeController.setSetpoint(scale * setSpeed);
 
     // Call enable() to configure and start the controller in case it is not already enabled.
     enableIntake();
@@ -284,7 +302,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private void loadPreferences() {
 
     // Read the motor speed set point
-    setpoint = IntakeConstants.INTAKE_SET_POINT_RPM.getValue();
+    setSpeed = IntakeConstants.INTAKE_SET_POINT_RPM.getValue();
 
     // Read Preferences for PID controller
     intakeController.setP(IntakeConstants.INTAKE_KP.getValue());
