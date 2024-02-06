@@ -201,6 +201,15 @@ public class DataLogging {
             new InstantCommand(
                     () ->
                         RobotPreferences.resetPreferencesArray(
+                            Constants.IntakeConstants.getIntakePreferences()))
+                .withName("Reset Intake Preferences"))
+        .withSize(2, 1);
+
+    sbCommandsTab
+        .add(
+            new InstantCommand(
+                    () ->
+                        RobotPreferences.resetPreferencesArray(
                             Constants.LauncherConstants.getLauncherPreferences()))
                 .withName("Reset Launcher Preferences"))
         .withSize(2, 1);

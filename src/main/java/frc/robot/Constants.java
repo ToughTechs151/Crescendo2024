@@ -130,9 +130,36 @@ public final class Constants {
     }
 
     public static final int INTAKE_MOTOR_PORT = 7;
+
+    // These are fake gains; in actuality these must be determined individually for each robot
+    // Constants tunable through preferences
+    public static final PreferenceKeyValue INTAKE_KP = new PreferenceKeyValue("IntakeKP", 0.006);
+    public static final PreferenceKeyValue INTAKE_KS_VOLTS =
+        new PreferenceKeyValue("IntakeKS", 0.0);
+    public static final PreferenceKeyValue INTAKE_KV_VOLTS_PER_RPM =
+        new PreferenceKeyValue("IntakeKV", 0.015);
+    public static final PreferenceKeyValue INTAKE_KA_VOLTS_PER_RPM2 =
+        new PreferenceKeyValue("IntakeKA", 0.0);
+
+    public static final PreferenceKeyValue INTAKE_SET_POINT_RPM =
+        new PreferenceKeyValue("IntakeRPM", 450);
+
+    private static final PreferenceKeyValue[] INTAKE_PREFERENCES = {
+      INTAKE_SET_POINT_RPM,
+      INTAKE_KP,
+      INTAKE_KS_VOLTS,
+      INTAKE_KV_VOLTS_PER_RPM,
+      INTAKE_KA_VOLTS_PER_RPM2
+    };
+
+    public static PreferenceKeyValue[] getIntakePreferences() {
+      return INTAKE_PREFERENCES;
+    }
+
     public static final double INTAKE_GEAR_RATIO =
-        1.0; // Ratio of motor rotations to output rotations
-    public static final double INTAKE_COMMAND_VOLTS = 12.0;
+        12.0; // Ratio of motor rotations to output rotations
+    public static final double INTAKE_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / INTAKE_GEAR_RATIO;
+    public static final double INTAKE_TOLERANCE_RPM = 20;
   }
 
   /** Constants used for the Launcher subsystem. */

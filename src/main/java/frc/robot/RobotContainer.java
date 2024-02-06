@@ -190,16 +190,15 @@ public class RobotContainer {
                 .runLauncher(Constants.LauncherConstants.LAUNCHER_FULL_SPEED)
                 .withName("Launcher: Run Full Speed"));
 
-    // Start the intake when the left bumper is pressed.
+    // Run the intake forward when the right bumper is pressed.
+    operatorController
+        .rightBumper()
+        .whileTrue(robotIntake.runForward().withName("Intake: Run Forward"));
+
+    // Run the intake in reverse when the left bumper is pressed.
     operatorController
         .leftBumper()
-        .onTrue(
-            robotIntake
-                .runIntake(Constants.IntakeConstants.INTAKE_COMMAND_VOLTS)
-                .withName("Intake: Run"));
-
-    // Stop the intake when the right bumper is pressed.
-    operatorController.rightBumper().onTrue(robotIntake.stopIntake().withName("Intake: Stop"));
+        .whileTrue(robotIntake.runReverse().withName("Intake: Run Reverse"));
   }
 
   /**
@@ -222,7 +221,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Drive forward slowly unitl the robot moves 1 meter
+    // Drive forward slowly until the robot moves 1 meter
     return new RunCommand(() -> this.robotDrive.arcadeDrive(0.3, 0.0, false), this.robotDrive)
         .until(() -> robotDrive.getAverageDistanceMeters() > 1.0)
         .withTimeout(5)
