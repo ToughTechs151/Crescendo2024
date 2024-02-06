@@ -170,7 +170,6 @@ public class DataLogging {
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
 
     // Add widgets to the Commands tab
-    sbCommandsTab.add(CommandScheduler.getInstance()).withSize(3, 2);
     sbCommandsTab.add(arm).withSize(3, 1);
     sbCommandsTab.add(climber).withSize(3, 1);
     sbCommandsTab.add(drive).withSize(3, 1);
@@ -224,9 +223,6 @@ public class DataLogging {
         .addNumber("PDP Temp", pdp::getTemperature)
         .withWidget(BuiltInWidgets.kDial)
         .withProperties(Map.of("min", 15, "max", 50));
-    pdpWidget.addNumber("PDP Current", pdp::getTotalCurrent);
-    pdpWidget.addNumber("PDP Energy", pdp::getTotalEnergy);
-    pdpWidget.addNumber("PDP Power", pdp::getTotalPower);
   }
 
   /**
