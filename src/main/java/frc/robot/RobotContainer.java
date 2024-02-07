@@ -128,7 +128,7 @@ public class RobotContainer {
         .a()
         .onTrue(
             robotArm
-                .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION)
+                .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                 .andThen(robotArm::disable)
                 .withName("Arm: Move to Forward Position"));
 
@@ -138,7 +138,7 @@ public class RobotContainer {
         .b()
         .onTrue(
             robotArm
-                .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION)
+                .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
                 .andThen(robotArm::disable)
                 .withName("Arm: Move to Back Position"));
 
