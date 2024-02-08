@@ -75,7 +75,7 @@ class ArmSubsystemTest {
   void testMoveCommand() {
 
     // Create a command to move the arm then initialize
-    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS);
     moveCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
@@ -83,7 +83,7 @@ class ArmSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION),
+        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION_RADS),
         telemetryDoubleMap.get("Arm Goal"),
         DELTA);
 
@@ -117,7 +117,7 @@ class ArmSubsystemTest {
 
     // The motor voltage should be set twice: once to 0 when configured and once  to a
     // negative value when controller is run.
-    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS);
     moveCommand.initialize();
     moveCommand.execute();
     verify(mockMotor, times(2)).setVoltage(anyDouble());
@@ -169,7 +169,7 @@ class ArmSubsystemTest {
         DELTA);
 
     // Verify that the hold command runs the controller
-    Command moveCommandHigh = arm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION);
+    Command moveCommandHigh = arm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS);
     Command holdCommand = arm.holdPosition();
     // Initialize to set goal but don't execute so hold can be checked
     moveCommandHigh.initialize();
@@ -185,7 +185,7 @@ class ArmSubsystemTest {
   @Test
   @DisplayName("Test shift down and up commands.")
   void testShiftDownCommand() {
-    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION);
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS);
     Command upCommand = arm.shiftUp();
 
     // Command to a position and then shift up
@@ -194,7 +194,7 @@ class ArmSubsystemTest {
     arm.periodic();
     readTelemetry();
     assertEquals(
-        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION + ArmConstants.POS_INCREMENT),
+        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION_RADS + ArmConstants.POS_INCREMENT),
         telemetryDoubleMap.get("Arm Goal"),
         DELTA);
 
@@ -206,7 +206,7 @@ class ArmSubsystemTest {
     // Currently up and down increments are the same. Update if that changes.
     assertEquals(
         Units.radiansToDegrees(
-            ArmConstants.ARM_FORWARD_POSITION
+            ArmConstants.ARM_FORWARD_POSITION_RADS
                 + ArmConstants.POS_INCREMENT
                 - ArmConstants.POS_INCREMENT),
         telemetryDoubleMap.get("Arm Goal"),

@@ -47,8 +47,8 @@ public class ArmModel implements AutoCloseable {
           );
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-  private final Mechanism2d mech2d = new Mechanism2d(60, 40);
-  private final MechanismRoot2d mechArmPivot = mech2d.getRoot("ArmPivot", 30, 10);
+  private final Mechanism2d mech2d = new Mechanism2d(40, 20);
+  private final MechanismRoot2d mechArmPivot = mech2d.getRoot("ArmPivot", 20, 10);
   private final MechanismLigament2d mechArmTower =
       mechArmPivot.append(new MechanismLigament2d("ArmTower", 10, -90));
   private final MechanismLigament2d mechArm =

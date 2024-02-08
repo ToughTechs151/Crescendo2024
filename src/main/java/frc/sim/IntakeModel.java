@@ -8,19 +8,19 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.sim.Constants.IntakeSimConstants;
 
-/** A robot arm simulation based on a linear system model with Mech2d display. */
+/** A simulation for a simple DC motor with a load. */
 public class IntakeModel implements AutoCloseable {
 
   private final IntakeSubsystem intakeIntakeSubsystem;
   private double simIntakeCurrent = 0.0;
+  private CANSparkMaxSim sparkSim;
 
   // The arm gearbox represents a gearbox containing one motor.
-  private final DCMotor intakeGearbox = DCMotor.getAndymarkRs775_125(1);
+  private final DCMotor intakeGearbox = DCMotor.getNEO(1);
 
   private final DCMotorSim intakeMotorSim =
       new DCMotorSim(
@@ -28,10 +28,10 @@ public class IntakeModel implements AutoCloseable {
           IntakeConstants.INTAKE_GEAR_RATIO,
           IntakeSimConstants.INTAKE_MOI_KG_METERS2);
 
-  /** Create a new IntakeModel. */
-  public IntakeModel(IntakeSubsystem intakeSubsystemToSimulate) {
+  /** Create a new ElevatorModel. */
+  public IntakeModel(IntakeSubsystem intakeIntakeSubsystemToSimulate) {
 
-    intakeIntakeSubsystem = intakeSubsystemToSimulate;
+    intakeIntakeSubsystem = intakeIntakeSubsystemToSimulate;
     simulationInit();
 
     // There is nothing to add to the dashboard for this sim since output is motor speed.
@@ -40,7 +40,8 @@ public class IntakeModel implements AutoCloseable {
   /** Initialize the arm simulation. */
   public void simulationInit() {
 
-    // Nothing to do
+    // Setup a simulation of the CANSparkMax and methods to set values
+    sparkSim = new CANSparkMaxSim(IntakeConstants.INTAKE_MOTOR_PORT);
   }
 
   /** Update the simulation model. */
@@ -53,20 +54,19 @@ public class IntakeModel implements AutoCloseable {
     // Next, we update it. The standard loop time is 20ms.
     intakeMotorSim.update(0.020);
 
+    double newPosition = intakeMotorSim.getAngularPositionRotations();
     double simIntakeSpeed = intakeMotorSim.getAngularVelocityRPM();
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage and
     // save the current so it can be retrieved later.
+    sparkSim.setVelocity(simIntakeSpeed);
+    sparkSim.setPosition(newPosition);
     simIntakeCurrent =
         intakeGearbox.getCurrent(1.0, intakeIntakeSubsystem.getIntakeVoltageCommand());
+    sparkSim.setCurrent(simIntakeCurrent);
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(simIntakeCurrent));
-
-    // Publish speed and current to the dashboard during simulation since this motor setup
-    // does not provide data.
-    SmartDashboard.putNumber("Intake Sim Speed", simIntakeSpeed);
-    SmartDashboard.putNumber("Intake Sim Current", simIntakeCurrent);
   }
 
   /** Return the simulated current. */
