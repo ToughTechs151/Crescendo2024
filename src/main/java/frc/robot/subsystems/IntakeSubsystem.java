@@ -303,6 +303,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
     // Read the motor speed set point
     setSpeed = IntakeConstants.INTAKE_SET_POINT_RPM.getValue();
+    setSpeed = 600;
 
     // Read Preferences for PID controller
     intakeController.setP(IntakeConstants.INTAKE_KP.getValue());
