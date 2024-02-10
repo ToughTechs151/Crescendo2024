@@ -85,11 +85,11 @@ public final class Constants {
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
     public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.2);
-    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 0.4);
+    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 0.1);
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmKV", 0.0);
+        new PreferenceKeyValue("ArmKV", 2.0);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
+        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(120));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
         new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
 
@@ -111,7 +111,7 @@ public final class Constants {
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-10.0);
+    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-20.0);
     public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(145.0);
     public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-20.0);
     public static final double MAX_ANGLE_RADS = Units.degreesToRadians(155.0);
