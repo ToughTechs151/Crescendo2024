@@ -40,6 +40,16 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
+  private ArmSubsystem arm;
+  private ClimberSubsystem climber;
+  private IntakeSubsystem intake;
+  private LauncherSubsystem launcher;
+
+  private ShuffleboardLayout driveWidget;
+  private ShuffleboardLayout armWidget;
+  private ShuffleboardLayout climberWidget;
+  private ShuffleboardLayout intakeWidget;
+  private ShuffleboardLayout launcherWidget;
 
   private DataLogging() {
     // Starts recording to data log
@@ -62,9 +72,9 @@ public class DataLogging {
     }
 
     ShuffleboardTab sbRobotTab = Shuffleboard.getTab("Robot");
-    pdpWidget = sbRobotTab.getLayout("PDP", BuiltInLayouts.kGrid).withSize(3, 3);
+    pdpWidget = sbRobotTab.getLayout("PDP", BuiltInLayouts.kGrid).withSize(2, 4).withPosition(3, 0);
     ShuffleboardLayout rcWidget =
-        sbRobotTab.getLayout("RobotController", BuiltInLayouts.kGrid).withSize(3, 3);
+        sbRobotTab.getLayout("RobotController", BuiltInLayouts.kGrid).withSize(2, 3);
 
     sbCommandsTab = Shuffleboard.getTab("Commands");
 
@@ -163,18 +173,27 @@ public class DataLogging {
    */
   public void dataLogRobotContainerInit(RobotContainer robotContainer) {
 
-    drive = robotContainer.getDriveSubsystem();
-    ArmSubsystem arm = robotContainer.getArmSubsystem();
-    ClimberSubsystem climber = robotContainer.getClimberSubsystem();
-    IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
-    LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
+    drive = robotContainer.getDriveSubsystem(); 
+    driveWidget.add("DriveSubsystem", drive);
+
+
+    // Add values with supplier functions here.
+    pdpWidget
+        .addNumber("PDP Temp", pdp::getTemperature)
+        .withWidget(BuiltInWidgets.kDial)
+        .withProperties(Map.of("min", 15, "max", 50));
 
     // Add widgets to the Commands tab
-    sbCommandsTab.add(arm).withSize(3, 1);
-    sbCommandsTab.add(climber).withSize(3, 1);
-    sbCommandsTab.add(drive).withSize(3, 1);
-    sbCommandsTab.add(intake).withSize(3, 1);
-    sbCommandsTab.add(launcher).withSize(3, 1);
+    driveWidget =
+        sbCommandsTab.add(drive).getLayout("Drive", BuiltInLayouts.kGrid).withSize(3, 1).withPosition(0, 0);
+
+    /*
+    sbCommandsTab.add(drive).withSize(3, 1).withPosition(0, 0);
+    sbCommandsTab.add(arm).withSize(3, 1).withPosition(0, 1);
+    sbCommandsTab.add(intake).withSize(3, 1).withPosition(0, 2);
+    sbCommandsTab.add(launcher).withSize(3, 1).withPosition(0, 3);
+    sbCommandsTab.add(climber).withSize(3, 1).withPosition(0, 4);
+    */
 
     // Add buttons to reset preferences to the default constant values
     sbCommandsTab
