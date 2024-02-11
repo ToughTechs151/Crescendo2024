@@ -30,7 +30,7 @@ public class RobotModel {
 
   // Mechanical launcher driven by motor with gear reduction for simulation purposes.
   // Works in conjunction with LauncherSubsystem
-  LauncherModel simLauncher;
+  // LauncherModel simLauncher;
 
   Random random = new Random();
   private final boolean isReal;
@@ -60,7 +60,7 @@ public class RobotModel {
 
     simDrivetrain = new DrivetrainModel(robot.getRobotContainer().getDriveSubsystem());
 
-    simLauncher = new LauncherModel(robot.getRobotContainer().getLauncherSubsystem());
+    //    simLauncher = new LauncherModel(robot.getRobotContainer().getLauncherSubsystem());
 
     simIntake = new IntakeModel(robot.getRobotContainer().getIntakeSubsystem());
 
@@ -79,7 +79,7 @@ public class RobotModel {
     simClimber.updateSim();
     simDrivetrain.updateSim();
     simIntake.updateSim();
-    simLauncher.updateSim();
+    //    simLauncher.updateSim();
 
     // Simulate battery voltage drop based on total simulated current
     double armCurrent = Math.abs(simArm.getSimCurrent());
@@ -87,7 +87,7 @@ public class RobotModel {
     double rightClimberCurrent = Math.abs(simClimber.getSimCurrentRight());
     double leftDriveCurrent = Math.abs(simDrivetrain.getLeftSimCurrent());
     double rightDriveCurrent = Math.abs(simDrivetrain.getRightSimCurrent());
-    double launcherCurrent = Math.abs(simLauncher.getSimCurrent());
+    //    double launcherCurrent = Math.abs(simLauncher.getSimCurrent());
     double intakeCurrent = Math.abs(simIntake.getSimCurrent());
 
     double[] simCurrents = {
@@ -96,7 +96,7 @@ public class RobotModel {
       rightClimberCurrent,
       leftDriveCurrent,
       rightDriveCurrent,
-      launcherCurrent,
+      // launcherCurrent,
       intakeCurrent
     };
 
@@ -111,7 +111,7 @@ public class RobotModel {
     simpdp.setCurrent(7, armCurrent);
     simpdp.setCurrent(8, leftClimberCurrent);
     simpdp.setCurrent(9, rightClimberCurrent);
-    simpdp.setCurrent(4, launcherCurrent);
+    //    simpdp.setCurrent(4, launcherCurrent);
     simpdp.setCurrent(5, intakeCurrent);
     simpdp.setCurrent(10, leftDriveCurrent / 2);
     simpdp.setCurrent(11, leftDriveCurrent / 2);

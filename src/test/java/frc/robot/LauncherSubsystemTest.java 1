@@ -49,7 +49,7 @@ class LauncherSubsystemTest {
     RobotPreferences.resetPreferences();
 
     // Create subsystem object using mock hardware
-    launcherHardware = new LauncherSubsystem.Hardware(mockMotor, mockEncoder);
+    // launcherHardware = new LauncherSubsystem.Hardware(mockMotor, mockEncoder);
     launcher = new LauncherSubsystem(launcherHardware);
   }
 

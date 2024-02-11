@@ -41,7 +41,7 @@ public class LauncherModel implements AutoCloseable {
   public void simulationInit() {
 
     // Setup a simulation of the CANSparkMax and methods to set values
-    sparkSim = new CANSparkMaxSim(LauncherConstants.LAUNCHER_MOTOR_PORT);
+    sparkSim = new CANSparkMaxSim(LauncherConstants.RIGHT_LAUNCHER_MOTOR_PORT);
   }
 
   /** Update the simulation model. */

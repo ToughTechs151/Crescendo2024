@@ -168,7 +168,8 @@ public final class Constants {
       throw new IllegalStateException("LauncherConstants Utility Class");
     }
 
-    public static final int LAUNCHER_MOTOR_PORT = 10;
+    public static final int RIGHT_LAUNCHER_MOTOR_PORT = 11;
+    public static final int LEFT_LAUNCHER_MOTOR_PORT = 10;
 
     // These are fake gains; in actuality these must be determined individually for each robot
     // Constants tunable through preferences
@@ -193,7 +194,7 @@ public final class Constants {
         3.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0d / LAUNCHER_GEAR_RATIO;
     public static final double LAUNCHER_TOLERANCE_RPM = 20;
-    public static final double LAUNCHER_FULL_SPEED = 600;
+    public static final double LAUNCHER_FULL_SPEED = 3600;
   }
 
   /** Constants used for the Climber subsystem. */
