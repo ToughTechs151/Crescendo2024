@@ -5,9 +5,7 @@
 package frc.sim;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.sim.Constants.LauncherSimConstants;
@@ -15,7 +13,7 @@ import frc.sim.Constants.LauncherSimConstants;
 /** A simulation for a simple DC motor with a load. */
 public class LauncherModel implements AutoCloseable {
 
-  private final LauncherSubsystem intakeLauncherSubsystem;
+  private final LauncherSubsystem launcherSubsystem;
   private double simLauncherCurrent = 0.0;
   private CANSparkMaxSim sparkSim;
 
@@ -29,9 +27,9 @@ public class LauncherModel implements AutoCloseable {
           LauncherSimConstants.LAUNCHER_MOI_KG_METERS2);
 
   /** Create a new ElevatorModel. */
-  public LauncherModel(LauncherSubsystem intakeLauncherSubsystemToSimulate) {
+  public LauncherModel(LauncherSubsystem launcherSubsystemToSimulate) {
 
-    intakeLauncherSubsystem = intakeLauncherSubsystemToSimulate;
+    launcherSubsystem = launcherSubsystemToSimulate;
     simulationInit();
 
     // There is nothing to add to the dashboard for this sim since output is motor speed.
@@ -47,7 +45,7 @@ public class LauncherModel implements AutoCloseable {
   /** Update the simulation model. */
   public void updateSim() {
 
-    double inputVoltage = intakeLauncherSubsystem.getLauncherVoltageCommand();
+    double inputVoltage = launcherSubsystem.getLauncherVoltageCommand();
 
     launcherMotorSim.setInput(inputVoltage);
 
@@ -57,16 +55,15 @@ public class LauncherModel implements AutoCloseable {
     double newPosition = launcherMotorSim.getAngularPositionRotations();
     double simLauncherSpeed = launcherMotorSim.getAngularVelocityRPM();
 
-    // Finally, we set our simulated encoder's readings and simulated battery voltage and
-    // save the current so it can be retrieved later.
+    // Finally, we set our simulated encoder's readings and save the current so it can be
+    // retrieved later.
     sparkSim.setVelocity(simLauncherSpeed);
     sparkSim.setPosition(newPosition);
     simLauncherCurrent =
-        launcherGearbox.getCurrent(1.0, intakeLauncherSubsystem.getLauncherVoltageCommand());
+        launcherGearbox.getCurrent(
+            launcherMotorSim.getAngularVelocityRadPerSec(),
+            launcherSubsystem.getLauncherVoltageCommand());
     sparkSim.setCurrent(simLauncherCurrent);
-
-    // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(simLauncherCurrent));
   }
 
   /** Return the simulated current. */

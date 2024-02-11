@@ -136,19 +136,25 @@ public final class Constants {
     public static final PreferenceKeyValue INTAKE_KS_VOLTS =
         new PreferenceKeyValue("IntakeKS", 0.0);
     public static final PreferenceKeyValue INTAKE_KV_VOLTS_PER_RPM =
-        new PreferenceKeyValue("IntakeKV", 0.015);
+        new PreferenceKeyValue("IntakeKV", 0.025);
     public static final PreferenceKeyValue INTAKE_KA_VOLTS_PER_RPM2 =
         new PreferenceKeyValue("IntakeKA", 0.0);
 
     public static final PreferenceKeyValue INTAKE_SET_POINT_RPM =
-        new PreferenceKeyValue("IntakeRPM", 450);
+        new PreferenceKeyValue("IntakeRPM", 450.0);
+    public static final PreferenceKeyValue INTAKE_SPEED_THRESHOLD_RPM =
+        new PreferenceKeyValue("IntakeThresholdRPM", 300.0);
+    public static final PreferenceKeyValue INTAKE_CURRENT_THRESHOLD_AMPS =
+        new PreferenceKeyValue("IntakeThresholdAmps", 8.0);
 
     private static final PreferenceKeyValue[] INTAKE_PREFERENCES = {
-      INTAKE_SET_POINT_RPM,
       INTAKE_KP,
       INTAKE_KS_VOLTS,
       INTAKE_KV_VOLTS_PER_RPM,
-      INTAKE_KA_VOLTS_PER_RPM2
+      INTAKE_KA_VOLTS_PER_RPM2,
+      INTAKE_SET_POINT_RPM,
+      INTAKE_SPEED_THRESHOLD_RPM,
+      INTAKE_CURRENT_THRESHOLD_AMPS
     };
 
     public static PreferenceKeyValue[] getIntakePreferences() {

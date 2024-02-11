@@ -7,8 +7,6 @@ package frc.sim;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -90,16 +88,12 @@ public class ArmModel implements AutoCloseable {
     // Next, we update it. The standard loop time is 20ms.
     armSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and simulated battery voltage and
-    // save the current so it can be retrieved later.
+    // Finally, we set our simulated encoder's readings and save the current so it can be
+    // retrieved later.
     sparkSim.setPosition(armSim.getAngleRads() - ArmConstants.ARM_OFFSET_RADS);
     sparkSim.setVelocity(armSim.getVelocityRadPerSec());
     simCurrent = armSim.getCurrentDrawAmps();
     sparkSim.setCurrent(simCurrent);
-
-    // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     mechArm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));
