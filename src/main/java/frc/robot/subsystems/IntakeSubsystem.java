@@ -114,6 +114,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private double intakeVoltageCommand = 0.0;
 
   private double setSpeed;
+  private double speedThreshold;
+  private double currentThreshold;
+
+  // We need to save speed during the periodic function as a workaround to a SparkMax simulation
+  // limitation that motor speed is sometimes reset to 0 at times during the frame.
+  private double speed;
 
   /** Create a new IntakeSubsystem controlled by a Profiled PID COntroller . */
   public IntakeSubsystem(Hardware intakeHardware) {
@@ -172,9 +178,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
 
+    speed = intakeEncoder.getVelocity();
     SmartDashboard.putBoolean("Intake Enabled", intakeEnabled);
     SmartDashboard.putNumber("Intake Setpoint", intakeController.getSetpoint());
-    SmartDashboard.putNumber("Intake Speed", intakeEncoder.getVelocity());
+    SmartDashboard.putNumber("Intake Speed", speed);
     SmartDashboard.putNumber("Intake Voltage", intakeVoltageCommand);
     SmartDashboard.putNumber("Intake Current", intakeMotor.getOutputCurrent());
     SmartDashboard.putNumber("Intake Feedforward", newFeedforward);
@@ -211,6 +218,16 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
         this);
   }
 
+  /** Returns a Command that runs the motor forward until a note is loaded. */
+  public Command loadNote() {
+    return new FunctionalCommand(
+        () -> setMotorSetPoint(1.0),
+        this::updateMotorController,
+        interrupted -> disableIntake(),
+        this::noteFullyLoaded,
+        this);
+  }
+
   /** Returns a Command that runs the motor in reverse at the current set speed. */
   public Command runReverse() {
     return new FunctionalCommand(
@@ -236,6 +253,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns whether the intake has reached the set point speed within limits. */
   public boolean intakeAtSetpoint() {
     return intakeController.atSetpoint();
+  }
+
+  /**
+   * Returns whether the intake has fully pulled in a note which is detected by the motor being up
+   * to speed and the current hitting a threshold.
+   */
+  public boolean noteFullyLoaded() {
+    return (speed > speedThreshold && (intakeMotor.getOutputCurrent() > currentThreshold));
   }
 
   /**
@@ -301,9 +326,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
    */
   private void loadPreferences() {
 
-    // Read the motor speed set point
+    // Read the motor speed set point and thresholds for detecting a loaded note
     setSpeed = IntakeConstants.INTAKE_SET_POINT_RPM.getValue();
-    setSpeed = 3600;
+    speedThreshold = IntakeConstants.INTAKE_SPEED_THRESHOLD_RPM.getValue();
+    currentThreshold = IntakeConstants.INTAKE_CURRENT_THRESHOLD_AMPS.getValue();
 
     // Read Preferences for PID controller
     intakeController.setP(IntakeConstants.INTAKE_KP.getValue());
