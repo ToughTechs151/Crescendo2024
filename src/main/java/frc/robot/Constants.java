@@ -180,13 +180,13 @@ public final class Constants {
     // These are fake gains; in actuality these must be determined individually for each robot
     // Constants tunable through preferences
     public static final PreferenceKeyValue LAUNCHER_KP =
-        new PreferenceKeyValue("LauncherKP", 6.0d / 1000);
+        new PreferenceKeyValue("LauncherKP", 12.0 / 5800);
     public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
         new PreferenceKeyValue("LauncherKS", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KV_VOLTS_PER_RPM =
-        new PreferenceKeyValue("LauncherKV", 6.0d / 1000);
+        new PreferenceKeyValue("LauncherKV", 12.0 / 5800);
     public static final PreferenceKeyValue LAUNCHER_KA_VOLTS_PER_RPM2 =
-        new PreferenceKeyValue("LauncherKA", 0.0d / 1000);
+        new PreferenceKeyValue("LauncherKA", 0.0);
 
     private static final PreferenceKeyValue[] LAUNCHER_PREFERENCES = {
       LAUNCHER_KP, LAUNCHER_KS_VOLTS, LAUNCHER_KV_VOLTS_PER_RPM, LAUNCHER_KA_VOLTS_PER_RPM2
@@ -197,9 +197,9 @@ public final class Constants {
     }
 
     public static final double LAUNCHER_GEAR_RATIO =
-        3.0; // Ratio of motor rotations to output rotations
+        1.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0d / LAUNCHER_GEAR_RATIO;
-    public static final double LAUNCHER_TOLERANCE_RPM = 20;
+    public static final double LAUNCHER_TOLERANCE_RPM = 300;
     public static final double LAUNCHER_FULL_SPEED = 3600;
   }
 

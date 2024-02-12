@@ -14,13 +14,21 @@ import frc.sim.Constants.LauncherSimConstants;
 public class LauncherModel implements AutoCloseable {
 
   private final LauncherSubsystem launcherSubsystem;
-  private double simLauncherCurrent = 0.0;
-  private CANSparkMaxSim sparkSim;
+  private double simLauncherLeftCurrent = 0.0;
+  private double simLauncherRightCurrent = 0.0;
+  private CANSparkMaxSim sparkLeftSim;
+  private CANSparkMaxSim sparkRightSim;
 
   // The arm gearbox represents a gearbox containing one motor.
   private final DCMotor launcherGearbox = DCMotor.getNEO(1);
 
-  private final DCMotorSim launcherMotorSim =
+  private final DCMotorSim launcherMotorLeftSim =
+      new DCMotorSim(
+          launcherGearbox,
+          LauncherConstants.LAUNCHER_GEAR_RATIO,
+          LauncherSimConstants.LAUNCHER_MOI_KG_METERS2);
+
+  private final DCMotorSim launcherMotorRightSim =
       new DCMotorSim(
           launcherGearbox,
           LauncherConstants.LAUNCHER_GEAR_RATIO,
@@ -39,36 +47,46 @@ public class LauncherModel implements AutoCloseable {
   public void simulationInit() {
 
     // Setup a simulation of the CANSparkMax and methods to set values
-    sparkSim = new CANSparkMaxSim(LauncherConstants.RIGHT_LAUNCHER_MOTOR_PORT);
+    sparkLeftSim = new CANSparkMaxSim(LauncherConstants.LEFT_LAUNCHER_MOTOR_PORT);
+    sparkRightSim = new CANSparkMaxSim(LauncherConstants.RIGHT_LAUNCHER_MOTOR_PORT);
   }
 
   /** Update the simulation model. */
   public void updateSim() {
 
-    double inputVoltage = launcherSubsystem.getLauncherVoltageCommand();
-
-    launcherMotorSim.setInput(inputVoltage);
+    launcherMotorLeftSim.setInput(launcherSubsystem.getLauncherVoltageCommandLeft());
+    launcherMotorRightSim.setInput(launcherSubsystem.getLauncherVoltageCommandRight());
 
     // Next, we update it. The standard loop time is 20ms.
-    launcherMotorSim.update(0.020);
-
-    double newPosition = launcherMotorSim.getAngularPositionRotations();
-    double simLauncherSpeed = launcherMotorSim.getAngularVelocityRPM();
+    launcherMotorLeftSim.update(0.020);
+    launcherMotorRightSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and save the current so it can be
     // retrieved later.
-    sparkSim.setVelocity(simLauncherSpeed);
-    sparkSim.setPosition(newPosition);
-    simLauncherCurrent =
+    sparkLeftSim.setVelocity(launcherMotorLeftSim.getAngularVelocityRPM());
+    sparkRightSim.setVelocity(launcherMotorRightSim.getAngularVelocityRPM());
+    sparkLeftSim.setPosition(launcherMotorLeftSim.getAngularPositionRotations());
+    sparkRightSim.setPosition(launcherMotorRightSim.getAngularPositionRotations());
+    simLauncherLeftCurrent =
         launcherGearbox.getCurrent(
-            launcherMotorSim.getAngularVelocityRadPerSec(),
-            launcherSubsystem.getLauncherVoltageCommand());
-    sparkSim.setCurrent(simLauncherCurrent);
+            launcherMotorLeftSim.getAngularVelocityRadPerSec(),
+            launcherSubsystem.getLauncherVoltageCommandLeft());
+    simLauncherRightCurrent =
+        launcherGearbox.getCurrent(
+            launcherMotorRightSim.getAngularVelocityRadPerSec(),
+            launcherSubsystem.getLauncherVoltageCommandRight());
+    sparkLeftSim.setCurrent(simLauncherLeftCurrent);
+    sparkRightSim.setCurrent(simLauncherRightCurrent);
   }
 
-  /** Return the simulated current. */
-  public double getSimCurrent() {
-    return simLauncherCurrent;
+  /** Return the left simulated current. */
+  public double getSimLeftCurrent() {
+    return simLauncherLeftCurrent;
+  }
+
+  /** Return the right simulated current. */
+  public double getSimRightCurrent() {
+    return simLauncherRightCurrent;
   }
 
   @Override
