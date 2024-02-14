@@ -21,9 +21,9 @@ import frc.robot.RobotPreferences;
 
 /**
  * The {@code LauncherSubsystem} class is a subsystem that controls the speed of a launcher using a
- * PID Controller and simple motor feedforward. It uses a CANSparkMax motor and a RelativeEncoder to
- * measure the launcher's speed. The class provides methods to return commands that run the launcher
- * at the specified speed or stop the motor.
+ * PID Controller and simple motor feedforward. It uses two CANSparkMax motors with RelativeEncoders
+ * to measure the launcher's speed. The class provides methods to return commands that run the
+ * launcher at the specified speed or stop the motors.
  *
  * <p>The LauncherSubsystem class provides a constructor where hardware dependencies are passed in
  * to allow access for testing. There is also a method provided to create default hardware when
@@ -33,16 +33,19 @@ import frc.robot.RobotPreferences;
  *
  * <pre>{@code
  * // Create a new instance of LauncherSubsystem using specified hardware
- * CANSparkMax motor = new CANSparkMax(1, MotorType.kBrushless);
- * RelativeEncoder encoder = motor.getEncoder();
- * launcherHardware = new LauncherSubsystem.Hardware(motor, encoder);
+ * CANSparkMax motorLeft = new CANSparkMax(1, MotorType.kBrushless);
+ * CANSparkMax motorRight = new CANSparkMax(2, MotorType.kBrushless);
+ * RelativeEncoder encoderLeft = motorLeft.getEncoder();
+ * RelativeEncoder encoderRight = motorRight.getEncoder();
+ * launcherHardware = new LauncherSubsystem.Hardware(motorRight, motorLeft, encoderRight,
+ *  encoderLeft);
  * LauncherSubsystem launcherSubsystem = new LauncherSubsystem(launcherHardware);
  *
  * // Create a new instance of LauncherSubsystem using default hardware
  * LauncherSubsystem launcherSubsystem = new LauncherSubsystem(initializeHardware());
  *
  * // Run the launcher at a specific speed
- * Command runLauncherCommand = launcherSubsystem.runLauncher(500.0);
+ * Command runLauncherCommand = launcherSubsystem.runLauncher(5000.0);
  * runLauncherCommand.schedule();
  *
  * }
@@ -51,7 +54,7 @@ import frc.robot.RobotPreferences;
  * - Main functionalities:
  *   - Control the speed of an launcher using a PID Controller
  * - Methods:
- *   - {@code periodic()}: Updates the SmartDashboard with information about the launcher's state.
+ *   - {@code periodic()}: Publish telemetry with information about the intake's state.
  *   - {@code updateLauncherController()}: Generates the motor command using the PID controller and
  *     feedforward.
  *   - {@code runLauncher(double setpoint)}: Returns a Command that runs the launcher at the
@@ -61,23 +64,34 @@ import frc.robot.RobotPreferences;
  *     within limits.
  *   - {@code enable()}: Enables the PID control of the launcher.
  *   - {@code disable()}: Disables the PID control of the launcher.
- *   - {@code getLauncherSpeedRight()}: Returns the launcher position for PID control and logging.
- *   - {@code getLauncherSpeedLeft()}: Returns the launcher position for PID control and logging.
- *   - {@code getLauncherVoltageCommand()}: Returns the motor commanded voltage.
+ *   - {@code getLauncherSpeedRight()}: Returns the right side speed for PID control and logging.
+ *   - {@code getLauncherSpeedLeft()}: Returns the left side for PID control and logging.
+ *   - {@code getLauncherVoltageCommandLeft()}: Returns the left motor commanded voltage.
+ *   - {@code getLauncherVoltageCommandRight()}: Returns the right motor commanded voltage.
  *   - {@code loadPreferences()}: Loads the preferences for tuning the controller.
  *   - {@code close()}: Closes any objects that support it.
  *   - Fields:
- *   - {@code private final CANSparkMax motor}: The motor used to control the launcher.
- *   - {@code private final RelativeEncoder encoder}: The encoder used to measure the launcher's
- *     position.
- *   - {@code private PIDController launcherController}: The PID controller used to
- *     control the launcher's speed.
+ *   - {@code private final CANSparkMax launcherMotorRight}: The right side motor used to control
+ *     the launcher.
+ *   - {@code private final CANSparkMax launcherMotorLeftt}: The left side motor used to control
+ *     the launcher.
+ *   - {@code private final RelativeEncoder launcherEncoderRight}: The right side encoder used to
+ *      measure the launcher's speed.
+ *   - {@code private final RelativeEncoder launcherEncodeLeft}: The left side encoder used to
+ *      measure the launcher's speed.
+ *   - {@code private PIDController launcherLeftController}: The PID controller used to
+ *     control the left launcher's speed.
+ *   - {@code private PIDController launcherRightController}: The PID controller used to
+ *     control the right launcher's speed.
  *   - {@code private Feedforward feedforward}: The feedforward controller used to
  *     calculate the motor output.
- *   - {@code private double pidOutput}: The output of the PID controller.
- *   - {@code private double newFeedforward}: The calculated feedforward value.
+ *   - {@code private double pidLeftOutput}: The output of the left PID controller.
+ *   - {@code private double pidRightOutput}: The output of the right PID controller.
+ *   - {@code private double newLeftFeedforward}: The calculated left feedforward value.
+ *   - {@code private double newRightFeedforward}: The calculated right feedforward value.
  *   - {@code private boolean launcherEnabled}: A flag indicating whether the launcher is enabled.
- *   - {@code private double launcherVoltageCommand}: The motor commanded voltage.
+ *   - {@code private double launcherVoltageLeftCommand}: The left motor commanded voltage.
+ *   - {@code private double launcherVoltageRightCommand}: The right motor commanded voltage.
  * </pre>
  */
 public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
@@ -89,6 +103,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     RelativeEncoder launcherEncoderRight;
     RelativeEncoder launcherEncoderLeft;
 
+    /** COnstruct the hardware class to hold the motors and encoders. */
     public Hardware(
         CANSparkMax launcherMotorRight,
         CANSparkMax launcherMotorLeft,
@@ -193,6 +208,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
         launcherMotorRight, launcherMotorLeft, launcherEncoderRight, launcherEncoderLeft);
   }
 
+  /** Publish telemetry with information about the intake's state. */
   @Override
   public void periodic() {
 
@@ -262,7 +278,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Returns whether the launcher has reached the set point speed within limits. */
   public boolean launcherAtSetpoint() {
-    return launcherLeftController.atSetpoint();
+    return (launcherLeftController.atSetpoint() && launcherRightController.atSetpoint());
   }
 
   /**

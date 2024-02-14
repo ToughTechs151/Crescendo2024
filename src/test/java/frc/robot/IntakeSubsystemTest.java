@@ -18,6 +18,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,10 +79,10 @@ class IntakeSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     System.out.println("set point: " + telemetryDoubleMap.get("Intake Setpoint"));
-    // assertEquals(
-    //     IntakeConstants.INTAKE_SET_POINT_RPM.getValue(),
-    //     telemetryDoubleMap.get("Intake Setpoint"),
-    //     DELTA);
+    assertEquals(
+        IntakeConstants.INTAKE_SET_POINT_RPM.getValue(),
+        telemetryDoubleMap.get("Intake Setpoint"),
+        DELTA);
 
     // Execute the command to run the controller
     runForwardCommand.execute();
@@ -111,10 +112,10 @@ class IntakeSubsystemTest {
     intake.periodic();
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
-    // assertEquals(
-    //     -IntakeConstants.INTAKE_SET_POINT_RPM.getValue(),
-    //     telemetryDoubleMap.get("Intake Setpoint"),
-    //     DELTA);
+    assertEquals(
+        -IntakeConstants.INTAKE_SET_POINT_RPM.getValue(),
+        telemetryDoubleMap.get("Intake Setpoint"),
+        DELTA);
 
     // Execute the command to run the controller
     runIntakeCommand.execute();
