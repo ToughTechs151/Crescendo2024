@@ -232,6 +232,7 @@ public class DriveSubsystem extends SubsystemBase {
                         DriveConstants.START_XPOS_METERS,
                         DriveConstants.START_YPOS_METERS,
                         new Rotation2d(DriveConstants.START_HEADING_RADIANS))))
+        .ignoringDisable(true)
         .withName("Reset Start Pose");
   }
 

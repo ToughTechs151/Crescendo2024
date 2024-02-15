@@ -183,6 +183,7 @@ public class DataLogging {
                     () ->
                         RobotPreferences.resetPreferencesArray(
                             Constants.ArmConstants.getArmPreferences()))
+                .ignoringDisable(true)
                 .withName("Reset Arm Preferences"))
         .withSize(2, 1);
 
@@ -192,6 +193,7 @@ public class DataLogging {
                     () ->
                         RobotPreferences.resetPreferencesArray(
                             Constants.ClimberConstants.getClimberPreferences()))
+                .ignoringDisable(true)
                 .withName("Reset Climber Preferences"))
         .withSize(2, 1);
 
@@ -200,7 +202,18 @@ public class DataLogging {
             new InstantCommand(
                     () ->
                         RobotPreferences.resetPreferencesArray(
+                            Constants.IntakeConstants.getIntakePreferences()))
+                .ignoringDisable(true)
+                .withName("Reset Intake Preferences"))
+        .withSize(2, 1);
+
+    sbCommandsTab
+        .add(
+            new InstantCommand(
+                    () ->
+                        RobotPreferences.resetPreferencesArray(
                             Constants.LauncherConstants.getLauncherPreferences()))
+                .ignoringDisable(true)
                 .withName("Reset Launcher Preferences"))
         .withSize(2, 1);
 

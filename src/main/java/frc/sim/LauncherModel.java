@@ -12,7 +12,7 @@ import frc.robot.Constants.LauncherConstants;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.sim.Constants.LauncherSimConstants;
 
-/** A robot arm simulation based on a linear system model with Mech2d display. */
+/** A simulation for a simple DC motor with a load. */
 public class LauncherModel implements AutoCloseable {
 
   private final LauncherSubsystem intakeLauncherSubsystem;

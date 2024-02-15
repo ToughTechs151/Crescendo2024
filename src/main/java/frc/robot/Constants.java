@@ -83,11 +83,11 @@ public final class Constants {
     // These are fake gains; in actuality these must be determined individually for each robot
 
     // Constants tunable through preferences
-    public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 3.0);
+    public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
     public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.2);
-    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 2.15);
+    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 0.4);
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmKV", 0.6);
+        new PreferenceKeyValue("ArmKV", 0.0);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
         new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
@@ -106,22 +106,21 @@ public final class Constants {
       return ARM_PREFERENCES;
     }
 
-    // TO DO, Update this for the real design.
-    public static final double GEAR_RATIO = 12.0 * (46.0 / 18) * (46.0 / 18);
+    public static final double GEAR_RATIO = 100;
     public static final double ARM_RAD_PER_ENCODER_ROTATION = 2.0 * Math.PI / GEAR_RATIO;
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double ARM_FORWARD_POSITION = Units.degreesToRadians(-25);
-    public static final double ARM_BACK_POSITION =
-        ARM_FORWARD_POSITION + Units.degreesToRadians(180);
-    public static final double MIN_ANGLE_RADS = ARM_FORWARD_POSITION - Units.degreesToRadians(5.0);
-    public static final double MAX_ANGLE_RADS = ARM_BACK_POSITION + Units.degreesToRadians(5.0);
+    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-10.0);
+    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(145.0);
+    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-20.0);
+    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(155.0);
     public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
-    public static final double POS_INCREMENT = Units.degreesToRadians(2); // For small adjustments
-    public static final double POSITION_TOLERANCE = Units.degreesToRadians(1);
-    public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1);
+    public static final double POS_INCREMENT = Units.degreesToRadians(2.0); // For small adjustments
+    public static final double POSITION_TOLERANCE = Units.degreesToRadians(2.0);
+    public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1.0);
   }
+
   /** Constants used for the Launcher subsystem. */
   public static final class IntakeConstants {
 
@@ -130,9 +129,36 @@ public final class Constants {
     }
 
     public static final int INTAKE_MOTOR_PORT = 7;
+
+    // These are fake gains; in actuality these must be determined individually for each robot
+    // Constants tunable through preferences
+    public static final PreferenceKeyValue INTAKE_KP = new PreferenceKeyValue("IntakeKP", 0.006);
+    public static final PreferenceKeyValue INTAKE_KS_VOLTS =
+        new PreferenceKeyValue("IntakeKS", 0.0);
+    public static final PreferenceKeyValue INTAKE_KV_VOLTS_PER_RPM =
+        new PreferenceKeyValue("IntakeKV", 0.015);
+    public static final PreferenceKeyValue INTAKE_KA_VOLTS_PER_RPM2 =
+        new PreferenceKeyValue("IntakeKA", 0.0);
+
+    public static final PreferenceKeyValue INTAKE_SET_POINT_RPM =
+        new PreferenceKeyValue("IntakeRPM", 450);
+
+    private static final PreferenceKeyValue[] INTAKE_PREFERENCES = {
+      INTAKE_SET_POINT_RPM,
+      INTAKE_KP,
+      INTAKE_KS_VOLTS,
+      INTAKE_KV_VOLTS_PER_RPM,
+      INTAKE_KA_VOLTS_PER_RPM2
+    };
+
+    public static PreferenceKeyValue[] getIntakePreferences() {
+      return INTAKE_PREFERENCES;
+    }
+
     public static final double INTAKE_GEAR_RATIO =
-        1.0; // Ratio of motor rotations to output rotations
-    public static final double INTAKE_COMMAND_VOLTS = 12.0;
+        12.0; // Ratio of motor rotations to output rotations
+    public static final double INTAKE_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / INTAKE_GEAR_RATIO;
+    public static final double INTAKE_TOLERANCE_RPM = 20;
   }
 
   /** Constants used for the Launcher subsystem. */
@@ -219,6 +245,7 @@ public final class Constants {
     public static final double POSITION_TOLERANCE_METERS = 0.03;
     public static final double VELOCITY_TOLERANCE_METERS = 0.01;
   }
+
   /** Constants used for assigning operator input. */
   public static final class OIConstants {
 
