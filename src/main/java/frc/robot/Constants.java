@@ -80,8 +80,6 @@ public final class Constants {
 
     public static final int MOTOR_PORT = 6;
 
-    // These are fake gains; in actuality these must be determined individually for each robot
-
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
     public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.2);
@@ -130,7 +128,7 @@ public final class Constants {
 
     public static final int INTAKE_MOTOR_PORT = 7;
 
-    // These are fake gains; in actuality these must be determined individually for each robot
+    // TO DO - update these constants for the real design
     // Constants tunable through preferences
     public static final PreferenceKeyValue INTAKE_KP = new PreferenceKeyValue("IntakeKP", 0.006);
     public static final PreferenceKeyValue INTAKE_KS_VOLTS =
@@ -177,7 +175,7 @@ public final class Constants {
     public static final int RIGHT_LAUNCHER_MOTOR_PORT = 11;
     public static final int LEFT_LAUNCHER_MOTOR_PORT = 10;
 
-    // These are fake gains; in actuality these must be determined individually for each robot
+    // TO DO - update these constants for the real design
     // Constants tunable through preferences
     public static final PreferenceKeyValue LAUNCHER_KP =
         new PreferenceKeyValue("LauncherKP", 12.0 / 5800);
@@ -210,10 +208,10 @@ public final class Constants {
       throw new IllegalStateException("ClimberConstants Utility Class");
     }
 
-    // These are fake gains; in actuality these must be determined individually for each robot
     public static final int LEFT_MOTOR_PORT = 8;
     public static final int RIGHT_MOTOR_PORT = 9;
 
+    // TO DO - update these constants for the real design
     // Constants tunable through preferences
     public static final PreferenceKeyValue CLIMBER_KP = new PreferenceKeyValue("ClimberKP", 15.0);
     public static final PreferenceKeyValue CLIMBER_KS = new PreferenceKeyValue("ClimberKS", 0.1);
