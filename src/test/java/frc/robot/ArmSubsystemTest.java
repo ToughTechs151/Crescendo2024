@@ -47,7 +47,7 @@ class ArmSubsystemTest {
     mockEncoder = mock(RelativeEncoder.class);
 
     // Reset preferences to default values so test results are consistent
-    RobotPreferences.resetPreferences();
+    RobotPreferences.resetAllPreferences();
 
     // Create subsystem object using mock hardware
     armHardware = new ArmSubsystem.Hardware(mockMotor, mockEncoder);
