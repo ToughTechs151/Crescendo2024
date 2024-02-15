@@ -224,9 +224,9 @@ public class DataLogging {
                 .withName("Reset Launcher Preferences"))
         .withSize(2, 1);
 
-    sbCommandsTab
+    resetPreferencesLayout
         .add(
-            new InstantCommand(() -> RobotPreferences.resetAllPreferences())
+            new InstantCommand(RobotPreferences::resetAllPreferences)
                 .ignoringDisable(true)
                 .withName("Reset All Preferences"))
         .withSize(2, 1);
