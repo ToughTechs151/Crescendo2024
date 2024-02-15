@@ -62,7 +62,7 @@ public class DataLogging {
     }
 
     ShuffleboardTab sbRobotTab = Shuffleboard.getTab("Robot");
-    pdpWidget = sbRobotTab.getLayout("PDP", BuiltInLayouts.kGrid).withSize(3, 3);
+    pdpWidget = sbRobotTab.getLayout("PDP", BuiltInLayouts.kGrid).withSize(3, 4).withPosition(3, 0);
     ShuffleboardLayout rcWidget =
         sbRobotTab.getLayout("RobotController", BuiltInLayouts.kGrid).withSize(3, 3);
 
@@ -170,14 +170,21 @@ public class DataLogging {
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
 
     // Add widgets to the Commands tab
-    sbCommandsTab.add(arm).withSize(3, 1);
-    sbCommandsTab.add(climber).withSize(3, 1);
-    sbCommandsTab.add(drive).withSize(3, 1);
-    sbCommandsTab.add(intake).withSize(3, 1);
-    sbCommandsTab.add(launcher).withSize(3, 1);
+    sbCommandsTab.add(arm).withSize(3, 1).withPosition(3, 0);
+    sbCommandsTab.add(climber).withSize(3, 1).withPosition(3, 1);
+    sbCommandsTab.add(drive).withSize(3, 1).withPosition(3, 2);
+    sbCommandsTab.add(intake).withSize(3, 1).withPosition(3, 3);
+    sbCommandsTab.add(launcher).withSize(3, 1).withPosition(3, 4);
+
+    ShuffleboardLayout resetPreferencesLayout =
+        sbCommandsTab
+            .getLayout("Reset Preferences", BuiltInLayouts.kList)
+            .withSize(3, 3)
+            .withPosition(0, 0)
+            .withProperties(Map.of("Label position", "HIDDEN"));
 
     // Add buttons to reset preferences to the default constant values
-    sbCommandsTab
+    resetPreferencesLayout
         .add(
             new InstantCommand(
                     () ->
@@ -187,7 +194,7 @@ public class DataLogging {
                 .withName("Reset Arm Preferences"))
         .withSize(2, 1);
 
-    sbCommandsTab
+    resetPreferencesLayout
         .add(
             new InstantCommand(
                     () ->
@@ -197,7 +204,7 @@ public class DataLogging {
                 .withName("Reset Climber Preferences"))
         .withSize(2, 1);
 
-    sbCommandsTab
+    resetPreferencesLayout
         .add(
             new InstantCommand(
                     () ->
@@ -207,7 +214,7 @@ public class DataLogging {
                 .withName("Reset Intake Preferences"))
         .withSize(2, 1);
 
-    sbCommandsTab
+    resetPreferencesLayout
         .add(
             new InstantCommand(
                     () ->
