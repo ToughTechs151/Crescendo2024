@@ -6,9 +6,7 @@ package frc.sim;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -109,8 +107,8 @@ public class ClimberModel implements AutoCloseable {
     climberLeftSim.update(0.020);
     climberRightSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and simulated battery voltage and
-    // save the current so it can be retrieved later.
+    // Finally, we set our simulated encoder's readings and save the current so it can be
+    // retrieved later.
     sparkLeftSim.setPosition(climberLeftSim.getPositionMeters());
     sparkRightSim.setPosition(climberRightSim.getPositionMeters());
     sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
@@ -119,11 +117,6 @@ public class ClimberModel implements AutoCloseable {
     simCurrentRight = climberRightSim.getCurrentDrawAmps();
     sparkLeftSim.setCurrent(simCurrentLeft);
     sparkRightSim.setCurrent(simCurrentRight);
-
-    // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(
-            climberLeftSim.getCurrentDrawAmps() + climberRightSim.getCurrentDrawAmps()));
 
     // Update climber visualizations with position
     climberMech2dLeft.setLength(

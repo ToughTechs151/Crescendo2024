@@ -36,20 +36,26 @@ class LauncherSubsystemTest {
 
   private LauncherSubsystem.Hardware launcherHardware;
   private LauncherSubsystem launcher;
-  private CANSparkMax mockMotor;
-  private RelativeEncoder mockEncoder;
+  private CANSparkMax mockMotorLeft;
+  private CANSparkMax mockMotorRight;
+  private RelativeEncoder mockEncoderLeft;
+  private RelativeEncoder mockEncoderRight;
 
   @BeforeEach
   public void initEach() {
     // Create mock hardware devices
-    mockMotor = mock(CANSparkMax.class);
-    mockEncoder = mock(RelativeEncoder.class);
+    mockMotorLeft = mock(CANSparkMax.class);
+    mockMotorRight = mock(CANSparkMax.class);
+    mockEncoderLeft = mock(RelativeEncoder.class);
+    mockEncoderRight = mock(RelativeEncoder.class);
 
     // Reset preferences to default values so test results are consistent
     RobotPreferences.resetPreferences();
 
     // Create subsystem object using mock hardware
-    launcherHardware = new LauncherSubsystem.Hardware(mockMotor, mockEncoder);
+    launcherHardware =
+        new LauncherSubsystem.Hardware(
+            mockMotorRight, mockMotorLeft, mockEncoderRight, mockEncoderLeft);
     launcher = new LauncherSubsystem(launcherHardware);
   }
 
@@ -62,8 +68,9 @@ class LauncherSubsystemTest {
   @DisplayName("Test constructor and initialization.")
   void testConstructor() {
     // We haven't enabled it yet, so command to motor and saved value should be zero.
-    verify(mockMotor).setVoltage(0.0);
-    assertThat(launcher.getLauncherVoltageCommand()).isZero();
+    verify(mockMotorLeft).setVoltage(0.0);
+    assertThat(launcher.getLauncherVoltageCommandLeft()).isZero();
+    assertThat(launcher.getLauncherVoltageCommandRight()).isZero();
   }
 
   @Test
@@ -79,21 +86,30 @@ class LauncherSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        LauncherConstants.LAUNCHER_FULL_SPEED, telemetryDoubleMap.get("Launcher Setpoint"), DELTA);
+        LauncherConstants.LAUNCHER_FULL_SPEED,
+        telemetryDoubleMap.get("Launcher Left Setpoint"),
+        DELTA);
+    assertEquals(
+        -LauncherConstants.LAUNCHER_FULL_SPEED,
+        telemetryDoubleMap.get("Launcher Right Setpoint"),
+        DELTA);
 
     // Execute the command to run the controller
     runLauncherCommand.execute();
     launcher.periodic();
     readTelemetry();
-    assertThat(telemetryDoubleMap.get("Launcher Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Launcher Left Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Launcher Right Voltage")).isNegative();
     assertThat(telemetryBooleanMap.get("Launcher Enabled")).isTrue();
 
-    // When disabled mMotor should be commanded to zero
+    // When disabled Motor should be commanded to zero
     launcher.disableLauncher();
     launcher.periodic();
     readTelemetry();
-    verify(mockMotor, times(2)).setVoltage(0.0);
-    assertThat(telemetryDoubleMap.get("Launcher Voltage")).isZero();
+    verify(mockMotorLeft, times(2)).setVoltage(0.0);
+    verify(mockMotorRight, times(2)).setVoltage(0.0);
+    assertThat(telemetryDoubleMap.get("Launcher Left Voltage")).isZero();
+    assertThat(telemetryDoubleMap.get("Launcher Right Voltage")).isZero();
     assertThat(telemetryBooleanMap.get("Launcher Enabled")).isFalse();
   }
 
@@ -102,25 +118,34 @@ class LauncherSubsystemTest {
   void testSensors() {
 
     // Set values for mocked sensors
-    final double fakeCurrent = -3.3;
-    when(mockMotor.getOutputCurrent()).thenReturn(fakeCurrent);
-    final double fakeVelocity = 123.5;
-    when(mockEncoder.getVelocity()).thenReturn(fakeVelocity);
+    final double fakeCurrentLeft = -3.3;
+    final double fakeCurrentRight = 4.4;
+    when(mockMotorLeft.getOutputCurrent()).thenReturn(fakeCurrentLeft);
+    when(mockMotorRight.getOutputCurrent()).thenReturn(fakeCurrentRight);
+    final double fakeVelocityLeft = 123.5;
+    final double fakeVelocityRight = -234.5;
+    when(mockEncoderLeft.getVelocity()).thenReturn(fakeVelocityLeft);
+    when(mockEncoderRight.getVelocity()).thenReturn(fakeVelocityRight);
 
-    // The motor voltage should be set twice: once to 0 when configured and once to a
-    // positive value when controller is run.
+    // The motor voltages should be set twice: once to 0 when configured and once to a
+    // positive value for left and negative value for right when controller is run.
     Command runLauncherCommand = launcher.runLauncher(LauncherConstants.LAUNCHER_FULL_SPEED);
     runLauncherCommand.initialize();
     runLauncherCommand.execute();
-    verify(mockMotor, times(2)).setVoltage(anyDouble());
-    verify(mockMotor).setVoltage(0.0);
-    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
+    verify(mockMotorLeft, times(2)).setVoltage(anyDouble());
+    verify(mockMotorLeft).setVoltage(0.0);
+    verify(mockMotorLeft, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
+    verify(mockMotorRight, times(2)).setVoltage(anyDouble());
+    verify(mockMotorRight).setVoltage(0.0);
+    verify(mockMotorRight, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
 
     // Check that telemetry was sent to dashboard
     launcher.periodic();
     readTelemetry();
-    assertEquals(fakeCurrent, telemetryDoubleMap.get("Launcher Current"), DELTA);
-    assertEquals(fakeVelocity, telemetryDoubleMap.get("Launcher Speed"), DELTA);
+    assertEquals(fakeCurrentLeft, telemetryDoubleMap.get("Launcher Left Current"), DELTA);
+    assertEquals(fakeVelocityLeft, telemetryDoubleMap.get("Launcher Left Speed"), DELTA);
+    assertEquals(fakeCurrentRight, telemetryDoubleMap.get("Launcher Right Current"), DELTA);
+    assertEquals(fakeVelocityRight, telemetryDoubleMap.get("Launcher Right Speed"), DELTA);
   }
 
   // ---------- Utility Functions --------------------------------------
