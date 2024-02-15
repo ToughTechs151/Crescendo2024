@@ -50,7 +50,7 @@ class LauncherSubsystemTest {
     mockEncoderRight = mock(RelativeEncoder.class);
 
     // Reset preferences to default values so test results are consistent
-    RobotPreferences.resetPreferences();
+    RobotPreferences.resetAllPreferences();
 
     // Create subsystem object using mock hardware
     launcherHardware =
