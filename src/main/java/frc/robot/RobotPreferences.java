@@ -44,7 +44,9 @@ public class RobotPreferences {
   }
 
   /** Reset the Preferences table to default values. */
-  public static void resetPreferences() {
+  public static void resetAllPreferences() {
+    // Clear the preferences table
+    Preferences.removeAll();
 
     // Reset the subsystem preferences
     resetPreferencesArray(Constants.ArmConstants.getArmPreferences());

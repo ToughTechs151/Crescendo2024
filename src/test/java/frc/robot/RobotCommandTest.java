@@ -49,7 +49,7 @@ class RobotCommandTest {
     arm = container.getArmSubsystem();
 
     // Reset preferences to default values so test results are consistent
-    RobotPreferences.resetPreferences();
+    RobotPreferences.resetAllPreferences();
   }
 
   @AfterEach

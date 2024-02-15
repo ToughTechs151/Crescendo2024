@@ -218,6 +218,13 @@ public class DataLogging {
                 .withName("Reset Launcher Preferences"))
         .withSize(2, 1);
 
+    sbCommandsTab
+        .add(
+            new InstantCommand(() -> RobotPreferences.resetAllPreferences())
+                .ignoringDisable(true)
+                .withName("Reset All Preferences"))
+        .withSize(2, 1);
+
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
     // Start Pose command.  Using that command in simulation mode will cause the robot position
     // to be displayed incorrectly on the field.
