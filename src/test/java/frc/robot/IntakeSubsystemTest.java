@@ -80,7 +80,7 @@ class IntakeSubsystemTest {
     assertThat(numEntries).isPositive();
     System.out.println("set point: " + telemetryDoubleMap.get("Intake Setpoint"));
     assertEquals(
-        IntakeConstants.INTAKE_SET_POINT_RPM.getValue(),
+        IntakeConstants.INTAKE_SET_POINT_FORWARD_RPM.getValue(),
         telemetryDoubleMap.get("Intake Setpoint"),
         DELTA);
 
@@ -113,7 +113,7 @@ class IntakeSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        -IntakeConstants.INTAKE_SET_POINT_RPM.getValue(),
+        IntakeConstants.INTAKE_SET_POINT_REVERSE_RPM.getValue(),
         telemetryDoubleMap.get("Intake Setpoint"),
         DELTA);
 

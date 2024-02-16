@@ -113,7 +113,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean intakeEnabled;
   private double intakeVoltageCommand = 0.0;
 
-  private double setSpeed;
+  private double forwardSetSpeed;
+  private double reverseSetSpeed;
   private double speedThreshold;
   private double currentThreshold;
 
@@ -211,7 +212,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns a Command that runs the motor forward at the current set speed. */
   public Command runForward() {
     return new FunctionalCommand(
-        () -> setMotorSetPoint(1.0),
+        () -> setMotorSetPointForward(),
         this::updateMotorController,
         interrupted -> disableIntake(),
         () -> false,
@@ -221,7 +222,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns a Command that runs the motor forward until a note is loaded. */
   public Command loadNote() {
     return new FunctionalCommand(
-        () -> setMotorSetPoint(1.0),
+        () -> setMotorSetPointForward(),
         this::updateMotorController,
         interrupted -> disableIntake(),
         this::noteFullyLoaded,
@@ -231,7 +232,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns a Command that runs the motor in reverse at the current set speed. */
   public Command runReverse() {
     return new FunctionalCommand(
-        () -> setMotorSetPoint(-1.0),
+        () -> setMotorSetPointReverse(),
         this::updateMotorController,
         interrupted -> disableIntake(),
         () -> false,
@@ -239,12 +240,24 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Set the setpoint for the motor as a scale factor applied to the setpoint value. The
+   * Set the setpoint for the motor as a scale factor applied to the setpoint value going forwards.
+   * The PIDController drives the motor to this speed and holds it there.
+   */
+  private void setMotorSetPointForward() {
+    loadPreferences();
+    intakeController.setSetpoint(forwardSetSpeed);
+
+    // Call enable() to configure and start the controller in case it is not already enabled.
+    enableIntake();
+  }
+
+  /**
+   * Set the setpoint for the motor as a scale factor applied to the setpoint value reversed. The
    * PIDController drives the motor to this speed and holds it there.
    */
-  private void setMotorSetPoint(double scale) {
+  private void setMotorSetPointReverse() {
     loadPreferences();
-    intakeController.setSetpoint(scale * setSpeed);
+    intakeController.setSetpoint(reverseSetSpeed);
 
     // Call enable() to configure and start the controller in case it is not already enabled.
     enableIntake();
@@ -327,7 +340,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private void loadPreferences() {
 
     // Read the motor speed set point and thresholds for detecting a loaded note
-    setSpeed = IntakeConstants.INTAKE_SET_POINT_RPM.getValue();
+    forwardSetSpeed = IntakeConstants.INTAKE_SET_POINT_FORWARD_RPM.getValue();
+    reverseSetSpeed = IntakeConstants.INTAKE_SET_POINT_REVERSE_RPM.getValue();
     speedThreshold = IntakeConstants.INTAKE_SPEED_THRESHOLD_RPM.getValue();
     currentThreshold = IntakeConstants.INTAKE_CURRENT_THRESHOLD_AMPS.getValue();
 
