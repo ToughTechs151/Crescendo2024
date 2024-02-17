@@ -86,11 +86,11 @@ class LauncherSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        LauncherConstants.LAUNCHER_FULL_SPEED,
+        -LauncherConstants.LAUNCHER_FULL_SPEED,
         telemetryDoubleMap.get("Launcher Left Setpoint"),
         DELTA);
     assertEquals(
-        -LauncherConstants.LAUNCHER_FULL_SPEED,
+        LauncherConstants.LAUNCHER_FULL_SPEED,
         telemetryDoubleMap.get("Launcher Right Setpoint"),
         DELTA);
 
@@ -98,8 +98,8 @@ class LauncherSubsystemTest {
     runLauncherCommand.execute();
     launcher.periodic();
     readTelemetry();
-    assertThat(telemetryDoubleMap.get("Launcher Left Voltage")).isPositive();
-    assertThat(telemetryDoubleMap.get("Launcher Right Voltage")).isNegative();
+    assertThat(telemetryDoubleMap.get("Launcher Left Voltage")).isNegative();
+    assertThat(telemetryDoubleMap.get("Launcher Right Voltage")).isPositive();
     assertThat(telemetryBooleanMap.get("Launcher Enabled")).isTrue();
 
     // When disabled Motor should be commanded to zero
@@ -118,12 +118,12 @@ class LauncherSubsystemTest {
   void testSensors() {
 
     // Set values for mocked sensors
-    final double fakeCurrentLeft = -3.3;
+    final double fakeCurrentLeft = 3.3;
     final double fakeCurrentRight = 4.4;
     when(mockMotorLeft.getOutputCurrent()).thenReturn(fakeCurrentLeft);
     when(mockMotorRight.getOutputCurrent()).thenReturn(fakeCurrentRight);
-    final double fakeVelocityLeft = 123.5;
-    final double fakeVelocityRight = -234.5;
+    final double fakeVelocityLeft = -123.5;
+    final double fakeVelocityRight = 234.5;
     when(mockEncoderLeft.getVelocity()).thenReturn(fakeVelocityLeft);
     when(mockEncoderRight.getVelocity()).thenReturn(fakeVelocityRight);
 
@@ -134,10 +134,10 @@ class LauncherSubsystemTest {
     runLauncherCommand.execute();
     verify(mockMotorLeft, times(2)).setVoltage(anyDouble());
     verify(mockMotorLeft).setVoltage(0.0);
-    verify(mockMotorLeft, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
+    verify(mockMotorLeft, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
     verify(mockMotorRight, times(2)).setVoltage(anyDouble());
     verify(mockMotorRight).setVoltage(0.0);
-    verify(mockMotorRight, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
+    verify(mockMotorRight, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
 
     // Check that telemetry was sent to dashboard
     launcher.periodic();

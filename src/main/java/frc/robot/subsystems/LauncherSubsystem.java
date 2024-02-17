@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -132,6 +133,11 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
           LauncherConstants.LAUNCHER_KV_VOLTS_PER_RPM.getValue(),
           LauncherConstants.LAUNCHER_KA_VOLTS_PER_RPM2.getValue());
 
+  SlewRateLimiter leftLimiter =
+      new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
+  SlewRateLimiter rightLimiter =
+      new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
+
   private double pidLeftOutput = 0.0;
   private double pidRightOutput = 0.0;
   private double newLeftFeedforward = 0;
@@ -236,8 +242,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
       pidLeftOutput = launcherLeftController.calculate(getLauncherSpeedLeft());
       newLeftFeedforward = feedforward.calculate(launcherLeftController.getSetpoint());
       newRightFeedforward = feedforward.calculate(launcherRightController.getSetpoint());
-      launcherVoltageLeftCommand = pidLeftOutput + newLeftFeedforward;
-      launcherVoltageRightCommand = pidRightOutput + newRightFeedforward;
+      launcherVoltageLeftCommand = leftLimiter.calculate(pidLeftOutput + newLeftFeedforward);
+      launcherVoltageRightCommand = rightLimiter.calculate(pidRightOutput + newRightFeedforward);
 
     } else {
       // If the launcher isn't enabled, set the motor command to 0. In this state the launcher
@@ -269,8 +275,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
    * holds it there.
    */
   private void setLauncherSetPoint(double setpoint) {
-    launcherLeftController.setSetpoint(setpoint);
-    launcherRightController.setSetpoint(-setpoint);
+    launcherLeftController.setSetpoint(-setpoint);
+    launcherRightController.setSetpoint(setpoint);
 
     // Call enable() to configure and start the controller in case it is not already enabled.
     enableLauncher();
@@ -367,6 +373,9 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     double velocityGain = LauncherConstants.LAUNCHER_KV_VOLTS_PER_RPM.getValue();
     double accelerationGain = LauncherConstants.LAUNCHER_KA_VOLTS_PER_RPM2.getValue();
     feedforward = new SimpleMotorFeedforward(staticGain, velocityGain, accelerationGain);
+
+    leftLimiter = new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
+    rightLimiter = new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
   }
 
   /** Close any objects that support it. */

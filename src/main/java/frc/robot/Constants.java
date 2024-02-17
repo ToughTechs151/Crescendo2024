@@ -175,22 +175,28 @@ public final class Constants {
       throw new IllegalStateException("LauncherConstants Utility Class");
     }
 
-    public static final int RIGHT_LAUNCHER_MOTOR_PORT = 11;
-    public static final int LEFT_LAUNCHER_MOTOR_PORT = 10;
+    public static final int RIGHT_LAUNCHER_MOTOR_PORT = 10;
+    public static final int LEFT_LAUNCHER_MOTOR_PORT = 11;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
+    public static final PreferenceKeyValue LAUNCHER_SLEW_VOLTS_PER_SEC =
+        new PreferenceKeyValue("LauncherSlew", 12.0);
     public static final PreferenceKeyValue LAUNCHER_KP =
-        new PreferenceKeyValue("LauncherKP", 12.0 / 5800);
+        new PreferenceKeyValue("LauncherKP", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
         new PreferenceKeyValue("LauncherKS", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KV_VOLTS_PER_RPM =
-        new PreferenceKeyValue("LauncherKV", 12.0 / 5800);
+        new PreferenceKeyValue("LauncherKV", 0.002);
     public static final PreferenceKeyValue LAUNCHER_KA_VOLTS_PER_RPM2 =
         new PreferenceKeyValue("LauncherKA", 0.0);
 
     private static final PreferenceKeyValue[] LAUNCHER_PREFERENCES = {
-      LAUNCHER_KP, LAUNCHER_KS_VOLTS, LAUNCHER_KV_VOLTS_PER_RPM, LAUNCHER_KA_VOLTS_PER_RPM2
+      LAUNCHER_SLEW_VOLTS_PER_SEC,
+      LAUNCHER_KP,
+      LAUNCHER_KS_VOLTS,
+      LAUNCHER_KV_VOLTS_PER_RPM,
+      LAUNCHER_KA_VOLTS_PER_RPM2
     };
 
     public static PreferenceKeyValue[] getLauncherPreferences() {
@@ -199,9 +205,9 @@ public final class Constants {
 
     public static final double LAUNCHER_GEAR_RATIO =
         1.0; // Ratio of motor rotations to output rotations
-    public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0d / LAUNCHER_GEAR_RATIO;
-    public static final double LAUNCHER_TOLERANCE_RPM = 300;
-    public static final double LAUNCHER_FULL_SPEED = 3600;
+    public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / LAUNCHER_GEAR_RATIO;
+    public static final double LAUNCHER_TOLERANCE_RPM = 500;
+    public static final double LAUNCHER_FULL_SPEED = 5300;
   }
 
   /** Constants used for the Climber subsystem. */
