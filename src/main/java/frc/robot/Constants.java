@@ -175,17 +175,16 @@ public final class Constants {
       throw new IllegalStateException("LauncherConstants Utility Class");
     }
 
-    public static final int TOP_RIGHT_LAUNCHER_MOTOR_PORT = 10;
-    public static final int TOP_LEFT_LAUNCHER_MOTOR_PORT = 11;
-    public static final int BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT = 12;
-    public static final int BOTTOM_LEFT_LAUNCHER_MOTOR_PORT = 13;
+    public static final int TOP_RIGHT_LAUNCHER_MOTOR_PORT = 12;
+    public static final int TOP_LEFT_LAUNCHER_MOTOR_PORT = 13;
+    public static final int BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT = 10;
+    public static final int BOTTOM_LEFT_LAUNCHER_MOTOR_PORT = 11;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
     public static final PreferenceKeyValue LAUNCHER_SLEW_VOLTS_PER_SEC =
         new PreferenceKeyValue("LauncherSlew", 12.0);
-    public static final PreferenceKeyValue LAUNCHER_KP =
-        new PreferenceKeyValue("LauncherKP", 0.0);
+    public static final PreferenceKeyValue LAUNCHER_KP = new PreferenceKeyValue("LauncherKP", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
         new PreferenceKeyValue("LauncherKS", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KV_VOLTS_PER_RPM =

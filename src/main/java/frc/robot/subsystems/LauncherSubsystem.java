@@ -129,14 +129,14 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     }
   }
 
-    private final CANSparkMax launcherMotorTopRight;
-    private final CANSparkMax launcherMotorTopLeft;
-    private final CANSparkMax launcherMotorBottomRight;
-    private final CANSparkMax launcherMotorBottomLeft;
-    private final RelativeEncoder launcherEncoderTopRight;
-    private final RelativeEncoder launcherEncoderTopLeft;
-    private final RelativeEncoder launcherEncoderBottomRight;
-    private final RelativeEncoder launcherEncoderBottomLeft;
+  private final CANSparkMax launcherMotorTopRight;
+  private final CANSparkMax launcherMotorTopLeft;
+  private final CANSparkMax launcherMotorBottomRight;
+  private final CANSparkMax launcherMotorBottomLeft;
+  private final RelativeEncoder launcherEncoderTopRight;
+  private final RelativeEncoder launcherEncoderTopLeft;
+  private final RelativeEncoder launcherEncoderBottomRight;
+  private final RelativeEncoder launcherEncoderBottomLeft;
 
   private PIDController launcherTopLeftController =
       new PIDController(LauncherConstants.LAUNCHER_KP.getValue(), 0.0, 0.0);
@@ -219,10 +219,14 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     launcherMotorTopLeft.setIdleMode(IdleMode.kBrake);
     launcherMotorBottomRight.setIdleMode(IdleMode.kBrake);
     launcherMotorBottomLeft.setIdleMode(IdleMode.kBrake);
-    DataLogManager.log("Launcher motor firmware version:" + launcherMotorTopRight.getFirmwareString());
-    DataLogManager.log("Launcher motor firmware version:" + launcherMotorTopLeft.getFirmwareString());
-    DataLogManager.log("Launcher motor firmware version:" + launcherMotorBottomRight.getFirmwareString());
-    DataLogManager.log("Launcher motor firmware version:" + launcherMotorBottomLeft.getFirmwareString());
+    DataLogManager.log(
+        "Launcher motor firmware version:" + launcherMotorTopRight.getFirmwareString());
+    DataLogManager.log(
+        "Launcher motor firmware version:" + launcherMotorTopLeft.getFirmwareString());
+    DataLogManager.log(
+        "Launcher motor firmware version:" + launcherMotorBottomRight.getFirmwareString());
+    DataLogManager.log(
+        "Launcher motor firmware version:" + launcherMotorBottomLeft.getFirmwareString());
   }
 
   private void initLauncherEncoder() {
@@ -266,8 +270,14 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     RelativeEncoder launcherEncoderBottomRight = launcherMotorBottomRight.getEncoder();
     RelativeEncoder launcherEncoderBottomLeft = launcherMotorBottomLeft.getEncoder();
     return new Hardware(
-        launcherMotorTopRight, launcherMotorTopRight, launcherMotorBottomRight, launcherMotorBottomRight, 
-        launcherEncoderTopRight, launcherEncoderTopLeft, launcherEncoderBottomRight, launcherEncoderBottomLeft);
+        launcherMotorTopRight,
+        launcherMotorTopRight,
+        launcherMotorBottomRight,
+        launcherMotorBottomRight,
+        launcherEncoderTopRight,
+        launcherEncoderTopLeft,
+        launcherEncoderBottomRight,
+        launcherEncoderBottomLeft);
   }
 
   /** Publish telemetry with information about the intake's state. */
@@ -276,13 +286,17 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putBoolean("Launcher Enabled", launcherEnabled);
 
     SmartDashboard.putNumber("Launcher Top Left Setpoint", launcherTopLeftController.getSetpoint());
-    SmartDashboard.putNumber("Launcher Top Right Setpoint", launcherTopRightController.getSetpoint());
-    SmartDashboard.putNumber("Launcher Bottom Left Setpoint", launcherBottomLeftController.getSetpoint());
-    SmartDashboard.putNumber("Launcher Bottom Right Setpoint", launcherBottomRightController.getSetpoint());
+    SmartDashboard.putNumber(
+        "Launcher Top Right Setpoint", launcherTopRightController.getSetpoint());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Left Setpoint", launcherBottomLeftController.getSetpoint());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Right Setpoint", launcherBottomRightController.getSetpoint());
 
     SmartDashboard.putNumber("Launcher Top Right Speed", launcherEncoderTopRight.getVelocity());
     SmartDashboard.putNumber("Launcher Top Left Speed", launcherEncoderTopLeft.getVelocity());
-    SmartDashboard.putNumber("Launcher Bottom Right Speed", launcherEncoderBottomRight.getVelocity());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Right Speed", launcherEncoderBottomRight.getVelocity());
     SmartDashboard.putNumber("Launcher Bottom Left Speed", launcherEncoderBottomLeft.getVelocity());
 
     SmartDashboard.putNumber("Launcher Top Left Voltage", launcherVoltageTopLeftCommand);
@@ -290,10 +304,13 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Launcher Bottom Left Voltage", launcherVoltageBottomLeftCommand);
     SmartDashboard.putNumber("Launcher Bottom Right Voltage", launcherVoltageBottomRightCommand);
 
-    SmartDashboard.putNumber("Launcher Top Right Current", launcherMotorTopRight.getOutputCurrent());
+    SmartDashboard.putNumber(
+        "Launcher Top Right Current", launcherMotorTopRight.getOutputCurrent());
     SmartDashboard.putNumber("Launcher Top Left Current", launcherMotorTopLeft.getOutputCurrent());
-    SmartDashboard.putNumber("Launcher Bottom Right Current", launcherMotorBottomRight.getOutputCurrent());
-    SmartDashboard.putNumber("Launcher Bottom Left Current", launcherMotorBottomLeft.getOutputCurrent());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Right Current", launcherMotorBottomRight.getOutputCurrent());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Left Current", launcherMotorBottomLeft.getOutputCurrent());
 
     SmartDashboard.putNumber("Launcher Top Feedforward", newTopFeedforward);
     SmartDashboard.putNumber("Launcher Bottom Feedforward", newBottomFeedforward);
@@ -315,10 +332,14 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
       pidBottomLeftOutput = launcherBottomLeftController.calculate(getLauncherSpeedTopLeft());
       newTopFeedforward = feedforward.calculate(launcherTopLeftController.getSetpoint());
       newBottomFeedforward = feedforward.calculate(launcherBottomLeftController.getSetpoint());
-      launcherVoltageTopLeftCommand = topLeftLimiter.calculate(pidTopLeftOutput + newTopFeedforward);
-      launcherVoltageTopRightCommand = topRightLimiter.calculate(pidTopRightOutput + newTopFeedforward);
-      launcherVoltageBottomLeftCommand = bottomLeftLimiter.calculate(pidBottomLeftOutput + newBottomFeedforward);
-      launcherVoltageBottomRightCommand = bottomRightLimiter.calculate(pidBottomRightOutput + newBottomFeedforward);
+      launcherVoltageTopLeftCommand =
+          topLeftLimiter.calculate(pidTopLeftOutput + newTopFeedforward);
+      launcherVoltageTopRightCommand =
+          topRightLimiter.calculate(pidTopRightOutput - newTopFeedforward);
+      launcherVoltageBottomLeftCommand =
+          bottomLeftLimiter.calculate(pidBottomLeftOutput + newBottomFeedforward);
+      launcherVoltageBottomRightCommand =
+          bottomRightLimiter.calculate(pidBottomRightOutput - newBottomFeedforward);
 
     } else {
       // If the launcher isn't enabled, set the motor command to 0. In this state the launcher
@@ -367,8 +388,10 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Returns whether the launcher has reached the set point speed within limits. */
   public boolean launcherAtSetpoint() {
-    return (launcherTopLeftController.atSetpoint() && launcherTopRightController.atSetpoint() 
-    && launcherBottomLeftController.atSetpoint() && launcherBottomRightController.atSetpoint());
+    return (launcherTopLeftController.atSetpoint()
+        && launcherTopRightController.atSetpoint()
+        && launcherBottomLeftController.atSetpoint()
+        && launcherBottomRightController.atSetpoint());
   }
 
   /**
@@ -490,8 +513,10 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
     topLeftLimiter = new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
     topRightLimiter = new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
-    bottomLeftLimiter = new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
-    bottomRightLimiter = new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
+    bottomLeftLimiter =
+        new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
+    bottomRightLimiter =
+        new SlewRateLimiter(LauncherConstants.LAUNCHER_SLEW_VOLTS_PER_SEC.getValue());
   }
 
   /** Close any objects that support it. */
