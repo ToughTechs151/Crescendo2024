@@ -206,7 +206,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
       newFeedforward = 0;
       intakeVoltageCommand = 0;
     }
-    intakeMotor.setVoltage(intakeVoltageCommand);
+    intakeMotor.setVoltage(-intakeVoltageCommand);
   }
 
   /** Returns a Command that runs the motor forward at the current set speed. */
@@ -325,7 +325,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Returns the intake speed for PID control and logging (Units are RPM). */
   public double getIntakeSpeed() {
-    return intakeEncoder.getVelocity();
+    return -intakeEncoder.getVelocity();
   }
 
   /** Returns the intake motor commanded voltage. */

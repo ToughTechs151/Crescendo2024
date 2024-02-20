@@ -184,7 +184,8 @@ public final class Constants {
     // Constants tunable through preferences
     public static final PreferenceKeyValue LAUNCHER_SLEW_VOLTS_PER_SEC =
         new PreferenceKeyValue("LauncherSlew", 12.0);
-    public static final PreferenceKeyValue LAUNCHER_KP = new PreferenceKeyValue("LauncherKP", 0.0);
+    public static final PreferenceKeyValue LAUNCHER_KP =
+        new PreferenceKeyValue("LauncherKP", 0.001);
     public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
         new PreferenceKeyValue("LauncherKS", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KV_VOLTS_PER_RPM =

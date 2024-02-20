@@ -112,8 +112,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     public Hardware(
         CANSparkMax launcherMotorTopRight,
         CANSparkMax launcherMotorTopLeft,
-        CANSparkMax launcherMotorBottomLeft,
         CANSparkMax launcherMotorBottomRight,
+        CANSparkMax launcherMotorBottomLeft,
         RelativeEncoder launcherEncoderTopRight,
         RelativeEncoder launcherEncoderTopLeft,
         RelativeEncoder launcherEncoderBottomRight,
@@ -166,8 +166,10 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
   private double pidTopRightOutput = 0.0;
   private double pidBottomLeftOutput = 0.0;
   private double pidBottomRightOutput = 0.0;
-  private double newTopFeedforward = 0;
-  private double newBottomFeedforward = 0;
+  private double newTopLeftFeedforward = 0;
+  private double newTopRightFeedforward = 0;
+  private double newBottomLeftFeedforward = 0;
+  private double newBottomRightFeedforward = 0;
   private boolean launcherEnabled;
   private double launcherVoltageTopLeftCommand = 0.0;
   private double launcherVoltageTopRightCommand = 0.0;
@@ -271,9 +273,9 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     RelativeEncoder launcherEncoderBottomLeft = launcherMotorBottomLeft.getEncoder();
     return new Hardware(
         launcherMotorTopRight,
-        launcherMotorTopRight,
+        launcherMotorTopLeft,
         launcherMotorBottomRight,
-        launcherMotorBottomRight,
+        launcherMotorBottomLeft,
         launcherEncoderTopRight,
         launcherEncoderTopLeft,
         launcherEncoderBottomRight,
@@ -312,8 +314,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber(
         "Launcher Bottom Left Current", launcherMotorBottomLeft.getOutputCurrent());
 
-    SmartDashboard.putNumber("Launcher Top Feedforward", newTopFeedforward);
-    SmartDashboard.putNumber("Launcher Bottom Feedforward", newBottomFeedforward);
+    SmartDashboard.putNumber("Launcher Top Feedforward", newTopLeftFeedforward);
+    SmartDashboard.putNumber("Launcher Bottom Feedforward", newBottomLeftFeedforward);
 
     SmartDashboard.putNumber("Launcher Top Left PID output", pidTopLeftOutput);
     SmartDashboard.putNumber("Launcher Top Right PID output", pidTopRightOutput);
@@ -330,16 +332,20 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
       pidTopLeftOutput = launcherTopLeftController.calculate(getLauncherSpeedTopLeft());
       pidBottomRightOutput = launcherBottomRightController.calculate(getLauncherSpeedTopRight());
       pidBottomLeftOutput = launcherBottomLeftController.calculate(getLauncherSpeedTopLeft());
-      newTopFeedforward = feedforward.calculate(launcherTopLeftController.getSetpoint());
-      newBottomFeedforward = feedforward.calculate(launcherBottomLeftController.getSetpoint());
+      newTopLeftFeedforward = feedforward.calculate(launcherTopLeftController.getSetpoint());
+      newBottomLeftFeedforward = feedforward.calculate(launcherBottomLeftController.getSetpoint());
+      newTopRightFeedforward = feedforward.calculate(launcherTopRightController.getSetpoint());
+      newBottomRightFeedforward =
+          feedforward.calculate(launcherBottomRightController.getSetpoint());
+
       launcherVoltageTopLeftCommand =
-          topLeftLimiter.calculate(pidTopLeftOutput + newTopFeedforward);
+          topLeftLimiter.calculate(pidTopLeftOutput + newTopLeftFeedforward);
       launcherVoltageTopRightCommand =
-          topRightLimiter.calculate(pidTopRightOutput - newTopFeedforward);
+          topRightLimiter.calculate(pidTopRightOutput + newTopRightFeedforward);
       launcherVoltageBottomLeftCommand =
-          bottomLeftLimiter.calculate(pidBottomLeftOutput + newBottomFeedforward);
+          bottomLeftLimiter.calculate(pidBottomLeftOutput + newBottomLeftFeedforward);
       launcherVoltageBottomRightCommand =
-          bottomRightLimiter.calculate(pidBottomRightOutput - newBottomFeedforward);
+          bottomRightLimiter.calculate(pidBottomRightOutput + newBottomRightFeedforward);
 
     } else {
       // If the launcher isn't enabled, set the motor command to 0. In this state the launcher
@@ -349,8 +355,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
       pidTopRightOutput = 0;
       pidBottomLeftOutput = 0;
       pidBottomRightOutput = 0;
-      newTopFeedforward = 0;
-      newBottomFeedforward = 0;
+      newTopLeftFeedforward = 0;
+      newBottomLeftFeedforward = 0;
       launcherVoltageTopLeftCommand = 0;
       launcherVoltageTopRightCommand = 0;
       launcherVoltageBottomLeftCommand = 0;
@@ -485,12 +491,12 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Returns the bottom left launcher motor commanded voltage. */
   public double getLauncherVoltageCommandBottomLeft() {
-    return launcherVoltageTopLeftCommand;
+    return launcherVoltageBottomLeftCommand;
   }
 
   /** Returns the bottom right launcher motor commanded voltage. */
   public double getLauncherVoltageCommandBottomRight() {
-    return launcherVoltageTopRightCommand;
+    return launcherVoltageBottomRightCommand;
   }
 
   /**
