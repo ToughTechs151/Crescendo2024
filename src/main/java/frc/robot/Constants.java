@@ -175,8 +175,10 @@ public final class Constants {
       throw new IllegalStateException("LauncherConstants Utility Class");
     }
 
-    public static final int RIGHT_LAUNCHER_MOTOR_PORT = 10;
-    public static final int LEFT_LAUNCHER_MOTOR_PORT = 11;
+    public static final int TOP_RIGHT_LAUNCHER_MOTOR_PORT = 10;
+    public static final int TOP_LEFT_LAUNCHER_MOTOR_PORT = 11;
+    public static final int BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT = 12;
+    public static final int BOTTOM_LEFT_LAUNCHER_MOTOR_PORT = 13;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
