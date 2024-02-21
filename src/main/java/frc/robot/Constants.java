@@ -139,11 +139,11 @@ public final class Constants {
         new PreferenceKeyValue("IntakeKA", 0.0);
 
     public static final PreferenceKeyValue INTAKE_SET_POINT_FORWARD_RPM =
-        new PreferenceKeyValue("IntakeForwardRPM", 300.0);
+        new PreferenceKeyValue("IntakeForwardRPM", -300.0);
     public static final PreferenceKeyValue INTAKE_SET_POINT_REVERSE_RPM =
-        new PreferenceKeyValue("IntakeReverseRPM", -400.0);
+        new PreferenceKeyValue("IntakeReverseRPM", 400.0);
     public static final PreferenceKeyValue INTAKE_SPEED_THRESHOLD_RPM =
-        new PreferenceKeyValue("IntakeThresholdRPM", 300.0);
+        new PreferenceKeyValue("IntakeThresholdRPM", -300.0);
     public static final PreferenceKeyValue INTAKE_CURRENT_THRESHOLD_AMPS =
         new PreferenceKeyValue("IntakeThresholdAmps", 8.0);
 
@@ -209,7 +209,8 @@ public final class Constants {
         1.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / LAUNCHER_GEAR_RATIO;
     public static final double LAUNCHER_TOLERANCE_RPM = 500;
-    public static final double LAUNCHER_FULL_SPEED = 5300;
+    public static final double LAUNCHER_TOP_SPEED = 5300;
+    public static final double LAUNCHER_BOTTOM_SPEED = 4000;
   }
 
   /** Constants used for the Climber subsystem. */

@@ -86,6 +86,8 @@ class LauncherSubsystemTest {
     verify(mockMotorTopLeft).setVoltage(0.0);
     assertThat(launcher.getLauncherVoltageCommandTopLeft()).isZero();
     assertThat(launcher.getLauncherVoltageCommandTopRight()).isZero();
+    assertThat(launcher.getLauncherVoltageCommandBottomLeft()).isZero();
+    assertThat(launcher.getLauncherVoltageCommandBottomRight()).isZero();
   }
 
   @Test
@@ -93,7 +95,7 @@ class LauncherSubsystemTest {
   void testMoveCommand() {
 
     // Create a command to run the launcher then initialize
-    Command runLauncherCommand = launcher.runLauncher(LauncherConstants.LAUNCHER_FULL_SPEED);
+    Command runLauncherCommand = launcher.runLauncher();
     runLauncherCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
@@ -101,12 +103,20 @@ class LauncherSubsystemTest {
     int numEntries = readTelemetry();
     assertThat(numEntries).isPositive();
     assertEquals(
-        LauncherConstants.LAUNCHER_FULL_SPEED,
+        LauncherConstants.LAUNCHER_TOP_SPEED,
         telemetryDoubleMap.get("Launcher Top Left Setpoint"),
         DELTA);
     assertEquals(
-        -LauncherConstants.LAUNCHER_FULL_SPEED,
+        -LauncherConstants.LAUNCHER_TOP_SPEED,
         telemetryDoubleMap.get("Launcher Top Right Setpoint"),
+        DELTA);
+    assertEquals(
+        -LauncherConstants.LAUNCHER_BOTTOM_SPEED,
+        telemetryDoubleMap.get("Launcher Bottom Left Setpoint"),
+        DELTA);
+    assertEquals(
+        LauncherConstants.LAUNCHER_BOTTOM_SPEED,
+        telemetryDoubleMap.get("Launcher Bottom Right Setpoint"),
         DELTA);
 
     // Execute the command to run the controller
@@ -125,8 +135,12 @@ class LauncherSubsystemTest {
     readTelemetry();
     verify(mockMotorTopLeft, times(2)).setVoltage(0.0);
     verify(mockMotorTopRight, times(2)).setVoltage(0.0);
+    verify(mockMotorBottomLeft, times(2)).setVoltage(0.0);
+    verify(mockMotorBottomRight, times(2)).setVoltage(0.0);
     assertThat(telemetryDoubleMap.get("Launcher Top Left Voltage")).isZero();
     assertThat(telemetryDoubleMap.get("Launcher Top Right Voltage")).isZero();
+    assertThat(telemetryDoubleMap.get("Launcher Bottom Left Voltage")).isZero();
+    assertThat(telemetryDoubleMap.get("Launcher Bottom Right Voltage")).isZero();
     assertThat(telemetryBooleanMap.get("Launcher Enabled")).isFalse();
   }
 
@@ -135,18 +149,27 @@ class LauncherSubsystemTest {
   void testSensors() {
 
     // Set values for mocked sensors
-    final double fakeCurrentLeft = 3.3;
-    final double fakeCurrentRight = 4.4;
-    when(mockMotorTopLeft.getOutputCurrent()).thenReturn(fakeCurrentLeft);
-    when(mockMotorTopRight.getOutputCurrent()).thenReturn(fakeCurrentRight);
-    final double fakeVelocityLeft = 123.5;
-    final double fakeVelocityRight = -234.5;
-    when(mockEncoderTopLeft.getVelocity()).thenReturn(fakeVelocityLeft);
-    when(mockEncoderTopRight.getVelocity()).thenReturn(fakeVelocityRight);
+    final double fakeCurrentTopLeft = 3.3;
+    final double fakeCurrentTopRight = 4.4;
+    final double fakeCurrentBottomLeft = 5.5;
+    final double fakeCurrentBottomRight = 6.6;
+    when(mockMotorTopLeft.getOutputCurrent()).thenReturn(fakeCurrentTopLeft);
+    when(mockMotorTopRight.getOutputCurrent()).thenReturn(fakeCurrentTopRight);
+    when(mockMotorBottomLeft.getOutputCurrent()).thenReturn(fakeCurrentBottomLeft);
+    when(mockMotorBottomRight.getOutputCurrent()).thenReturn(fakeCurrentBottomRight);
+
+    final double fakeVelocityTopLeft = 123.5;
+    final double fakeVelocityTopRight = -234.5;
+    final double fakeVelocityBottomLeft = -345.6;
+    final double fakeVelocityBottomRight = 456.7;
+    when(mockEncoderTopLeft.getVelocity()).thenReturn(fakeVelocityTopLeft);
+    when(mockEncoderTopRight.getVelocity()).thenReturn(fakeVelocityTopRight);
+    when(mockEncoderBottomLeft.getVelocity()).thenReturn(fakeVelocityBottomLeft);
+    when(mockEncoderBottomRight.getVelocity()).thenReturn(fakeVelocityBottomRight);
 
     // The motor voltages should be set twice: once to 0 when configured and once to a
     // positive value for left and negative value for right when controller is run.
-    Command runLauncherCommand = launcher.runLauncher(LauncherConstants.LAUNCHER_FULL_SPEED);
+    Command runLauncherCommand = launcher.runLauncher();
     runLauncherCommand.initialize();
     runLauncherCommand.execute();
     verify(mockMotorTopLeft, times(2)).setVoltage(anyDouble());
@@ -155,14 +178,28 @@ class LauncherSubsystemTest {
     verify(mockMotorTopRight, times(2)).setVoltage(anyDouble());
     verify(mockMotorTopRight).setVoltage(0.0);
     verify(mockMotorTopRight, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
+    verify(mockMotorBottomLeft, times(2)).setVoltage(anyDouble());
+    verify(mockMotorBottomLeft).setVoltage(0.0);
+    verify(mockMotorBottomLeft, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
+    verify(mockMotorBottomRight, times(2)).setVoltage(anyDouble());
+    verify(mockMotorBottomRight).setVoltage(0.0);
+    verify(mockMotorBottomRight, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
 
     // Check that telemetry was sent to dashboard
     launcher.periodic();
     readTelemetry();
-    assertEquals(fakeCurrentLeft, telemetryDoubleMap.get("Launcher Top Left Current"), DELTA);
-    assertEquals(fakeVelocityLeft, telemetryDoubleMap.get("Launcher Top Left Speed"), DELTA);
-    assertEquals(fakeCurrentRight, telemetryDoubleMap.get("Launcher Top Right Current"), DELTA);
-    assertEquals(fakeVelocityRight, telemetryDoubleMap.get("Launcher Top Right Speed"), DELTA);
+    assertEquals(fakeCurrentTopLeft, telemetryDoubleMap.get("Launcher Top Left Current"), DELTA);
+    assertEquals(fakeVelocityTopLeft, telemetryDoubleMap.get("Launcher Top Left Speed"), DELTA);
+    assertEquals(fakeCurrentTopRight, telemetryDoubleMap.get("Launcher Top Right Current"), DELTA);
+    assertEquals(fakeVelocityTopRight, telemetryDoubleMap.get("Launcher Top Right Speed"), DELTA);
+    assertEquals(
+        fakeCurrentBottomLeft, telemetryDoubleMap.get("Launcher Bottom Left Current"), DELTA);
+    assertEquals(
+        fakeVelocityBottomLeft, telemetryDoubleMap.get("Launcher Bottom Left Speed"), DELTA);
+    assertEquals(
+        fakeCurrentBottomRight, telemetryDoubleMap.get("Launcher Bottom Right Current"), DELTA);
+    assertEquals(
+        fakeVelocityBottomRight, telemetryDoubleMap.get("Launcher Bottom Right Speed"), DELTA);
   }
 
   // ---------- Utility Functions --------------------------------------

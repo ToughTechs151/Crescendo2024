@@ -88,7 +88,7 @@ class IntakeSubsystemTest {
     runForwardCommand.execute();
     intake.periodic();
     readTelemetry();
-    assertThat(telemetryDoubleMap.get("Intake Voltage")).isPositive();
+    assertThat(telemetryDoubleMap.get("Intake Voltage")).isNegative();
     assertThat(telemetryBooleanMap.get("Intake Enabled")).isTrue();
 
     // When disabled mMotor should be commanded to zero
@@ -121,7 +121,7 @@ class IntakeSubsystemTest {
     runIntakeCommand.execute();
     intake.periodic();
     readTelemetry();
-    assertThat(telemetryDoubleMap.get("Intake Voltage")).isNegative();
+    assertThat(telemetryDoubleMap.get("Intake Voltage")).isPositive();
     assertThat(telemetryBooleanMap.get("Intake Enabled")).isTrue();
   }
 
@@ -130,9 +130,9 @@ class IntakeSubsystemTest {
   void testSensors() {
 
     // Set values for mocked sensors
-    final double fakeCurrent = -3.3;
+    final double fakeCurrent = 3.3;
     when(mockMotor.getOutputCurrent()).thenReturn(fakeCurrent);
-    final double fakeVelocity = 123.5;
+    final double fakeVelocity = -123.5;
     when(mockEncoder.getVelocity()).thenReturn(fakeVelocity);
 
     // The motor voltage should be set twice: once to 0 when configured and once to a
@@ -142,7 +142,7 @@ class IntakeSubsystemTest {
     runIntakeCommand.execute();
     verify(mockMotor, times(2)).setVoltage(anyDouble());
     verify(mockMotor).setVoltage(0.0);
-    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.gt(0.0));
+    verify(mockMotor, times(1)).setVoltage(AdditionalMatchers.lt(0.0));
 
     // Check that telemetry was sent to dashboard
     intake.periodic();

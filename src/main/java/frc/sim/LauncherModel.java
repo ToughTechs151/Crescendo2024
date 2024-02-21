@@ -69,15 +69,15 @@ public class LauncherModel implements AutoCloseable {
     launcherMotorBottomSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and save the current so it can be
-    // retrieved later.
+    // retrieved later. Left side is modelled and right side is set to inverse of left.
     sparkTopLeftSim.setVelocity(launcherMotorTopSim.getAngularVelocityRPM());
     sparkTopRightSim.setVelocity(-launcherMotorTopSim.getAngularVelocityRPM());
     sparkTopLeftSim.setPosition(launcherMotorTopSim.getAngularPositionRotations());
     sparkTopRightSim.setPosition(-launcherMotorTopSim.getAngularPositionRotations());
-    sparkBottomLeftSim.setVelocity(-launcherMotorBottomSim.getAngularVelocityRPM());
-    sparkBottomRightSim.setVelocity(launcherMotorBottomSim.getAngularVelocityRPM());
-    sparkBottomLeftSim.setPosition(-launcherMotorBottomSim.getAngularPositionRotations());
-    sparkBottomRightSim.setPosition(launcherMotorBottomSim.getAngularPositionRotations());
+    sparkBottomLeftSim.setVelocity(launcherMotorBottomSim.getAngularVelocityRPM());
+    sparkBottomRightSim.setVelocity(-launcherMotorBottomSim.getAngularVelocityRPM());
+    sparkBottomLeftSim.setPosition(launcherMotorBottomSim.getAngularPositionRotations());
+    sparkBottomRightSim.setPosition(-launcherMotorBottomSim.getAngularPositionRotations());
     simLauncherTopCurrent =
         launcherGearbox.getCurrent(
             launcherMotorTopSim.getAngularVelocityRadPerSec(),
@@ -92,12 +92,12 @@ public class LauncherModel implements AutoCloseable {
     sparkBottomRightSim.setCurrent(simLauncherBottomCurrent);
   }
 
-  /** Return the left simulated current. */
+  /** Return the top simulated current. Left and right are the same. */
   public double getSimTopCurrent() {
     return simLauncherTopCurrent;
   }
 
-  /** Return the right simulated current. */
+  /** Return the bottom simulated current. Left and right are the same. */
   public double getSimBottomCurrent() {
     return simLauncherBottomCurrent;
   }

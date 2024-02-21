@@ -185,10 +185,7 @@ public class RobotContainer {
     // Run the launcher at the defined speed while the right trigger is held.
     operatorController
         .rightTrigger()
-        .whileTrue(
-            robotLauncher
-                .runLauncher(Constants.LauncherConstants.LAUNCHER_FULL_SPEED)
-                .withName("Launcher: Run Full Speed"));
+        .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
 
     // Run the intake forward when the right bumper is pressed.
     operatorController
