@@ -69,6 +69,30 @@ public final class Constants {
     public static final double START_XPOS_METERS = 0.5;
     public static final double START_YPOS_METERS = 2.5;
     public static final double START_HEADING_RADIANS = Units.degreesToRadians(0.0);
+
+    public static final boolean SQUARE_INPUTS = true;
+    public static final boolean ENABLE_BRAKE = false;
+    public static final double DEADBAND = 0.05;
+
+    // Constants tunable through preferences
+    public static final PreferenceKeyValue DRIVE_TURN_FACTOR =
+        new PreferenceKeyValue("DriveTurnFactor", 0.7);
+    public static final PreferenceKeyValue DRIVE_SLEW_SPEED =
+        new PreferenceKeyValue("DriveSlewSpeed", 2.0);
+    public static final PreferenceKeyValue DRIVE_SLEW_TURN =
+        new PreferenceKeyValue("DriveSlewTurn", 5.0);
+    public static final PreferenceKeyValue DRIVE_NORMAL_SPEED =
+        new PreferenceKeyValue("DriveNormalSpeed", 1.0);
+    public static final PreferenceKeyValue DRIVE_CRAWL_SPEED =
+        new PreferenceKeyValue("DriveCrawlSpeed", 0.3);
+
+    private static final PreferenceKeyValue[] DRIVE_PREFERENCES = {
+      DRIVE_TURN_FACTOR, DRIVE_SLEW_SPEED, DRIVE_SLEW_TURN, DRIVE_NORMAL_SPEED, DRIVE_CRAWL_SPEED
+    };
+
+    public static PreferenceKeyValue[] getDrivePreferences() {
+      return DRIVE_PREFERENCES;
+    }
   }
 
   /** Constants used for the Arm subsystem. */
