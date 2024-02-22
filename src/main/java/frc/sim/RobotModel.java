@@ -87,8 +87,8 @@ public class RobotModel {
     double rightClimberCurrent = Math.abs(simClimber.getSimCurrentRight());
     double leftDriveCurrent = Math.abs(simDrivetrain.getLeftSimCurrent());
     double rightDriveCurrent = Math.abs(simDrivetrain.getRightSimCurrent());
-    double launcherLeftCurrent = Math.abs(simLauncher.getSimLeftCurrent());
-    double launcherRightCurrent = Math.abs(simLauncher.getSimRightCurrent());
+    double launcherTopCurrent = Math.abs(simLauncher.getSimTopCurrent());
+    double launcherBottomCurrent = Math.abs(simLauncher.getSimBottomCurrent());
     double intakeCurrent = Math.abs(simIntake.getSimCurrent());
 
     double[] simCurrents = {
@@ -97,8 +97,10 @@ public class RobotModel {
       rightClimberCurrent,
       leftDriveCurrent,
       rightDriveCurrent,
-      launcherLeftCurrent,
-      launcherRightCurrent,
+      launcherTopCurrent,
+      launcherBottomCurrent,
+      launcherTopCurrent,
+      launcherBottomCurrent,
       intakeCurrent
     };
 
@@ -110,12 +112,14 @@ public class RobotModel {
 
     simpdp.setVoltage(loadedVoltage);
     simpdp.setCurrent(0, currentDrawA + random.nextDouble());
-    simpdp.setCurrent(7, armCurrent);
-    simpdp.setCurrent(8, leftClimberCurrent);
-    simpdp.setCurrent(9, rightClimberCurrent);
-    simpdp.setCurrent(4, launcherLeftCurrent);
-    simpdp.setCurrent(5, launcherRightCurrent);
-    simpdp.setCurrent(6, intakeCurrent);
+    simpdp.setCurrent(1, armCurrent);
+    simpdp.setCurrent(2, leftClimberCurrent);
+    simpdp.setCurrent(3, rightClimberCurrent);
+    simpdp.setCurrent(4, launcherTopCurrent);
+    simpdp.setCurrent(5, launcherBottomCurrent);
+    simpdp.setCurrent(6, launcherTopCurrent);
+    simpdp.setCurrent(7, launcherBottomCurrent);
+    simpdp.setCurrent(8, intakeCurrent);
     simpdp.setCurrent(10, leftDriveCurrent / 2);
     simpdp.setCurrent(11, leftDriveCurrent / 2);
     simpdp.setCurrent(12, rightDriveCurrent / 2);

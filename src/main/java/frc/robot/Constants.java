@@ -87,7 +87,7 @@ public final class Constants {
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
         new PreferenceKeyValue("ArmKV", 2.0);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(120));
+        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
         new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
 
@@ -109,14 +109,14 @@ public final class Constants {
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-20.0);
-    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(145.0);
-    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-20.0);
+    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-28.0);
+    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(148.0);
+    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-35.0);
     public static final double MAX_ANGLE_RADS = Units.degreesToRadians(155.0);
     public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
     public static final double POS_INCREMENT = Units.degreesToRadians(2.0); // For small adjustments
-    public static final double POSITION_TOLERANCE = Units.degreesToRadians(2.0);
-    public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(1.0);
+    public static final double POSITION_TOLERANCE = Units.degreesToRadians(4.0);
+    public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(10.0);
   }
 
   /** Constants used for the Launcher subsystem. */
@@ -138,10 +138,12 @@ public final class Constants {
     public static final PreferenceKeyValue INTAKE_KA_VOLTS_PER_RPM2 =
         new PreferenceKeyValue("IntakeKA", 0.0);
 
-    public static final PreferenceKeyValue INTAKE_SET_POINT_RPM =
-        new PreferenceKeyValue("IntakeRPM", 450.0);
+    public static final PreferenceKeyValue INTAKE_SET_POINT_FORWARD_RPM =
+        new PreferenceKeyValue("IntakeForwardRPM", -300.0);
+    public static final PreferenceKeyValue INTAKE_SET_POINT_REVERSE_RPM =
+        new PreferenceKeyValue("IntakeReverseRPM", 400.0);
     public static final PreferenceKeyValue INTAKE_SPEED_THRESHOLD_RPM =
-        new PreferenceKeyValue("IntakeThresholdRPM", 300.0);
+        new PreferenceKeyValue("IntakeThresholdRPM", -300.0);
     public static final PreferenceKeyValue INTAKE_CURRENT_THRESHOLD_AMPS =
         new PreferenceKeyValue("IntakeThresholdAmps", 8.0);
 
@@ -150,7 +152,8 @@ public final class Constants {
       INTAKE_KS_VOLTS,
       INTAKE_KV_VOLTS_PER_RPM,
       INTAKE_KA_VOLTS_PER_RPM2,
-      INTAKE_SET_POINT_RPM,
+      INTAKE_SET_POINT_FORWARD_RPM,
+      INTAKE_SET_POINT_REVERSE_RPM,
       INTAKE_SPEED_THRESHOLD_RPM,
       INTAKE_CURRENT_THRESHOLD_AMPS
     };
@@ -172,22 +175,30 @@ public final class Constants {
       throw new IllegalStateException("LauncherConstants Utility Class");
     }
 
-    public static final int RIGHT_LAUNCHER_MOTOR_PORT = 11;
-    public static final int LEFT_LAUNCHER_MOTOR_PORT = 10;
+    public static final int TOP_RIGHT_LAUNCHER_MOTOR_PORT = 12;
+    public static final int TOP_LEFT_LAUNCHER_MOTOR_PORT = 13;
+    public static final int BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT = 10;
+    public static final int BOTTOM_LEFT_LAUNCHER_MOTOR_PORT = 11;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
+    public static final PreferenceKeyValue LAUNCHER_SLEW_VOLTS_PER_SEC =
+        new PreferenceKeyValue("LauncherSlew", 12.0);
     public static final PreferenceKeyValue LAUNCHER_KP =
-        new PreferenceKeyValue("LauncherKP", 12.0 / 5800);
+        new PreferenceKeyValue("LauncherKP", 0.001);
     public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
         new PreferenceKeyValue("LauncherKS", 0.0);
     public static final PreferenceKeyValue LAUNCHER_KV_VOLTS_PER_RPM =
-        new PreferenceKeyValue("LauncherKV", 12.0 / 5800);
+        new PreferenceKeyValue("LauncherKV", 0.002);
     public static final PreferenceKeyValue LAUNCHER_KA_VOLTS_PER_RPM2 =
         new PreferenceKeyValue("LauncherKA", 0.0);
 
     private static final PreferenceKeyValue[] LAUNCHER_PREFERENCES = {
-      LAUNCHER_KP, LAUNCHER_KS_VOLTS, LAUNCHER_KV_VOLTS_PER_RPM, LAUNCHER_KA_VOLTS_PER_RPM2
+      LAUNCHER_SLEW_VOLTS_PER_SEC,
+      LAUNCHER_KP,
+      LAUNCHER_KS_VOLTS,
+      LAUNCHER_KV_VOLTS_PER_RPM,
+      LAUNCHER_KA_VOLTS_PER_RPM2
     };
 
     public static PreferenceKeyValue[] getLauncherPreferences() {
@@ -196,9 +207,10 @@ public final class Constants {
 
     public static final double LAUNCHER_GEAR_RATIO =
         1.0; // Ratio of motor rotations to output rotations
-    public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0d / LAUNCHER_GEAR_RATIO;
-    public static final double LAUNCHER_TOLERANCE_RPM = 300;
-    public static final double LAUNCHER_FULL_SPEED = 3600;
+    public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / LAUNCHER_GEAR_RATIO;
+    public static final double LAUNCHER_TOLERANCE_RPM = 500;
+    public static final double LAUNCHER_TOP_SPEED = 5300;
+    public static final double LAUNCHER_BOTTOM_SPEED = 4000;
   }
 
   /** Constants used for the Climber subsystem. */
