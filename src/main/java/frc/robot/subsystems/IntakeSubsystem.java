@@ -212,7 +212,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns a Command that runs the motor forward at the current set speed. */
   public Command runForward() {
     return new FunctionalCommand(
-        () -> setMotorSetPointForward(),
+        this::setMotorSetPointForward,
         this::updateMotorController,
         interrupted -> disableIntake(),
         () -> false,
@@ -222,7 +222,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns a Command that runs the motor forward until a note is loaded. */
   public Command loadNote() {
     return new FunctionalCommand(
-        () -> setMotorSetPointForward(),
+        this::setMotorSetPointForward,
         this::updateMotorController,
         interrupted -> disableIntake(),
         this::noteFullyLoaded,
@@ -232,7 +232,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns a Command that runs the motor in reverse at the current set speed. */
   public Command runReverse() {
     return new FunctionalCommand(
-        () -> setMotorSetPointReverse(),
+        this::setMotorSetPointReverse,
         this::updateMotorController,
         interrupted -> disableIntake(),
         () -> false,
