@@ -366,6 +366,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Launcher Top Right PID output", pidTopRightOutput);
     SmartDashboard.putNumber("Launcher Bottom Left PID output", pidBottomLeftOutput);
     SmartDashboard.putNumber("Launcher Bottom Right PID output", pidBottomRightOutput);
+    SmartDashboard.putBoolean("Launcher at Setpoint", launcherAtSetpoint());
   }
 
   /** Generate the motor command using the PID controller output and feedforward. */

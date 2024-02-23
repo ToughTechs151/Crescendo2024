@@ -129,6 +129,48 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
 
+    // Run the launcher at the defined speed while the right trigger is held.
+    // operatorController
+    //     .leftTrigger()
+    //     .whileTrue(
+    //       new ParallelCommandGroup(
+    //         robotLauncher.runLauncher().withName("Launcher: Run Full Speed"),
+    //         robotIntake.runReverse().withName("Intake: Run Reverse")));
+
+    // operatorController
+    //     .leftTrigger()
+    //     .whileTrue(
+    //       Commands.parallel(
+    //         robotLauncher.runLauncher().withName("Launcher: Run Full Speed"),
+    //         robotIntake.runReverse().withName("Intake: Run Reverse")
+    //             .onlyIf(robotLauncher::launcherAtSetpoint)));
+
+    // operatorController
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //                 robotLauncher.runLauncher(),
+    //                 robotIntake.runReverse().onlyIf(robotLauncher::launcherAtSetpoint))
+    //             .withName("Launcher: Shoot"));
+
+    operatorController
+        .leftTrigger()
+        .whileTrue(
+            Commands.parallel(
+                    robotLauncher.runLauncher(),
+                    Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))
+                .withName("Launcher: Shoot"));
+
+    // operatorController
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //                 robotLauncher.runLauncher(),
+    //                 Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+    //                     .andThen(robotIntake.runReverse()))
+    //             .withName("Launcher: Shoot"));
+
     // Run the intake forward when the right bumper is pressed.
     operatorController
         .rightBumper()
@@ -140,7 +182,10 @@ public class RobotContainer {
         .whileTrue(robotIntake.runReverse().withName("Intake: Run Reverse"));
 
     // Run the intake until a note is loaded when the Y button is pressed.
-    operatorController.y().whileTrue(robotIntake.loadNote().withName("Intake: Load Note"));
+    operatorController
+        .y()
+        .whileTrue(
+            robotIntake.loadNote().withName("Intake: Load Note"));
   }
 
   /**
