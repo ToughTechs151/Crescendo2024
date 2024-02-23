@@ -218,6 +218,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
   private double launcherVoltageTopLeftCommand = 0.0;
   private double launcherVoltageBottomRightCommand = 0.0;
   private double launcherVoltageBottomLeftCommand = 0.0;
+  public Object launcherAtSetpoint;
 
   /** Create a new LauncherSubsystem controlled by a Profiled PID COntroller . */
   public LauncherSubsystem(Hardware launcherHardware) {
@@ -438,7 +439,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /** Returns whether the launcher has reached the set point speed within limits. */
-  public boolean launcherAtSetpoint() {
+  public boolean launcherAtTheSetpoint() {
     return (launcherTopLeftController.atSetpoint()
         && launcherTopRightController.atSetpoint()
         && launcherBottomLeftController.atSetpoint()

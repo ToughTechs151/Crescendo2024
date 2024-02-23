@@ -135,7 +135,8 @@ public class RobotContainer {
         .whileTrue(
             new ParallelCommandGroup(
                 robotLauncher.runLauncher().withName("Launcher: Run Full Speed"),
-                robotIntake.runReverse().withName("Intake: Run Reverse")));
+                    robotIntake.runReverse().withName("Intake: Run Reverse").unless(() -> !robotLauncher::launcherAtTheSetpoint())
+                    );
 
     // Run the intake forward when the right bumper is pressed.
     operatorController
