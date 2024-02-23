@@ -113,8 +113,8 @@ public class ClimberModel implements AutoCloseable {
     sparkRightSim.setPosition(climberRightSim.getPositionMeters());
     sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
     sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
-    simCurrentLeft = climberLeftSim.getCurrentDrawAmps();
-    simCurrentRight = climberRightSim.getCurrentDrawAmps();
+    simCurrentLeft = Math.abs(climberLeftSim.getCurrentDrawAmps());
+    simCurrentRight = Math.abs(climberRightSim.getCurrentDrawAmps());
     sparkLeftSim.setCurrent(simCurrentLeft);
     sparkRightSim.setCurrent(simCurrentRight);
 

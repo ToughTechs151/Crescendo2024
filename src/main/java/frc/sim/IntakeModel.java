@@ -57,9 +57,10 @@ public class IntakeModel implements AutoCloseable {
     sparkSim.setVelocity(intakeMotorSim.getAngularVelocityRPM());
     sparkSim.setPosition(newPosition);
     simIntakeCurrent =
-        motors.getCurrent(
-            intakeMotorSim.getAngularVelocityRadPerSec(),
-            intakeSubsystem.getIntakeVoltageCommand());
+        Math.abs(
+            motors.getCurrent(
+                intakeMotorSim.getAngularVelocityRadPerSec(),
+                intakeSubsystem.getIntakeVoltageCommand()));
     sparkSim.setCurrent(simIntakeCurrent);
   }
 

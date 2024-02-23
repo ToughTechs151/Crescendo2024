@@ -185,7 +185,11 @@ public class RobotContainer {
     operatorController
         .y()
         .whileTrue(
-            robotIntake.loadNote().withName("Intake: Load Note"));
+            robotIntake
+                .loadNote()
+                .andThen(robotArm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS))
+                .andThen(robotArm::disable)
+                .withName("Intake: Load Note"));
   }
 
   /**
