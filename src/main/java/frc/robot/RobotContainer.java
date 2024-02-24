@@ -150,8 +150,16 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(robotIntake.runReverse().withName("Intake: Run Reverse"));
 
-    // Run the intake until a note is loaded when the Y button is pressed.
-    operatorController.y().whileTrue(robotIntake.loadNote().withName("Intake: Load Note"));
+    // Run the intake until a note is loaded and move the arm back when the Y button is pressed and
+    // held.
+    operatorController
+        .y()
+        .whileTrue(
+            robotIntake
+                .loadNote()
+                .andThen(robotArm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS))
+                .andThen(robotArm::disable)
+                .withName("Intake: Load Note"));
   }
 
   /**
