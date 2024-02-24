@@ -130,13 +130,15 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
 
+    // This command runs the launcher, then the intake when the launcher is up to speed
     operatorController
         .leftTrigger()
         .whileTrue(
             new ParallelCommandGroup(
-                robotLauncher.runLauncher().withName("Launcher: Run Full Speed"),
-                    robotIntake.runReverse().withName("Intake: Run Reverse").unless(() -> !robotLauncher::launcherAtTheSetpoint())
-                    );
+                    robotLauncher.runLauncher(),
+                    Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))
+                .withName("Intake-Launcher: autoShoot"));
 
     // Run the intake forward when the right bumper is pressed.
     operatorController
