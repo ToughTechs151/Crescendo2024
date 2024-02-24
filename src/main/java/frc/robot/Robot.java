@@ -120,8 +120,8 @@ public class Robot extends TimedRobot {
       this.autonomousCommand.cancel();
     }
 
-    // Get selected drive mode and deadband from the SmartDashboard
-    Command driveCommand = robotContainer.getDriveCommand();
+    // Get the selected drive mode to use in TeleOp mode
+    Command driveCommand = robotContainer.getTeleopDriveCommand();
 
     // schedule the drive command
     if (driveCommand != null) {

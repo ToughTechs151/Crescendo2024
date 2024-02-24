@@ -209,6 +209,16 @@ public class DataLogging {
             new InstantCommand(
                     () ->
                         RobotPreferences.resetPreferencesArray(
+                            Constants.DriveConstants.getDrivePreferences()))
+                .ignoringDisable(true)
+                .withName("Reset Drive Preferences"))
+        .withSize(2, 1);
+
+    resetPreferencesLayout
+        .add(
+            new InstantCommand(
+                    () ->
+                        RobotPreferences.resetPreferencesArray(
                             Constants.IntakeConstants.getIntakePreferences()))
                 .ignoringDisable(true)
                 .withName("Reset Intake Preferences"))

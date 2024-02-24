@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.Preferences;
 import java.util.Set;
 
 /** Utility class for managing preferences. */
-// TODO - Add functions to manage preferences more automatically with lists of keys and
-//        default values defined in the constants file.
 public class RobotPreferences {
 
   private RobotPreferences() {
@@ -49,10 +47,11 @@ public class RobotPreferences {
     Preferences.removeAll();
 
     // Reset the subsystem preferences
-    resetPreferencesArray(Constants.ArmConstants.getArmPreferences());
-    resetPreferencesArray(Constants.ClimberConstants.getClimberPreferences());
-    resetPreferencesArray(Constants.IntakeConstants.getIntakePreferences());
-    resetPreferencesArray(Constants.LauncherConstants.getLauncherPreferences());
+    initPreferencesArray(Constants.ArmConstants.getArmPreferences());
+    initPreferencesArray(Constants.ClimberConstants.getClimberPreferences());
+    initPreferencesArray(Constants.DriveConstants.getDrivePreferences());
+    initPreferencesArray(Constants.IntakeConstants.getIntakePreferences());
+    initPreferencesArray(Constants.LauncherConstants.getLauncherPreferences());
   }
 
   /** Reset an array of Preferences to default values. */

@@ -8,6 +8,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -18,7 +20,9 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.RobotPreferences;
 
 /** Drive subsystem using differential drive. */
 public class DriveSubsystem extends SubsystemBase {
@@ -58,8 +62,13 @@ public class DriveSubsystem extends SubsystemBase {
   // Flag to let simulation know when odometry was reset
   boolean odometryReset = false;
 
+  private double normalSpeedMax = 1.0;
+  private double crawlSpeedMax = 0.5;
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+
+    RobotPreferences.initPreferencesArray(DriveConstants.getDrivePreferences());
 
     this.frontLeft.restoreFactoryDefaults();
     this.frontRight.restoreFactoryDefaults();
@@ -67,9 +76,10 @@ public class DriveSubsystem extends SubsystemBase {
     this.rearRight.restoreFactoryDefaults();
 
     // Set the default brake mode to coast and disable the built in deadband since we will apply our
-    // own
+    // own. Set the default drive speed to normal.
     setBrakeMode(false);
     drive.setDeadband(0.0);
+    setNormalSpeed();
 
     rearLeft.follow(frontLeft);
     rearRight.follow(frontRight);
@@ -166,6 +176,35 @@ public class DriveSubsystem extends SubsystemBase {
     drive.feed();
   }
 
+  /** Setup the drive command using the tunable settings. */
+  public Command getDriveCommand(CommandXboxController driverController) {
+
+    // Read Preferences for the drive speeds
+    normalSpeedMax = DriveConstants.DRIVE_NORMAL_SPEED.getValue();
+    crawlSpeedMax = DriveConstants.DRIVE_CRAWL_SPEED.getValue();
+    setNormalSpeed();
+
+    // Slew rate limiters for joystick inputs (units/sec). For example if the limit=2.0, the input
+    // can go from 0 to 1 in 0.5 seconds.
+    SlewRateLimiter speedLimiter = new SlewRateLimiter(DriveConstants.DRIVE_SLEW_SPEED.getValue());
+    SlewRateLimiter turnLimiter = new SlewRateLimiter(DriveConstants.DRIVE_SLEW_TURN.getValue());
+
+    // A split-stick arcade command, with forward/backward controlled by the left hand, and turn
+    // rate controlled by the right. A deadband is applied to both joysticks to avoid creep due to
+    // off calibration. Slew rate limits are applied to speed and turn controls. An additional
+    // factor is used to desensitize turning.
+    return run(() ->
+            arcadeDrive(
+                -speedLimiter.calculate(
+                    MathUtil.applyDeadband(driverController.getLeftY(), DriveConstants.DEADBAND)),
+                -DriveConstants.DRIVE_TURN_FACTOR.getValue()
+                    * turnLimiter.calculate(
+                        MathUtil.applyDeadband(
+                            driverController.getRightX(), DriveConstants.DEADBAND)),
+                DriveConstants.SQUARE_INPUTS))
+        .withName("Arcade");
+  }
+
   /**
    * Returns the currently-estimated pose of the robot.
    *
@@ -254,13 +293,14 @@ public class DriveSubsystem extends SubsystemBase {
         frontLeftEncoder.getVelocity(), frontRightEncoder.getVelocity());
   }
 
-  /**
-   * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
-   *
-   * @param maxOutput the maximum output to which the drive will be constrained
-   */
-  public void setMaxOutput(double maxOutput) {
-    this.drive.setMaxOutput(maxOutput);
+  /** Sets the max output of the drive. Useful for scaling the drive to drive more slowly. */
+  public void setNormalSpeed() {
+    this.drive.setMaxOutput(normalSpeedMax);
+  }
+
+  /** Sets the max output of the drive. Useful for scaling the drive to drive more slowly. */
+  public void setCrawlSpeed() {
+    this.drive.setMaxOutput(crawlSpeedMax);
   }
 
   /**
