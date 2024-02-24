@@ -92,7 +92,7 @@ public class ArmModel implements AutoCloseable {
     // retrieved later.
     sparkSim.setPosition(armSim.getAngleRads() - ArmConstants.ARM_OFFSET_RADS);
     sparkSim.setVelocity(armSim.getVelocityRadPerSec());
-    simCurrent = armSim.getCurrentDrawAmps();
+    simCurrent = Math.abs(armSim.getCurrentDrawAmps());
     sparkSim.setCurrent(simCurrent);
 
     // Update the Mechanism Arm angle based on the simulated arm angle

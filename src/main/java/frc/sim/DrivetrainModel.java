@@ -126,8 +126,8 @@ public class DrivetrainModel {
     rearRightSparkSim.setVelocity(encoderRightSimRate);
 
     // Set our simulated motor current based on the simulated drivetrain
-    double leftSimCurrent = drivetrainSimulator.getLeftCurrentDrawAmps();
-    double rightSimCurrent = drivetrainSimulator.getRightCurrentDrawAmps();
+    double leftSimCurrent = Math.abs(drivetrainSimulator.getLeftCurrentDrawAmps());
+    double rightSimCurrent = Math.abs(drivetrainSimulator.getRightCurrentDrawAmps());
 
     // Current in simulation is total per side so set individual motor current based on number of
     // motors per side.

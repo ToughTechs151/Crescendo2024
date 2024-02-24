@@ -79,13 +79,15 @@ public class LauncherModel implements AutoCloseable {
     sparkBottomLeftSim.setPosition(launcherMotorBottomSim.getAngularPositionRotations());
     sparkBottomRightSim.setPosition(-launcherMotorBottomSim.getAngularPositionRotations());
     simLauncherTopCurrent =
-        launcherGearbox.getCurrent(
-            launcherMotorTopSim.getAngularVelocityRadPerSec(),
-            launcherSubsystem.getLauncherVoltageCommandTopLeft());
+        Math.abs(
+            launcherGearbox.getCurrent(
+                launcherMotorTopSim.getAngularVelocityRadPerSec(),
+                launcherSubsystem.getLauncherVoltageCommandTopLeft()));
     simLauncherBottomCurrent =
-        launcherGearbox.getCurrent(
-            launcherMotorBottomSim.getAngularVelocityRadPerSec(),
-            launcherSubsystem.getLauncherVoltageCommandBottomLeft());
+        Math.abs(
+            launcherGearbox.getCurrent(
+                launcherMotorBottomSim.getAngularVelocityRadPerSec(),
+                launcherSubsystem.getLauncherVoltageCommandBottomLeft()));
     sparkTopLeftSim.setCurrent(simLauncherTopCurrent);
     sparkTopRightSim.setCurrent(-simLauncherTopCurrent);
     sparkBottomLeftSim.setCurrent(-simLauncherBottomCurrent);
