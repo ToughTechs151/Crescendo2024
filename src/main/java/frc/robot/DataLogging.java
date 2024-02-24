@@ -260,6 +260,30 @@ public class DataLogging {
         .addNumber("PDP Temp", pdp::getTemperature)
         .withWidget(BuiltInWidgets.kDial)
         .withProperties(Map.of("min", 15, "max", 50));
+
+    /* HW Test tab */
+    ShuffleboardTab sbHardwareTestTab = Shuffleboard.getTab("HW Test");
+
+    sbHardwareTestTab
+        .add(
+            new InstantCommand(() -> arm.setBrakeMode(true))
+                .ignoringDisable(true)
+                .withName("Arm Brake Mode"))
+        .withSize(2, 1);
+
+    sbHardwareTestTab
+        .add(
+            new InstantCommand(() -> arm.setBrakeMode(false))
+                .ignoringDisable(true)
+                .withName("Arm Coast Mode"))
+        .withSize(2, 1);
+
+    sbHardwareTestTab
+        .add(
+            new InstantCommand(arm::resetEncoder)
+                .ignoringDisable(true)
+                .withName("Arm Reset Position"))
+        .withSize(2, 1);
   }
 
   /**

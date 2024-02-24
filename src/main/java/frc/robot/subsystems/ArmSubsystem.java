@@ -155,7 +155,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     // Maybe we should print the faults if non-zero before clearing?
     motor.clearFaults();
     // Configure the motor to coast when idle and set voltage to 0.
-    motor.setIdleMode(IdleMode.kBrake);
+    setBrakeMode(true);
     DataLogManager.log("Arm motor firmware version:" + motor.getFirmwareString());
   }
 
@@ -344,6 +344,30 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns the Motor Commanded Voltage. */
   public double getVoltageCommand() {
     return voltageCommand;
+  }
+
+  /**
+   * Set the motor idle mode to brake or coast.
+   *
+   * @param enableBrake Enable motor braking when idle
+   */
+  public void setBrakeMode(boolean enableBrake) {
+    if (enableBrake) {
+      DataLogManager.log("Arm motor set to brake mode");
+      this.motor.setIdleMode(IdleMode.kBrake);
+    } else {
+      DataLogManager.log("Arm motor set to coast mode");
+      this.motor.setIdleMode(IdleMode.kCoast);
+    }
+  }
+
+  /**
+   * Reset the encoder to the start (zero) position. This should only be done when the arm is
+   * resting against the back stop. This command doesn't work in simulation.
+   */
+  public void resetEncoder() {
+    DataLogManager.log("Arm encoder reset");
+    encoder.setPosition(0);
   }
 
   /**
