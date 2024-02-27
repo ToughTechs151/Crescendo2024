@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -40,6 +41,7 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
+  private BlinkinSubsystem blinkin;
 
   private DataLogging() {
     // Starts recording to data log
@@ -151,6 +153,12 @@ public class DataLogging {
     // Get the pose from the drivetrain subsystem and update the field display
     sbField.setRobotPose(drive.getPose());
 
+    if (DriverStation.isAutonomous()) {
+      blinkin.setValue(BlinkinSubsystem.YELLOW);
+    } else if (DriverStation.isTeleop()) {
+      blinkin.setValue(BlinkinSubsystem.GREEN);
+    }
+
     if (Constants.LOOP_TIMING_LOG) {
       loopTime.append(Timer.getFPGATimestamp() - startTime);
     }
@@ -163,6 +171,7 @@ public class DataLogging {
    */
   public void dataLogRobotContainerInit(RobotContainer robotContainer) {
 
+    blinkin = robotContainer.getBlinkin();
     drive = robotContainer.getDriveSubsystem();
     ArmSubsystem arm = robotContainer.getArmSubsystem();
     ClimberSubsystem climber = robotContainer.getClimberSubsystem();

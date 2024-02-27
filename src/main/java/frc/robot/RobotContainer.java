@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -29,6 +31,8 @@ import frc.robot.subsystems.LauncherSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+
+  private BlinkinSubsystem blinkin = new BlinkinSubsystem(new PWM(0));
 
   // First we do things that are in all Robots.
   private PowerDistribution pdp = new PowerDistribution();
@@ -59,6 +63,9 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    blinkin.enable();
+    blinkin.setValue(BlinkinSubsystem.ORANGE);
 
     this.robotDrive.setDefaultCommand(this.robotDrive.getDriveCommand(driverController));
   }
@@ -202,6 +209,15 @@ public class RobotContainer {
    */
   public PowerDistribution getPdp() {
     return this.pdp;
+  }
+
+  /**
+   * Use this to get the Blinkin to set the LEDs.
+   *
+   * @return Blinkin subsystem.
+   */
+  public BlinkinSubsystem getBlinkin() {
+    return this.blinkin;
   }
 
   /**
