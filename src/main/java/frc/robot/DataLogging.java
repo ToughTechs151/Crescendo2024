@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -40,6 +41,7 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
+  private static SendableChooser<String> autoChooser = new SendableChooser<>();
 
   private DataLogging() {
     // Starts recording to data log
@@ -241,9 +243,23 @@ public class DataLogging {
                 .withName("Reset All Preferences"))
         .withSize(2, 1);
 
+    // Add a Chooser to select the Autonomous mode
+    autoChooser.setDefaultOption("Nothing", "Nothing");
+    autoChooser.addOption("Drive Straight", "DriveStraight");
+    autoChooser.addOption("Drive Twice", "DriveTwice");
+    autoChooser.addOption("Shoot and Drive", "ShootAndDrive");
+    autoChooser.addOption("Drive and Shoot", "DriveAndShoot");
+
+    ShuffleboardLayout autoChooserLayout =
+        sbCommandsTab
+            .getLayout("Autonomous Command", BuiltInLayouts.kList)
+            .withSize(3, 1)
+            .withPosition(6, 0)
+            .withProperties(Map.of("Label position", "HIDDEN"));
+    autoChooserLayout.add(autoChooser);
+
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
-    // Start Pose command.  Using that command in simulation mode will cause the robot position
-    // to be displayed incorrectly on the field.
+    // Start Pose command.
     sbField = new Field2d();
     sbDriverTab.add("Field", sbField).withSize(8, 4);
     sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
@@ -261,7 +277,7 @@ public class DataLogging {
         .withWidget(BuiltInWidgets.kDial)
         .withProperties(Map.of("min", 15, "max", 50));
 
-    /* HW Test tab */
+    // HW Test tab for buttons to control hardware for testing and maintenance
     ShuffleboardTab sbHardwareTestTab = Shuffleboard.getTab("HW Test");
 
     sbHardwareTestTab
@@ -284,6 +300,15 @@ public class DataLogging {
                 .ignoringDisable(true)
                 .withName("Arm Reset Position"))
         .withSize(2, 1);
+  }
+
+  /**
+   * Get the command from the Autonomous chooser.
+   *
+   * @return the name of the command to run in autonomous
+   */
+  public static String autoCommandName() {
+    return autoChooser.getSelected();
   }
 
   /**

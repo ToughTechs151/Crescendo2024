@@ -11,8 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
@@ -134,10 +133,11 @@ public class RobotContainer {
     operatorController
         .leftTrigger()
         .whileTrue(
-            new ParallelCommandGroup(
+            Commands.parallel(
                     robotLauncher.runLauncher(),
                     Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))
+                .withTimeout(5.0)
                 .withName("Intake-Launcher: autoShoot"));
 
     // Run the intake forward when the right bumper is pressed.
@@ -187,12 +187,46 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Drive forward slowly until the robot moves 1 meter
-    return new RunCommand(() -> this.robotDrive.arcadeDrive(0.3, 0.0, false), this.robotDrive)
-        .until(() -> robotDrive.getAverageDistanceMeters() > 1.0)
-        .withTimeout(5)
-        .andThen(() -> this.robotDrive.tankDriveVolts(0, 0))
-        .withName("Drive Forward 1m");
+
+    switch (DataLogging.autoCommandName()) {
+      case "DriveStraight":
+        // Drive forward slowly until the robot moves 1 meter
+        return robotDrive
+            .driveDistanceCommand(1.0, 0.3, 0.0)
+            .withTimeout(5)
+            .withName("Drive Forward 1m");
+
+      case "DriveTwice":
+        // Drive forward slowly until the robot moves 1 meter then drive an additional meter
+        // with a turn
+        return Commands.sequence(
+                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0),
+                robotDrive.driveDistanceCommand(2.0, 0.2, 0.15))
+            .withName("Drive Twice");
+
+      case "ShootAndDrive":
+        // Shoot a note then Drive forward slowly until the robot moves a set distance
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0))
+            .withName("Shoot and Drive Forward 1m");
+
+      case "DriveAndShoot":
+        // Drive forward a set distance and then shoot
+        return Commands.sequence(
+                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0),
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))))
+            .withName("Drive Forward and Shoot");
+
+      default:
+        return new PrintCommand("No Auto Selected");
+    }
   }
 
   /**

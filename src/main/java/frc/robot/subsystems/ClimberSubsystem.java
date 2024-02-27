@@ -16,7 +16,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -192,6 +191,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
         ClimberConstants.POSITION_TOLERANCE_METERS, ClimberConstants.VELOCITY_TOLERANCE_METERS);
 
     disable();
+
+    setDefaultCommand(runOnce(this::disable).andThen(run(() -> {})).withName("Idle"));
   }
 
   private void initMotors() {
@@ -383,13 +384,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     // Clear the enabled flag and call useOutput to zero the motor command
     climberEnabled = false;
     useOutput();
+    setDefaultCommand(run(() -> {}).withName("Idle"));
 
-    // Remove the default command and cancel any command that is active
-    removeDefaultCommand();
-    Command currentCommand = CommandScheduler.getInstance().requiring(this);
-    if (currentCommand != null) {
-      CommandScheduler.getInstance().cancel(currentCommand);
-    }
     DataLogManager.log(
         "Climber Disabled: LeftPos="
             + getMeasurementLeft()
