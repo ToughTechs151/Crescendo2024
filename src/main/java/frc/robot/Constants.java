@@ -272,16 +272,18 @@ public final class Constants {
       return CLIMBER_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 32.0;
-    public static final double CLIMBER_METERS_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
+    public static final double GEAR_RATIO = 32.0; // 16:1 transmission and 2:1 pulley
+    public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(1.1);
+    public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
+        2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.7;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.378;
     public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
     public static final double CLIMBER_OFFSET_RADS = 0.0;
 
     // Encoder is reset to measure 0 at the top, so minimum pull is 0.
     public static final double CLIMBER_MIN_PULL_METERS = 0.0;
-    public static final double CLIMBER_MAX_PULL_METERS = 0.8;
+    public static final double CLIMBER_MAX_PULL_METERS = 0.5;
 
     public static final double POSITION_TOLERANCE_METERS = 0.03;
     public static final double VELOCITY_TOLERANCE_METERS = 0.01;

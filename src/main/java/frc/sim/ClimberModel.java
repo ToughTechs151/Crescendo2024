@@ -26,7 +26,6 @@ public class ClimberModel implements AutoCloseable {
 
   // The arm gearbox represents a gearbox containing one motor.
   private final DCMotor climberGearbox = DCMotor.getNEO(1);
-  private final DCMotor climberGearbox2 = DCMotor.getNEO(1);
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This climber sim models an elevator that can travel up and down when driven by the motor.
@@ -35,9 +34,9 @@ public class ClimberModel implements AutoCloseable {
   private final ElevatorSim climberLeftSim =
       new ElevatorSim(
           climberGearbox,
-          ClimberSimConstants.CLIMBER_REDUCTION,
+          ClimberConstants.GEAR_RATIO,
           ClimberSimConstants.CARRIAGE_MASS,
-          ClimberSimConstants.CLIMBER_DRUM_RADIUS,
+          ClimberConstants.SPOOL_RADIUS_METERS,
           ClimberConstants.CLIMBER_MIN_PULL_METERS,
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
@@ -46,10 +45,10 @@ public class ClimberModel implements AutoCloseable {
 
   private final ElevatorSim climberRightSim =
       new ElevatorSim(
-          climberGearbox2,
-          ClimberSimConstants.CLIMBER_REDUCTION,
+          climberGearbox,
+          ClimberConstants.GEAR_RATIO,
           ClimberSimConstants.CARRIAGE_MASS,
-          ClimberSimConstants.CLIMBER_DRUM_RADIUS,
+          ClimberConstants.SPOOL_RADIUS_METERS,
           ClimberConstants.CLIMBER_MIN_PULL_METERS,
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
@@ -57,10 +56,10 @@ public class ClimberModel implements AutoCloseable {
           VecBuilder.fill(0.002));
 
   // Create Mechanism2d visualizations of the climber mechanisms
-  private final Mechanism2d mech2dLeft = new Mechanism2d(2, 2);
-  private final Mechanism2d mech2dRight = new Mechanism2d(2, 2);
-  private final MechanismRoot2d mech2dRootLeft = mech2dLeft.getRoot("Climber Root", 1.0, 0.2);
-  private final MechanismRoot2d mech2dRootRight = mech2dRight.getRoot("Climber Root", 1.0, 0.2);
+  private final Mechanism2d mech2dLeft = new Mechanism2d(1, 1.2);
+  private final Mechanism2d mech2dRight = new Mechanism2d(1, 1.2);
+  private final MechanismRoot2d mech2dRootLeft = mech2dLeft.getRoot("Climber Root", 0.5, 0.2);
+  private final MechanismRoot2d mech2dRootRight = mech2dRight.getRoot("Climber Root", 0.5, 0.2);
   private final MechanismLigament2d climberMech2dLeft =
       mech2dRootLeft.append(
           new MechanismLigament2d(
