@@ -6,9 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.sim.RobotModel;
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,6 +23,9 @@ public class Robot extends TimedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   private DataLogging datalog;
+  private Boolean enableDriver = true;
+
+  PhotonCamera camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
 
   /**
    * {@code robotInit} runs when the robot first starts up. It is used to create the robot
@@ -40,6 +46,10 @@ public class Robot extends TimedRobot {
     this.robotContainer = new RobotContainer();
 
     datalog.dataLogRobotContainerInit(this.robotContainer);
+
+    System.out.println("Camera Name: " + camera.getName());
+    camera.setDriverMode(enableDriver);
+    SmartDashboard.putBoolean("Driver Mode", enableDriver);
   }
 
   /**
@@ -59,6 +69,30 @@ public class Robot extends TimedRobot {
 
     // Must be at the end of robotPeriodic
     datalog.periodic();
+
+    boolean newMode = SmartDashboard.getBoolean("Driver Mode", true);
+
+    if (newMode != enableDriver) {
+      enableDriver = newMode;
+      camera.setDriverMode(enableDriver);
+    }
+
+    double targetYaw = 0;
+    double targetPitch = 0;
+    int targetId = 0;
+
+    var result = camera.getLatestResult();
+    if (result.hasTargets()) {
+      PhotonTrackedTarget bestTarget = result.getBestTarget();
+      targetYaw = bestTarget.getYaw();
+      targetPitch = bestTarget.getPitch();
+      targetId = bestTarget.getFiducialId();
+    }
+
+    SmartDashboard.putNumber("Target Yaw", targetYaw);
+    SmartDashboard.putNumber("Target Pitch", targetPitch);
+    SmartDashboard.putNumber("Target ID", targetId);
+    SmartDashboard.putBoolean("Camera Connected", camera.isConnected());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
