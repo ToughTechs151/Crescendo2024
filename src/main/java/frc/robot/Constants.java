@@ -133,10 +133,10 @@ public final class Constants {
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-28.0);
-    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(148.0);
-    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-35.0);
-    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(155.0);
+    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-10.0);
+    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(170.0);
+    public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-18.0);
+    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(180.0);
     public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
     public static final double POS_INCREMENT = Units.degreesToRadians(2.0); // For small adjustments
     public static final double POSITION_TOLERANCE = Units.degreesToRadians(4.0);
@@ -163,11 +163,11 @@ public final class Constants {
         new PreferenceKeyValue("IntakeKA", 0.0);
 
     public static final PreferenceKeyValue INTAKE_SET_POINT_FORWARD_RPM =
-        new PreferenceKeyValue("IntakeForwardRPM", -300.0);
+        new PreferenceKeyValue("IntakeForwardRPM", 300.0);
     public static final PreferenceKeyValue INTAKE_SET_POINT_REVERSE_RPM =
-        new PreferenceKeyValue("IntakeReverseRPM", 400.0);
+        new PreferenceKeyValue("IntakeReverseRPM", -400.0);
     public static final PreferenceKeyValue INTAKE_SPEED_THRESHOLD_RPM =
-        new PreferenceKeyValue("IntakeThresholdRPM", -300.0);
+        new PreferenceKeyValue("IntakeThresholdRPM", 300.0);
     public static final PreferenceKeyValue INTAKE_CURRENT_THRESHOLD_AMPS =
         new PreferenceKeyValue("IntakeThresholdAmps", 8.0);
 
@@ -272,16 +272,18 @@ public final class Constants {
       return CLIMBER_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 32.0;
-    public static final double CLIMBER_METERS_PER_ENCODER_ROTATION = 2.0 * Math.PI * GEAR_RATIO;
+    public static final double GEAR_RATIO = 32.0; // 16:1 transmission and 2:1 pulley
+    public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(1.1);
+    public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
+        2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.7;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.378;
     public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
     public static final double CLIMBER_OFFSET_RADS = 0.0;
 
     // Encoder is reset to measure 0 at the top, so minimum pull is 0.
     public static final double CLIMBER_MIN_PULL_METERS = 0.0;
-    public static final double CLIMBER_MAX_PULL_METERS = 0.8;
+    public static final double CLIMBER_MAX_PULL_METERS = 0.5;
 
     public static final double POSITION_TOLERANCE_METERS = 0.03;
     public static final double VELOCITY_TOLERANCE_METERS = 0.01;

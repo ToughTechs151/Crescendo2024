@@ -273,7 +273,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
    * to speed and the current hitting a threshold.
    */
   public boolean noteFullyLoaded() {
-    return (speed < speedThreshold && (intakeMotor.getOutputCurrent() > currentThreshold));
+    return ((Math.abs(speed) >= speedThreshold)
+        && (intakeMotor.getOutputCurrent() > currentThreshold));
   }
 
   /**
