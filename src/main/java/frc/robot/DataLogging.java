@@ -41,6 +41,7 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
+  private ArmSubsystem arm;
   private BlinkinSubsystem blinkin;
 
   private DataLogging() {
@@ -154,9 +155,18 @@ public class DataLogging {
     sbField.setRobotPose(drive.getPose());
 
     if (DriverStation.isAutonomous()) {
-      blinkin.setValue(BlinkinSubsystem.YELLOW);
+      blinkin.setValue(BlinkinSubsystem.BLUE);
     } else if (DriverStation.isTeleop()) {
       blinkin.setValue(BlinkinSubsystem.GREEN);
+    }
+   
+    if (arm.getMeasurement() > Constants.ArmConstants.ARM_BACK_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.RED);
+    } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.YELLOW);
+    } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_BACK_POSITION_RADS
+        && arm.getMeasurement() > Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.ORANGE);
     }
 
     if (Constants.LOOP_TIMING_LOG) {
@@ -173,7 +183,7 @@ public class DataLogging {
 
     blinkin = robotContainer.getBlinkin();
     drive = robotContainer.getDriveSubsystem();
-    ArmSubsystem arm = robotContainer.getArmSubsystem();
+    arm = robotContainer.getArmSubsystem();
     ClimberSubsystem climber = robotContainer.getClimberSubsystem();
     IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
