@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -53,11 +54,16 @@ public class RobotContainer {
   private final IntakeSubsystem robotIntake =
       new IntakeSubsystem(IntakeSubsystem.initializeHardware());
 
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Setup the Autonomous mode command chooser
+    setupAutoChooser();
 
     this.robotDrive.setDefaultCommand(this.robotDrive.getDriveCommand(driverController));
   }
@@ -181,6 +187,16 @@ public class RobotContainer {
     return robotDrive.getDriveCommand(driverController);
   }
 
+  /** Setup the options for the Autonomous mode command chooser. */
+  private void setupAutoChooser() {
+
+    autoChooser.setDefaultOption("Nothing", "Nothing");
+    autoChooser.addOption("Drive Straight", "DriveStraight");
+    autoChooser.addOption("Drive Twice", "DriveTwice");
+    autoChooser.addOption("Shoot and Drive", "ShootAndDrive");
+    autoChooser.addOption("Drive and Shoot", "DriveAndShoot");
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -188,7 +204,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-    switch (DataLogging.autoCommandName()) {
+    switch (autoChooser.getSelected()) {
       case "DriveStraight":
         // Drive forward slowly until the robot moves 1 meter
         return robotDrive
@@ -230,6 +246,15 @@ public class RobotContainer {
   }
 
   /**
+   * Use this to get the chooser for the Autonomous mode command.
+   *
+   * @return a reference to the chooser for the autonomous command
+   */
+  public SendableChooser<String> getAutoChooser() {
+    return autoChooser;
+  }
+
+  /**
    * Use this to get the PDP for data logging.
    *
    * @return The PowerDistribution module.
@@ -241,7 +266,7 @@ public class RobotContainer {
   /**
    * Use this to get the Arm Subsystem.
    *
-   * @return the command to run in autonomous
+   * @return a reference to the arm subsystem
    */
   public ArmSubsystem getArmSubsystem() {
     return robotArm;
@@ -250,7 +275,7 @@ public class RobotContainer {
   /**
    * Use this to get the Drivetrain Subsystem.
    *
-   * @return the Drivetrain Subsystem
+   * @return a reference to the Drivetrain Subsystem
    */
   public DriveSubsystem getDriveSubsystem() {
     return robotDrive;

@@ -41,7 +41,6 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
-  private static SendableChooser<String> autoChooser = new SendableChooser<>();
 
   private DataLogging() {
     // Starts recording to data log
@@ -243,13 +242,8 @@ public class DataLogging {
                 .withName("Reset All Preferences"))
         .withSize(2, 1);
 
-    // Add a Chooser to select the Autonomous mode
-    autoChooser.setDefaultOption("Nothing", "Nothing");
-    autoChooser.addOption("Drive Straight", "DriveStraight");
-    autoChooser.addOption("Drive Twice", "DriveTwice");
-    autoChooser.addOption("Shoot and Drive", "ShootAndDrive");
-    autoChooser.addOption("Drive and Shoot", "DriveAndShoot");
-
+    // Add the chooser to select the autonomous mode command
+    SendableChooser<String> autoChooser = robotContainer.getAutoChooser();
     ShuffleboardLayout autoChooserLayout =
         sbCommandsTab
             .getLayout("Autonomous Command", BuiltInLayouts.kList)
@@ -300,15 +294,6 @@ public class DataLogging {
                 .ignoringDisable(true)
                 .withName("Arm Reset Position"))
         .withSize(2, 1);
-  }
-
-  /**
-   * Get the command from the Autonomous chooser.
-   *
-   * @return the name of the command to run in autonomous
-   */
-  public static String autoCommandName() {
-    return autoChooser.getSelected();
   }
 
   /**
