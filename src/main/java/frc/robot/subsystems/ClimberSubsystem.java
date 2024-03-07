@@ -201,9 +201,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     // Maybe we should print the faults if non-zero before clearing?
     motorLeft.clearFaults();
     motorRight.clearFaults();
-    // Configure the motor to use EMF braking when idle and set voltage to 0.
-    motorLeft.setIdleMode(IdleMode.kBrake);
-    motorRight.setIdleMode(IdleMode.kBrake);
+    // Configure the motor to use EMF braking when idle.
+    setBrakeMode(true);
 
     DataLogManager.log("Climber motor left firmware version:" + motorLeft.getFirmwareString());
     DataLogManager.log("Climber motor right firmware version:" + motorRight.getFirmwareString());
@@ -425,6 +424,33 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns the Right Motor Commanded Voltage. */
   public double getRightVoltageCommand() {
     return rightVoltageCommand;
+  }
+
+  /**
+   * Set the motor idle mode to brake or coast.
+   *
+   * @param enableBrake Enable motor braking when idle
+   */
+  public void setBrakeMode(boolean enableBrake) {
+    if (enableBrake) {
+      DataLogManager.log("Climber motors set to brake mode");
+      this.motorLeft.setIdleMode(IdleMode.kBrake);
+      this.motorRight.setIdleMode(IdleMode.kBrake);
+    } else {
+      DataLogManager.log("Climber motors set to coast mode");
+      this.motorLeft.setIdleMode(IdleMode.kCoast);
+      this.motorRight.setIdleMode(IdleMode.kCoast);
+    }
+  }
+
+  /**
+   * Reset the encoders to the start (zero) position. This should only be done when the climber is
+   * extended. This command doesn't work in simulation.
+   */
+  public void resetEncoders() {
+    DataLogManager.log("Climber encoders reset");
+    encoderLeft.setPosition(0);
+    encoderRight.setPosition(0);
   }
 
   /**
