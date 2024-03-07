@@ -36,7 +36,7 @@ public class RobotModel {
   private final boolean isReal;
   static final double QUIESCENT_CURRENT_DRAW_A = 2.0; // Misc electronics
   static final double BATTERY_NOMINAL_VOLTAGE = 13.2; // Nicely charged battery
-  static final double BATTERY_NOMINAL_RESISTANCE = 0.040; // 40mOhm - average battery + cabling
+  static final double BATTERY_NOMINAL_RESISTANCE = 0.010; // average battery + cabling
   double currentDrawA = QUIESCENT_CURRENT_DRAW_A;
   double batteryVoltageV = BATTERY_NOMINAL_VOLTAGE;
 
