@@ -191,9 +191,14 @@ public class RobotContainer {
   private void setupAutoChooser() {
 
     autoChooser.setDefaultOption("Nothing", "Nothing");
-    autoChooser.addOption("Drive Straight", "DriveStraight");
+    autoChooser.addOption("Taxi", "DriveStraight");
+    autoChooser.addOption("Shoot", "Shoot");
+    autoChooser.addOption("Shoot and Taxi Straight", "ShootAndTaxiStraight");
+    autoChooser.addOption("Shoot and Taxi Right", "ShootAndTaxiRight");
+    autoChooser.addOption("Shoot and Taxi Left", "ShootAndTaxiLeft");
+    // The 2 below are not part of the drive teams requests, but were already implemented in the
+    // autonomous
     autoChooser.addOption("Drive Twice", "DriveTwice");
-    autoChooser.addOption("Shoot and Drive", "ShootAndDrive");
     autoChooser.addOption("Drive and Shoot", "DriveAndShoot");
   }
 
@@ -212,15 +217,16 @@ public class RobotContainer {
             .withTimeout(5)
             .withName("Drive Forward 1m");
 
-      case "DriveTwice":
-        // Drive forward slowly until the robot moves 1 meter then drive an additional meter
-        // with a turn
+      case "Shoot":
+        // Shoot a note into the speaker
         return Commands.sequence(
-                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0),
-                robotDrive.driveDistanceCommand(2.0, 0.2, 0.15))
-            .withName("Drive Twice");
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))))
+            .withName("Shoot in to speaker");
 
-      case "ShootAndDrive":
+      case "ShootAndTaxiStraight":
         // Shoot a note then Drive forward slowly until the robot moves a set distance
         return Commands.sequence(
                 Commands.race(
@@ -229,6 +235,34 @@ public class RobotContainer {
                         .andThen(robotIntake.runReverse()))),
                 robotDrive.driveDistanceCommand(1.0, 0.2, 0.0))
             .withName("Shoot and Drive Forward 1m");
+
+      case "ShootAndTaxiRight":
+        // Start angled right and shoot a note then curve left slowly until the robot is straight
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(1.0, 0.2, 0.15))
+            .withName("Shoot and Drive Right 1m");
+
+      case "ShootAndTaxiLeft":
+        // Start angled left and shoot a note then curve right slowly until the robot is straight
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(1.0, 0.2, -0.15))
+            .withName("Shoot and Drive Left 1m");
+
+      case "DriveTwice":
+        // Drive forward slowly until the robot moves 1 meter then drive an additional meter
+        // with a turn
+        return Commands.sequence(
+                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0),
+                robotDrive.driveDistanceCommand(2.0, 0.2, 0.15))
+            .withName("Drive Twice");
 
       case "DriveAndShoot":
         // Drive forward a set distance and then shoot
