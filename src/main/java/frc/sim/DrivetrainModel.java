@@ -10,6 +10,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import frc.robot.Constants.DriveConstants;
@@ -28,6 +29,7 @@ public class DrivetrainModel {
 
   private final ADXRS450_GyroSim gyroSim;
   private double lastAngle = 0.0;
+  private double startAngle = 0.0;
 
   // Range of pose positions within the field boundary (meters)
   private static double fieldMinX = 0.5;
@@ -90,6 +92,9 @@ public class DrivetrainModel {
               DriveConstants.START_YPOS_METERS,
               new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
 
+      // The gyro is reset to zero, so save the offset from the starting heading
+      startAngle = Units.radiansToDegrees(DriveConstants.START_HEADING_RADIANS);
+
       driveSubsystem.clearOdometryReset();
 
     } else {
@@ -136,8 +141,9 @@ public class DrivetrainModel {
     frontRightSparkSim.setCurrent(rightSimCurrent / DriveSimConstants.NUM_MOTORS);
     rearRightSparkSim.setCurrent(rightSimCurrent / DriveSimConstants.NUM_MOTORS);
 
-    // Set gyro angle and rate based on change in angle since last iteration
-    double newAngle = -drivetrainSimulator.getHeading().getDegrees();
+    // Set gyro angle with offset from the angle at last reset. Set the rate based on change in
+    // angle since last iteration.
+    double newAngle = -(drivetrainSimulator.getHeading().getDegrees() - startAngle);
     gyroSim.setAngle(newAngle);
     gyroSim.setRate(((newAngle - lastAngle) / 0.02));
     lastAngle = newAngle;
