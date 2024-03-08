@@ -196,10 +196,6 @@ public class RobotContainer {
     autoChooser.addOption("Shoot and Taxi Straight", "ShootAndTaxiStraight");
     autoChooser.addOption("Shoot and Taxi Right", "ShootAndTaxiRight");
     autoChooser.addOption("Shoot and Taxi Left", "ShootAndTaxiLeft");
-    // The 2 below are not part of the drive teams requests, but were already implemented in the
-    // autonomous
-    autoChooser.addOption("Drive Twice", "DriveTwice");
-    autoChooser.addOption("Drive and Shoot", "DriveAndShoot");
   }
 
   /**
@@ -243,7 +239,7 @@ public class RobotContainer {
                     robotLauncher.runLauncher().withTimeout(5.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.2, 0.15))
+                robotDrive.driveDistanceCommand(1.0, 0.2, 0.06))
             .withName("Shoot and Drive Right 1m");
 
       case "ShootAndTaxiLeft":
@@ -253,26 +249,8 @@ public class RobotContainer {
                     robotLauncher.runLauncher().withTimeout(5.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.2, -0.15))
+                robotDrive.driveDistanceCommand(1.0, 0.2, -0.06))
             .withName("Shoot and Drive Left 1m");
-
-      case "DriveTwice":
-        // Drive forward slowly until the robot moves 1 meter then drive an additional meter
-        // with a turn
-        return Commands.sequence(
-                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0),
-                robotDrive.driveDistanceCommand(2.0, 0.2, 0.15))
-            .withName("Drive Twice");
-
-      case "DriveAndShoot":
-        // Drive forward a set distance and then shoot
-        return Commands.sequence(
-                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0),
-                Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))))
-            .withName("Drive Forward and Shoot");
 
       default:
         return new PrintCommand("No Auto Selected");
