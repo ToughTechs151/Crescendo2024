@@ -195,7 +195,9 @@ public class RobotContainer {
     autoChooser.addOption("Shoot", "Shoot");
     autoChooser.addOption("Shoot and Taxi Straight", "ShootAndTaxiStraight");
     autoChooser.addOption("Shoot and Taxi Right", "ShootAndTaxiRight");
+    autoChooser.addOption("Shoot and Taxi Far Right", "ShootAndTaxiFarRight");
     autoChooser.addOption("Shoot and Taxi Left", "ShootAndTaxiLeft");
+    autoChooser.addOption("Shoot and Taxi Far Left", "ShootAndTaxiFarLeft");
   }
 
   /**
@@ -229,7 +231,7 @@ public class RobotContainer {
                     robotLauncher.runLauncher().withTimeout(5.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.2, 0.0))
+                robotDrive.driveDistanceCommand(0.8, 0.2, 0.0))
             .withName("Shoot and Drive Forward 1m");
 
       case "ShootAndTaxiRight":
@@ -239,8 +241,19 @@ public class RobotContainer {
                     robotLauncher.runLauncher().withTimeout(5.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.2, 0.06))
+                robotDrive.driveDistanceCommand(0.75, 0.18, 0.1),
+                robotDrive.driveDistanceCommand(1.4, 0.3, 0.0))
             .withName("Shoot and Drive Right 1m");
+
+      case "ShootAndTaxiFarRight":
+        // Start angled right and shoot a note then drive straight to end on right of the field
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(5.0, 0.5, 0.03))
+            .withName("Shoot and Drive Far Right 3.5m");
 
       case "ShootAndTaxiLeft":
         // Start angled left and shoot a note then curve right slowly until the robot is straight
@@ -249,8 +262,19 @@ public class RobotContainer {
                     robotLauncher.runLauncher().withTimeout(5.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.2, -0.06))
+                robotDrive.driveDistanceCommand(0.75, 0.16, -0.09),
+                robotDrive.driveDistanceCommand(1.4, 0.3, 0.0))
             .withName("Shoot and Drive Left 1m");
+
+      case "ShootAndTaxiFarLeft":
+        // Start angled right and shoot a note then drive straight to end on Left of the field
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncher().withTimeout(5.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(5.0, 0.5, -0.03))
+            .withName("Shoot and Drive Far Right 3.5m");
 
       default:
         return new PrintCommand("No Auto Selected");
