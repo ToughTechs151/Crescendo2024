@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   private DataLogging datalog;
   private Boolean enableDriver = true;
 
-  PhotonCamera camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
+  PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
   /**
    * {@code robotInit} runs when the robot first starts up. It is used to create the robot
@@ -47,7 +47,6 @@ public class Robot extends TimedRobot {
 
     datalog.dataLogRobotContainerInit(this.robotContainer);
 
-    System.out.println("Camera Name: " + camera.getName());
     camera.setDriverMode(enableDriver);
     SmartDashboard.putBoolean("Driver Mode", enableDriver);
   }
