@@ -232,9 +232,12 @@ public final class Constants {
     public static final double LAUNCHER_GEAR_RATIO =
         1.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / LAUNCHER_GEAR_RATIO;
-    public static final double LAUNCHER_TOLERANCE_RPM = 500;
+    public static final double LAUNCHER_TOLERANCE_RPM = 400;
+    public static final double LAUNCHER_TOLERANCE_RPM_AMP = 100;
     public static final double LAUNCHER_TOP_SPEED = 5300;
     public static final double LAUNCHER_BOTTOM_SPEED = 4000;
+    public static final double LAUNCHER_TOP_SPEED_AMP = 1000;
+    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 1000;
   }
 
   /** Constants used for the Climber subsystem. */

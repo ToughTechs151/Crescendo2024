@@ -126,19 +126,31 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
 
     // Run the launcher at the defined speed while the right trigger is held.
-    operatorController
-        .rightTrigger()
-        .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
+    // operatorController
+    //     .rightTrigger()
+    //     .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
 
-    // This command runs the launcher, then the intake when the launcher is up to speed
+    // This command runs the launcher at high speed to shoot into the speaker, then the intake when
+    // the launcher is up to speed.
     operatorController
         .leftTrigger()
         .whileTrue(
             new ParallelCommandGroup(
-                    robotLauncher.runLauncher(),
+                    robotLauncher.runLauncherSpeaker(),
                     Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))
                 .withName("Intake-Launcher: autoShoot"));
+
+    // This command runs the launcher at low speed to shoot into the amp, then the intake when the
+    // launcher is up to speed.
+    operatorController
+        .rightTrigger()
+        .whileTrue(
+            new ParallelCommandGroup(
+                    robotLauncher.runLauncherAmp(),
+                    Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))
+                .withName("Intake-Launcher: autoShootAmp"));
 
     // Run the intake forward when the right bumper is pressed.
     operatorController
