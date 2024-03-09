@@ -236,8 +236,8 @@ public final class Constants {
     public static final double LAUNCHER_TOLERANCE_RPM_AMP = 100;
     public static final double LAUNCHER_TOP_SPEED = 5300;
     public static final double LAUNCHER_BOTTOM_SPEED = 4000;
-    public static final double LAUNCHER_TOP_SPEED_AMP = 1000;
-    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 1000;
+    public static final double LAUNCHER_TOP_SPEED_AMP = 650;
+    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 650;
   }
 
   /** Constants used for the Climber subsystem. */
