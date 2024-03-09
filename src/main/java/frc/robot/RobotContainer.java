@@ -211,7 +211,7 @@ public class RobotContainer {
       case "DriveStraight":
         // Drive forward slowly until the robot moves 1 meter
         return robotDrive
-            .driveDistanceCommand(1.0, 0.3, 0.0)
+            .driveDistanceCommand(1.0, 0.1, 0.0)
             .withTimeout(5)
             .withName("Drive Forward 1m");
 
@@ -219,7 +219,7 @@ public class RobotContainer {
         // Shoot a note into the speaker
         return Commands.sequence(
                 Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
+                    robotLauncher.runLauncher().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))))
             .withName("Shoot in to speaker");
@@ -228,52 +228,52 @@ public class RobotContainer {
         // Shoot a note then Drive forward slowly until the robot moves a set distance
         return Commands.sequence(
                 Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
+                    robotLauncher.runLauncher().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.8, 0.2, 0.0))
+                robotDrive.driveDistanceCommand(1.0, 0.1, 0.0))
             .withName("Shoot and Drive Forward 1m");
 
       case "ShootAndTaxiRight":
         // Start angled right and shoot a note then curve left slowly until the robot is straight
         return Commands.sequence(
                 Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
+                    robotLauncher.runLauncher().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.75, 0.18, 0.1),
-                robotDrive.driveDistanceCommand(1.4, 0.3, 0.0))
+                robotDrive.driveDistanceCommand(0.75, 0.2, 0.11),
+                robotDrive.driveDistanceCommand(1.4, 0.1, 0.0))
             .withName("Shoot and Drive Right 1m");
 
       case "ShootAndTaxiFarRight":
         // Start angled right and shoot a note then drive straight to end on right of the field
         return Commands.sequence(
                 Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
+                    robotLauncher.runLauncher().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(5.0, 0.5, 0.03))
+                robotDrive.driveDistanceCommand(5.0, 0.15, 0.01))
             .withName("Shoot and Drive Far Right 3.5m");
 
       case "ShootAndTaxiLeft":
         // Start angled left and shoot a note then curve right slowly until the robot is straight
         return Commands.sequence(
                 Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
+                    robotLauncher.runLauncher().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.75, 0.16, -0.09),
-                robotDrive.driveDistanceCommand(1.4, 0.3, 0.0))
+                robotDrive.driveDistanceCommand(0.75, 0.2, -0.11),
+                robotDrive.driveDistanceCommand(1.4, 0.1, 0.0))
             .withName("Shoot and Drive Left 1m");
 
       case "ShootAndTaxiFarLeft":
         // Start angled right and shoot a note then drive straight to end on Left of the field
         return Commands.sequence(
                 Commands.race(
-                    robotLauncher.runLauncher().withTimeout(5.0),
+                    robotLauncher.runLauncher().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(5.0, 0.5, -0.03))
+                robotDrive.driveDistanceCommand(5.0, 0.15, -0.01))
             .withName("Shoot and Drive Far Right 3.5m");
 
       default:
