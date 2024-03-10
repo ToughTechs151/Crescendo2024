@@ -257,8 +257,6 @@ public class DataLogging {
     sbField = new Field2d();
     sbDriverTab.add("Field", sbField).withSize(8, 4);
     sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
-    sbDriverTab.add(drive.resetOdometryToBlueCenterStart()).withSize(2, 1);
-    sbDriverTab.add(drive.resetOdometryToRedCenterStart()).withSize(2, 1);
 
     // Add hardware sendables here
     PowerDistribution pdp = robotContainer.getPdp();

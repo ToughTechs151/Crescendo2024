@@ -66,27 +66,9 @@ public final class Constants {
     // position. The pose is applied at initialization and can be set back to this position
     // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
     // is the start for trajectories.
-    public static final double START_XPOS_METERS = 15.75;
-    public static final double START_YPOS_METERS = 4.3;
-    public static final double START_HEADING_RADIANS = Units.degreesToRadians(-120.0);
-
-    // Starting Blue Center field pose (position and heading) for odometry which tracks movements
-    // from this
-    // position. The pose is applied at initialization and can be set back to this position
-    // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
-    // is the start for trajectories.
-    public static final double START_BLUE_CENTER_XPOS_METERS = 1.35;
-    public static final double START_BLUE_CENTER_YPOS_METERS = 5.5;
-    public static final double START_BLUE_CENTER_HEADING_RADIANS = Units.degreesToRadians(0.0);
-
-    // Starting Red Center field pose (position and heading) for odometry which tracks movements
-    // from this
-    // position. The pose is applied at initialization and can be set back to this position
-    // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
-    // is the start for trajectories.
-    public static final double START_RED_CENTER_XPOS_METERS = 15.2;
-    public static final double START_RED_CENTER_YPOS_METERS = 5.5;
-    public static final double START_RED_CENTER_HEADING_RADIANS = Units.degreesToRadians(180.0);
+    public static final double START_XPOS_METERS = 1.35;
+    public static final double START_YPOS_METERS = 5.5;
+    public static final double START_HEADING_RADIANS = Units.degreesToRadians(0.0);
 
     public static final boolean SQUARE_INPUTS = true;
     public static final boolean ENABLE_BRAKE = false;

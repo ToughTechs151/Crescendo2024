@@ -291,32 +291,6 @@ public class DriveSubsystem extends SubsystemBase {
         .withName("Reset Start Pose");
   }
 
-  /** Returns a Command that resets robot position and heading to the Blue Center start position. */
-  public Command resetOdometryToBlueCenterStart() {
-    return runOnce(
-            () ->
-                resetOdometry(
-                    new Pose2d(
-                        DriveConstants.START_BLUE_CENTER_XPOS_METERS,
-                        DriveConstants.START_BLUE_CENTER_YPOS_METERS,
-                        new Rotation2d(DriveConstants.START_BLUE_CENTER_HEADING_RADIANS))))
-        .ignoringDisable(true)
-        .withName("Reset Blue Center Start Pose");
-  }
-
-  /** Returns a Command that resets robot position and heading to the Red Center start position. */
-  public Command resetOdometryToRedCenterStart() {
-    return runOnce(
-            () ->
-                resetOdometry(
-                    new Pose2d(
-                        DriveConstants.START_RED_CENTER_XPOS_METERS,
-                        DriveConstants.START_RED_CENTER_YPOS_METERS,
-                        new Rotation2d(DriveConstants.START_RED_CENTER_HEADING_RADIANS))))
-        .ignoringDisable(true)
-        .withName("Reset Red Center Start Pose");
-  }
-
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     this.frontLeftEncoder.setPosition(0);
