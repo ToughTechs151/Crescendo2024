@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -41,6 +42,8 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
+  private ArmSubsystem arm;
+  private BlinkinSubsystem blinkin;
 
   private DataLogging() {
     // Starts recording to data log
@@ -152,6 +155,16 @@ public class DataLogging {
     // Get the pose from the drivetrain subsystem and update the field display
     sbField.setRobotPose(drive.getPose());
 
+    // Set the LEDs to show arm angle
+    if (arm.getMeasurement() > Constants.ArmConstants.ARM_BACK_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.RED);
+    } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.YELLOW);
+    } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_BACK_POSITION_RADS
+        && arm.getMeasurement() > Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.ORANGE);
+    }
+
     if (Constants.LOOP_TIMING_LOG) {
       loopTime.append(Timer.getFPGATimestamp() - startTime);
     }
@@ -164,8 +177,9 @@ public class DataLogging {
    */
   public void dataLogRobotContainerInit(RobotContainer robotContainer) {
 
+    blinkin = robotContainer.getBlinkin();
     drive = robotContainer.getDriveSubsystem();
-    ArmSubsystem arm = robotContainer.getArmSubsystem();
+    arm = robotContainer.getArmSubsystem();
     ClimberSubsystem climber = robotContainer.getClimberSubsystem();
     IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();

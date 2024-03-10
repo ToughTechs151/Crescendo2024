@@ -36,6 +36,10 @@ public final class Constants {
   // Set to true to log each frame of command execution. To false to disable.
   public static final boolean COMMAND_EXECUTE_LOG = false;
 
+  // Camera ID
+  public static final int CAMERA_0 = 0;
+  public static final int CAMERA_1 = 1;
+
   /** Constants used for the Drive subsystem. */
   public static final class DriveConstants {
 

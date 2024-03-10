@@ -367,6 +367,15 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
+   * Checks if the arm is enabled or not.
+   *
+   * @return boolean armEnabled
+   */
+  public boolean isEnabled() {
+    return armEnabled;
+  }
+
+  /**
    * Load Preferences for values that can be tuned at runtime. This should only be called when the
    * controller is disabled - for example from enable().
    */

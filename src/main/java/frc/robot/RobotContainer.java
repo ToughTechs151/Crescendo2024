@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -53,6 +55,8 @@ public class RobotContainer {
   // The Intake.
   private final IntakeSubsystem robotIntake =
       new IntakeSubsystem(IntakeSubsystem.initializeHardware());
+  // The Blinkin
+  private BlinkinSubsystem blinkin = new BlinkinSubsystem(new PWM(0));
 
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
@@ -64,6 +68,8 @@ public class RobotContainer {
 
     // Setup the Autonomous mode command chooser
     setupAutoChooser();
+
+    blinkin.enable();
 
     this.robotDrive.setDefaultCommand(this.robotDrive.getDriveCommand(driverController));
   }
@@ -309,6 +315,15 @@ public class RobotContainer {
    */
   public PowerDistribution getPdp() {
     return this.pdp;
+  }
+
+  /**
+   * Use this to get the Blinkin to set the LEDs.
+   *
+   * @return Blinkin subsystem.
+   */
+  public BlinkinSubsystem getBlinkin() {
+    return this.blinkin;
   }
 
   /**
