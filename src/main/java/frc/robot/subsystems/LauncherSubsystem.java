@@ -239,12 +239,6 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     initLauncherMotor();
     initLauncherEncoder();
 
-    // Set tolerances that will be used to determine when the launcher is at the goal velocity.
-    launcherTopRightController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
-    launcherTopLeftController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
-    launcherBottomRightController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
-    launcherBottomLeftController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
-
     disableLauncher();
 
     setDefaultCommand(runOnce(this::disableLauncher).andThen(run(() -> {})).withName("Idle"));
@@ -414,8 +408,8 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     launcherMotorBottomLeft.setVoltage(launcherVoltageBottomLeftCommand);
   }
 
-  /** Returns a Command that runs the launcher at the defined speed. */
-  public Command runLauncher() {
+  /** Returns a Command that runs the launcher at the defined speed to shoot into the speaker. */
+  public Command runLauncherSpeaker() {
     return new FunctionalCommand(
         this::setLauncherSetPoint,
         this::updateLauncherController,
@@ -424,15 +418,51 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
         this);
   }
 
+  /** Returns a Command that runs the launcher at the defined speed to shoot into the amp. */
+  public Command runLauncherAmp() {
+    return new FunctionalCommand(
+        this::setLauncherSetPointAmp,
+        this::updateLauncherController,
+        interrupted -> disableLauncher(),
+        () -> false,
+        this);
+  }
+
   /**
-   * Set the setpoint for the launcher. The PIDController drives the launcher to this speed and
-   * holds it there.
+   * Set the setpoint for the launcher to shoot into the amp. The PIDController drives the launcher
+   * to this speed and holds it there.
+   */
+  private void setLauncherSetPointAmp() {
+    launcherTopLeftController.setSetpoint(LauncherConstants.LAUNCHER_TOP_SPEED_AMP);
+    launcherTopRightController.setSetpoint(-LauncherConstants.LAUNCHER_TOP_SPEED_AMP);
+    launcherBottomLeftController.setSetpoint(-LauncherConstants.LAUNCHER_BOTTOM_SPEED_AMP);
+    launcherBottomRightController.setSetpoint(LauncherConstants.LAUNCHER_BOTTOM_SPEED_AMP);
+
+    // Set tolerances that will be used to determine when the launcher is at the goal velocity.
+    launcherTopRightController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM_AMP);
+    launcherTopLeftController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM_AMP);
+    launcherBottomRightController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM_AMP);
+    launcherBottomLeftController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM_AMP);
+
+    // Call enable() to configure and start the controller in case it is not already enabled.
+    enableLauncher();
+  }
+
+  /**
+   * Set the setpoint for the launcher to shoot into the speaker. The PIDController drives the
+   * launcher to this speed and holds it there.
    */
   private void setLauncherSetPoint() {
     launcherTopLeftController.setSetpoint(LauncherConstants.LAUNCHER_TOP_SPEED);
     launcherTopRightController.setSetpoint(-LauncherConstants.LAUNCHER_TOP_SPEED);
     launcherBottomLeftController.setSetpoint(-LauncherConstants.LAUNCHER_BOTTOM_SPEED);
     launcherBottomRightController.setSetpoint(LauncherConstants.LAUNCHER_BOTTOM_SPEED);
+
+    // Set tolerances that will be used to determine when the launcher is at the goal velocity.
+    launcherTopRightController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
+    launcherTopLeftController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
+    launcherBottomRightController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
+    launcherBottomLeftController.setTolerance(LauncherConstants.LAUNCHER_TOLERANCE_RPM);
 
     // Call enable() to configure and start the controller in case it is not already enabled.
     enableLauncher();
