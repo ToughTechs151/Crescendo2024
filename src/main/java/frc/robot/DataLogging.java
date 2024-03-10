@@ -159,11 +159,15 @@ public class DataLogging {
     } else if (DriverStation.isTeleop()) {
       blinkin.setValue(BlinkinSubsystem.GREEN);
     }
-   
+
     if (arm.getMeasurement() > Constants.ArmConstants.ARM_BACK_POSITION_RADS) {
       blinkin.setValue(BlinkinSubsystem.RED);
     } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
-      blinkin.setValue(BlinkinSubsystem.YELLOW);
+      if (arm.IsNoteInsideIntake()) {
+        blinkin.setValue(BlinkinSubsystem.BLUE);
+      } else {
+        blinkin.setValue(BlinkinSubsystem.YELLOW);
+      }
     } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_BACK_POSITION_RADS
         && arm.getMeasurement() > Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
       blinkin.setValue(BlinkinSubsystem.ORANGE);
