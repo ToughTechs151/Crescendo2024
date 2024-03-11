@@ -206,6 +206,22 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns a command that drives the robot forward a specified distance at a specified speed.
+   *
+   * @param distanceMeters The distance to drive forward in meters
+   * @param speed The fraction of max speed at which to drive
+   */
+  public Command driveDistanceCommand(double distanceMeters, double speed, double rot) {
+    return
+    // Drive forward at specified speed
+    run(() -> arcadeDrive(speed, rot, false))
+        // End command when we've traveled the specified distance
+        .until(() -> getAverageDistanceMeters() >= distanceMeters)
+        // Stop the drive when the command ends
+        .finallyDo(interrupted -> drive.stopMotor());
+  }
+
+  /**
    * Returns the currently-estimated pose of the robot.
    *
    * @return The pose.
@@ -372,7 +388,8 @@ public class DriveSubsystem extends SubsystemBase {
    * mode will cause drive to stop quickly.
    */
   public void disable() {
-    tankDriveVolts(0, 0);
+    frontLeft.setVoltage(0);
+    frontRight.setVoltage(0);
   }
 
   // The following methods are used for the simulation to get drive state

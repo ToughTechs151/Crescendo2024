@@ -73,8 +73,8 @@ public final class Constants {
     // position. The pose is applied at initialization and can be set back to this position
     // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
     // is the start for trajectories.
-    public static final double START_XPOS_METERS = 0.5;
-    public static final double START_YPOS_METERS = 2.5;
+    public static final double START_XPOS_METERS = 1.35;
+    public static final double START_YPOS_METERS = 5.5;
     public static final double START_HEADING_RADIANS = Units.degreesToRadians(0.0);
 
     public static final boolean SQUARE_INPUTS = true;
@@ -240,9 +240,12 @@ public final class Constants {
     public static final double LAUNCHER_GEAR_RATIO =
         1.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / LAUNCHER_GEAR_RATIO;
-    public static final double LAUNCHER_TOLERANCE_RPM = 500;
+    public static final double LAUNCHER_TOLERANCE_RPM = 400;
+    public static final double LAUNCHER_TOLERANCE_RPM_AMP = 100;
     public static final double LAUNCHER_TOP_SPEED = 5300;
     public static final double LAUNCHER_BOTTOM_SPEED = 4000;
+    public static final double LAUNCHER_TOP_SPEED_AMP = 650;
+    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 650;
   }
 
   /** Constants used for the Climber subsystem. */

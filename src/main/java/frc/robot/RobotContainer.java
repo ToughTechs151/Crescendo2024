@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
@@ -57,6 +57,10 @@ public class RobotContainer {
   // The Intake.
   private final IntakeSubsystem robotIntake =
       new IntakeSubsystem(IntakeSubsystem.initializeHardware());
+  // The Blinkin
+  private BlinkinSubsystem blinkin = new BlinkinSubsystem(new PWM(0));
+
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -64,8 +68,10 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    // Setup the Autonomous mode command chooser
+    setupAutoChooser();
+
     blinkin.enable();
-    blinkin.setValue(BlinkinSubsystem.ORANGE);
 
     this.robotDrive.setDefaultCommand(this.robotDrive.getDriveCommand(driverController));
   }
@@ -133,19 +139,32 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
 
     // Run the launcher at the defined speed while the right trigger is held.
-    operatorController
-        .rightTrigger()
-        .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
+    // operatorController
+    //     .rightTrigger()
+    //     .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
 
-    // This command runs the launcher, then the intake when the launcher is up to speed
+    // This command runs the launcher at high speed to launch a note into the speaker, then run
+    // the intake when the launcher is up to speed.
     operatorController
         .leftTrigger()
         .whileTrue(
-            new ParallelCommandGroup(
-                    robotLauncher.runLauncher(),
+            Commands.parallel(
+                    robotLauncher.runLauncherSpeaker(),
                     Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))
-                .withName("Intake-Launcher: autoShoot"));
+                .withTimeout(5.0)
+                .withName("Intake-Launcher: autoLaunch"));
+
+    // This command runs the launcher at low speed to launch a note into the amp, then run intake
+    // when the launcher is up to speed.
+    operatorController
+        .rightTrigger()
+        .whileTrue(
+            Commands.parallel(
+                    robotLauncher.runLauncherAmp(),
+                    Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))
+                .withName("Intake-Launcher: autoLaunchAmp"));
 
     // Run the intake forward when the right bumper is pressed.
     operatorController
@@ -188,18 +207,107 @@ public class RobotContainer {
     return robotDrive.getDriveCommand(driverController);
   }
 
+  /** Setup the options for the Autonomous mode command chooser. */
+  private void setupAutoChooser() {
+
+    autoChooser.setDefaultOption("Nothing", "Nothing");
+    autoChooser.addOption("Taxi", "DriveStraight");
+    autoChooser.addOption("Launch", "Launch");
+    autoChooser.addOption("Launch and Taxi Straight", "LaunchAndTaxiStraight");
+    autoChooser.addOption("Launch Right and Taxi", "LaunchRightAndTaxi");
+    autoChooser.addOption("Launch Right and Taxi Far", "LaunchAndTaxiFarRight");
+    autoChooser.addOption("Launch Left and Taxi", "LaunchLeftAndTaxi");
+    autoChooser.addOption("Launch Left and Taxi Far", "LaunchLeftAndTaxiFar");
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Drive forward slowly until the robot moves 1 meter
-    return new RunCommand(() -> this.robotDrive.arcadeDrive(0.3, 0.0, false), this.robotDrive)
-        .until(() -> robotDrive.getAverageDistanceMeters() > 1.0)
-        .withTimeout(5)
-        .andThen(() -> this.robotDrive.tankDriveVolts(0, 0))
-        .withName("Drive Forward 1m");
+
+    switch (autoChooser.getSelected()) {
+      case "DriveStraight":
+        // Drive forward slowly until the robot moves 1 meter
+        return robotDrive
+            .driveDistanceCommand(1.0, 0.1, 0.0)
+            .withTimeout(5)
+            .withName("Drive Forward 1m");
+
+      case "Launch":
+        // Launch a note into the speaker
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))))
+            .withName("Launch into speaker");
+
+      case "LaunchAndTaxiStraight":
+        // Launch a note then Drive forward slowly until the robot moves a set distance
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(1.0, 0.1, 0.0))
+            .withName("Launch and Drive Forward");
+
+      case "LaunchRightAndTaxi":
+        // Start angled right and launch a note then curve left slowly until the robot is straight
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(0.75, 0.2, 0.11),
+                robotDrive.driveDistanceCommand(1.4, 0.1, 0.0))
+            .withName("Launch Right and Drive");
+
+      case "LaunchAndTaxiFarRight":
+        // Start angled right and launch a note then drive straight to end on right of the field
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(3.0, 0.15, 0.01))
+            .withName("Launch Right and Drive Far");
+
+      case "LaunchLeftAndTaxi":
+        // Start angled left and launch a note then curve right slowly until the robot is straight
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(0.75, 0.2, -0.11),
+                robotDrive.driveDistanceCommand(1.4, 0.1, 0.0))
+            .withName("Launch Left and Drive");
+
+      case "LaunchLeftAndTaxiFar":
+        // Start angled left and launch a note then drive straight to end on Left of the field
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse()))),
+                robotDrive.driveDistanceCommand(3.0, 0.15, -0.01))
+            .withName("Launch Left and Drive Far");
+
+      default:
+        return new PrintCommand("No Auto Selected");
+    }
+  }
+
+  /**
+   * Use this to get the chooser for the Autonomous mode command.
+   *
+   * @return a reference to the chooser for the autonomous command
+   */
+  public SendableChooser<String> getAutoChooser() {
+    return autoChooser;
   }
 
   /**
@@ -223,7 +331,7 @@ public class RobotContainer {
   /**
    * Use this to get the Arm Subsystem.
    *
-   * @return the command to run in autonomous
+   * @return a reference to the arm subsystem
    */
   public ArmSubsystem getArmSubsystem() {
     return robotArm;
@@ -232,7 +340,7 @@ public class RobotContainer {
   /**
    * Use this to get the Drivetrain Subsystem.
    *
-   * @return the Drivetrain Subsystem
+   * @return a reference to the Drivetrain Subsystem
    */
   public DriveSubsystem getDriveSubsystem() {
     return robotDrive;

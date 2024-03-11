@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -153,6 +152,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
         Constants.ArmConstants.POSITION_TOLERANCE, Constants.ArmConstants.VELOCITY_TOLERANCE);
 
     disable();
+
+    setDefaultCommand(runOnce(this::disable).andThen(run(() -> {})).withName("Idle"));
   }
 
   private void initMotor() {
@@ -325,13 +326,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     // Clear the enabled flag and call useOutput to zero the motor command
     armEnabled = false;
     useOutput();
+    setDefaultCommand(run(() -> {}).withName("Idle"));
 
-    // Remove the default command and cancel any command that is active
-    removeDefaultCommand();
-    Command currentCommand = CommandScheduler.getInstance().requiring(this);
-    if (currentCommand != null) {
-      CommandScheduler.getInstance().cancel(currentCommand);
-    }
     DataLogManager.log(
         "Arm Disabled CurPos="
             + Units.radiansToDegrees(getMeasurement())

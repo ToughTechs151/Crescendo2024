@@ -13,7 +13,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
@@ -141,6 +140,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     intakeController.setTolerance(IntakeConstants.INTAKE_TOLERANCE_RPM);
 
     disableIntake();
+
+    setDefaultCommand(runOnce(this::disableIntake).andThen(run(() -> {})).withName("Idle"));
   }
 
   private void initIntakeMotor() {
@@ -316,11 +317,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     intakeEnabled = false;
     updateMotorController();
 
-    // Cancel any command that is active
-    Command currentCommand = CommandScheduler.getInstance().requiring(this);
-    if (currentCommand != null) {
-      CommandScheduler.getInstance().cancel(currentCommand);
-    }
     DataLogManager.log("Intake Disabled CurSpeed=" + getIntakeSpeed());
   }
 
