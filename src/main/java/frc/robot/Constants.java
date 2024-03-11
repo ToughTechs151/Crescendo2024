@@ -175,7 +175,7 @@ public final class Constants {
     public static final PreferenceKeyValue INTAKE_SET_POINT_REVERSE_RPM =
         new PreferenceKeyValue("IntakeReverseRPM", -400.0);
     public static final PreferenceKeyValue INTAKE_SPEED_THRESHOLD_RPM =
-        new PreferenceKeyValue("IntakeThresholdRPM", 300.0);
+        new PreferenceKeyValue("IntakeThresholdRPM", 250.0);
     public static final PreferenceKeyValue INTAKE_CURRENT_THRESHOLD_AMPS =
         new PreferenceKeyValue("IntakeThresholdAmps", 8.0);
 
