@@ -292,21 +292,48 @@ public class DataLogging {
             new InstantCommand(() -> arm.setBrakeMode(true))
                 .ignoringDisable(true)
                 .withName("Arm Brake Mode"))
-        .withSize(2, 1);
+        .withSize(2, 1)
+        .withPosition(0, 0);
 
     sbHardwareTestTab
         .add(
             new InstantCommand(() -> arm.setBrakeMode(false))
                 .ignoringDisable(true)
                 .withName("Arm Coast Mode"))
-        .withSize(2, 1);
+        .withSize(2, 1)
+        .withPosition(0, 1);
 
     sbHardwareTestTab
         .add(
             new InstantCommand(arm::resetEncoder)
                 .ignoringDisable(true)
                 .withName("Arm Reset Position"))
-        .withSize(2, 1);
+        .withSize(2, 1)
+        .withPosition(0, 2);
+
+    sbHardwareTestTab
+        .add(
+            new InstantCommand(() -> climber.setBrakeMode(true))
+                .ignoringDisable(true)
+                .withName("Climber Brake Mode"))
+        .withSize(2, 1)
+        .withPosition(3, 0);
+
+    sbHardwareTestTab
+        .add(
+            new InstantCommand(() -> climber.setBrakeMode(false))
+                .ignoringDisable(true)
+                .withName("Climber Coast Mode"))
+        .withSize(2, 1)
+        .withPosition(3, 1);
+
+    sbHardwareTestTab
+        .add(
+            new InstantCommand(climber::resetEncoders)
+                .ignoringDisable(true)
+                .withName("Climber Reset Position"))
+        .withSize(2, 1)
+        .withPosition(3, 2);
   }
 
   /**
