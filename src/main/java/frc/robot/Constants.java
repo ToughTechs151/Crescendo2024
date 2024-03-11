@@ -41,7 +41,7 @@ public final class Constants {
   public static final int CAMERA_1 = 1;
 
   // Blinkin
-  public static final int BLINKIN_PORT = 0;
+  public static final int BLINKIN_PORT = 1;
 
   /** Constants used for the Drive subsystem. */
   public static final class DriveConstants {
@@ -110,7 +110,7 @@ public final class Constants {
     }
 
     public static final int MOTOR_PORT = 6;
-    public static final int BEAM_BREAKER_PORT = 0;
+    public static final int BEAM_BREAKER_PORT = 1;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);

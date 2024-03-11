@@ -403,7 +403,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Return true if the Note is inside the ARM's intake */
   public boolean IsNoteInsideIntake() {
-    return beamBreaker.get();
+    return !beamBreaker.get();
   }
 
   /** Close any objects that support it. */

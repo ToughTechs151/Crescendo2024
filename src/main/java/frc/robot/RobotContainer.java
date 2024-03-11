@@ -32,8 +32,6 @@ import frc.robot.subsystems.LauncherSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  private BlinkinSubsystem blinkin = new BlinkinSubsystem(new PWM(Constants.BLINKIN_PORT));
-
   // First we do things that are in all Robots.
   private PowerDistribution pdp = new PowerDistribution();
   // The driver's controller
@@ -58,7 +56,7 @@ public class RobotContainer {
   private final IntakeSubsystem robotIntake =
       new IntakeSubsystem(IntakeSubsystem.initializeHardware());
   // The Blinkin
-  private BlinkinSubsystem blinkin = new BlinkinSubsystem(new PWM(0));
+  private BlinkinSubsystem blinkin = new BlinkinSubsystem(new PWM(Constants.BLINKIN_PORT));
 
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
 

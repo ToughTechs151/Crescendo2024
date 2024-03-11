@@ -160,9 +160,9 @@ public class DataLogging {
       blinkin.setValue(BlinkinSubsystem.RED);
     } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
       if (arm.IsNoteInsideIntake()) {
-        blinkin.setValue(BlinkinSubsystem.BLUE);
+        blinkin.setValue(BlinkinSubsystem.ORANGE);
       } else {
-        blinkin.setValue(BlinkinSubsystem.YELLOW);
+        blinkin.setValue(BlinkinSubsystem.BLUE);
       }
     } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_BACK_POSITION_RADS
         && arm.getMeasurement() > Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
