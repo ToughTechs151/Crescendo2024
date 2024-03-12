@@ -184,6 +184,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Intake Setpoint", intakeController.getSetpoint());
     SmartDashboard.putNumber("Intake Speed", speed);
     SmartDashboard.putNumber("Intake Voltage", intakeVoltageCommand);
+    SmartDashboard.putNumber("Intake Temp", intakeMotor.getMotorTemperature());
     SmartDashboard.putNumber("Intake Current", intakeMotor.getOutputCurrent());
     SmartDashboard.putNumber("Intake Feedforward", newFeedforward);
     SmartDashboard.putNumber("Intake PID output", pidOutput);

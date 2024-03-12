@@ -189,6 +189,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Arm Velocity", Units.radiansToDegrees(encoder.getVelocity()));
     SmartDashboard.putNumber("Arm Voltage", voltageCommand);
     SmartDashboard.putNumber("Arm Current", motor.getOutputCurrent());
+    SmartDashboard.putNumber("Arm Temp", motor.getMotorTemperature());
     SmartDashboard.putNumber("Arm Feedforward", newFeedforward);
     SmartDashboard.putNumber("Arm PID output", output);
     SmartDashboard.putNumber("Arm SetPt Pos", Units.radiansToDegrees(setpoint.position));

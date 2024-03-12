@@ -123,19 +123,19 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right pos", frontRightEncoder.getPosition());
     SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
     SmartDashboard.putNumber("Gyro rate", gyro.getRate());
-
+    // FRONT LEFT
     SmartDashboard.putNumber("FL-Voltage", frontLeft.getBusVoltage());
     SmartDashboard.putNumber("FL-Current", frontLeft.getOutputCurrent());
     SmartDashboard.putNumber("FL-Temp", frontLeft.getMotorTemperature());
-
+    // REAR LEFT
     SmartDashboard.putNumber("RL-Voltage", rearLeft.getBusVoltage());
     SmartDashboard.putNumber("RL-Current", rearLeft.getOutputCurrent());
     SmartDashboard.putNumber("RL-Temp", rearLeft.getMotorTemperature());
-
+    // FRONT RIGHT
     SmartDashboard.putNumber("FR-Voltage", frontRight.getBusVoltage());
     SmartDashboard.putNumber("FR-Current", frontRight.getOutputCurrent());
     SmartDashboard.putNumber("FR-Temp", frontRight.getMotorTemperature());
-
+    // REAR RIGHT
     SmartDashboard.putNumber("RR-Voltage", rearRight.getBusVoltage());
     SmartDashboard.putNumber("RR-Current", rearRight.getOutputCurrent());
     SmartDashboard.putNumber("RR-Temp", rearRight.getMotorTemperature());
