@@ -343,6 +343,13 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Launcher Top Right Voltage", launcherVoltageTopRightCommand);
     SmartDashboard.putNumber("Launcher Bottom Left Voltage", launcherVoltageBottomLeftCommand);
     SmartDashboard.putNumber("Launcher Bottom Right Voltage", launcherVoltageBottomRightCommand);
+    SmartDashboard.putNumber("Launcher Top Left Temp", launcherMotorTopLeft.getMotorTemperature());
+    SmartDashboard.putNumber(
+        "Launcher Top Right Temp", launcherMotorTopRight.getMotorTemperature());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Left Temp", launcherMotorBottomLeft.getMotorTemperature());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Right Temp", launcherMotorBottomRight.getMotorTemperature());
 
     SmartDashboard.putNumber(
         "Launcher Top Right Current", launcherMotorTopRight.getOutputCurrent());

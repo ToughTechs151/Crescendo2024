@@ -249,6 +249,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Climber Right Voltage", leftVoltageCommand);
     SmartDashboard.putNumber("Climber Left Current", motorLeft.getOutputCurrent());
     SmartDashboard.putNumber("Climber Right Current", motorRight.getOutputCurrent());
+    SmartDashboard.putNumber("Climber Left Temp", motorLeft.getMotorTemperature());
+    SmartDashboard.putNumber("Climber Right Temp", motorRight.getMotorTemperature());
     SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
     SmartDashboard.putNumber("Climber Right Feedforward", rightFeedforward);
     SmartDashboard.putNumber("Climber Left PID output", leftPidOutput);
