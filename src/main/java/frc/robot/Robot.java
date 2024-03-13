@@ -99,6 +99,9 @@ public class Robot extends TimedRobot {
 
       this.autonomousCommand = this.robotContainer.getAutonomousCommand();
 
+      // Set drive mode to brake while autonomous
+      this.robotContainer.getDriveSubsystem().setBrakeMode(true);
+
       // schedule the autonomous command (example)
       if (this.autonomousCommand != null) {
         this.autonomousCommand.schedule();
@@ -126,6 +129,9 @@ public class Robot extends TimedRobot {
 
     // Get the selected drive mode to use in TeleOp mode
     Command driveCommand = robotContainer.getTeleopDriveCommand();
+
+    // Set drive mode to coast while teleop
+    this.robotContainer.getDriveSubsystem().setBrakeMode(false);
 
     // schedule the drive command
     if (driveCommand != null) {
