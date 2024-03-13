@@ -184,6 +184,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
 
     SmartDashboard.putBoolean("Arm Enabled", armEnabled);
+    SmartDashboard.putNumber("Arm Goal", Units.radiansToDegrees(armController.getGoal().position));
     SmartDashboard.putNumber("Arm Angle", Units.radiansToDegrees(getMeasurement()));
     SmartDashboard.putNumber("Arm Voltage", voltageCommand);
     SmartDashboard.putNumber("Arm Current", motor.getOutputCurrent());

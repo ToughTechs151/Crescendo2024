@@ -79,15 +79,13 @@ class ArmSubsystemTest {
     moveCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
-    if (Constants.SD_SHOW_ARM_EXTENDED_LOGGING_DATA) {
-      arm.periodic();
-      int numEntries = readTelemetry();
-      assertThat(numEntries).isPositive();
-      assertEquals(
-          Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION_RADS),
-          telemetryDoubleMap.get("Arm Goal"),
-          DELTA);
-    }
+    arm.periodic();
+    int numEntries = readTelemetry();
+    assertThat(numEntries).isPositive();
+    assertEquals(
+        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION_RADS),
+        telemetryDoubleMap.get("Arm Goal"),
+        DELTA);
 
     // Execute the command to run the controller
     moveCommand.execute();
@@ -163,16 +161,14 @@ class ArmSubsystemTest {
   void testLimitAndHoldCommand() {
 
     // Try a command to move the arm above the limit
-    if (Constants.SD_SHOW_ARM_EXTENDED_LOGGING_DATA) {
-      Command moveCommand = arm.moveToPosition(Constants.ArmConstants.MAX_ANGLE_RADS + 0.1);
-      moveCommand.initialize();
-      arm.periodic();
-      readTelemetry();
-      assertEquals(
-          Units.radiansToDegrees(ArmConstants.MAX_ANGLE_RADS),
-          telemetryDoubleMap.get("Arm Goal"),
-          DELTA);
-    }
+    Command moveCommand = arm.moveToPosition(Constants.ArmConstants.MAX_ANGLE_RADS + 0.1);
+    moveCommand.initialize();
+    arm.periodic();
+    readTelemetry();
+    assertEquals(
+        Units.radiansToDegrees(ArmConstants.MAX_ANGLE_RADS),
+        telemetryDoubleMap.get("Arm Goal"),
+        DELTA);
 
     // Verify that the hold command runs the controller
     Command moveCommandHigh = arm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS);
@@ -195,32 +191,28 @@ class ArmSubsystemTest {
     Command upCommand = arm.shiftUp();
 
     // Command to a position and then shift up
-    if (Constants.SD_SHOW_ARM_EXTENDED_LOGGING_DATA) {
-      moveCommand.initialize();
-      upCommand.initialize();
-      arm.periodic();
-      readTelemetry();
-      assertEquals(
-          Units.radiansToDegrees(
-              ArmConstants.ARM_FORWARD_POSITION_RADS + ArmConstants.POS_INCREMENT),
-          telemetryDoubleMap.get("Arm Goal"),
-          DELTA);
+    moveCommand.initialize();
+    upCommand.initialize();
+    arm.periodic();
+    readTelemetry();
+    assertEquals(
+        Units.radiansToDegrees(ArmConstants.ARM_FORWARD_POSITION_RADS + ArmConstants.POS_INCREMENT),
+        telemetryDoubleMap.get("Arm Goal"),
+        DELTA);
 
-      // Shift down
-
-      Command downCommand = arm.shiftDown();
-      downCommand.initialize();
-      arm.periodic();
-      readTelemetry();
-      // Currently up and down increments are the same. Update if that changes.
-      assertEquals(
-          Units.radiansToDegrees(
-              ArmConstants.ARM_FORWARD_POSITION_RADS
-                  + ArmConstants.POS_INCREMENT
-                  - ArmConstants.POS_INCREMENT),
-          telemetryDoubleMap.get("Arm Goal"),
-          DELTA);
-    }
+    // Shift down
+    Command downCommand = arm.shiftDown();
+    downCommand.initialize();
+    arm.periodic();
+    readTelemetry();
+    // Currently up and down increments are the same. Update if that changes.
+    assertEquals(
+        Units.radiansToDegrees(
+            ArmConstants.ARM_FORWARD_POSITION_RADS
+                + ArmConstants.POS_INCREMENT
+                - ArmConstants.POS_INCREMENT),
+        telemetryDoubleMap.get("Arm Goal"),
+        DELTA);
   }
 
   // ---------- Utility Functions --------------------------------------
