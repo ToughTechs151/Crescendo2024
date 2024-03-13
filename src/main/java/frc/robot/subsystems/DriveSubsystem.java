@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -247,11 +248,13 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void setBrakeMode(boolean enableBrake) {
     if (enableBrake) {
+      DataLogManager.log("Drive is currently set to brake mode");
       this.frontLeft.setIdleMode(IdleMode.kBrake);
       this.frontRight.setIdleMode(IdleMode.kBrake);
       this.rearLeft.setIdleMode(IdleMode.kBrake);
       this.rearRight.setIdleMode(IdleMode.kBrake);
     } else {
+      DataLogManager.log("Drive is currently set to coast mode");
       this.frontLeft.setIdleMode(IdleMode.kCoast);
       this.frontRight.setIdleMode(IdleMode.kCoast);
       this.rearLeft.setIdleMode(IdleMode.kCoast);
