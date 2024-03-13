@@ -192,14 +192,17 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putBoolean("Arm Enabled", armEnabled);
     SmartDashboard.putNumber("Arm Goal", Units.radiansToDegrees(armController.getGoal().position));
     SmartDashboard.putNumber("Arm Angle", Units.radiansToDegrees(getMeasurement()));
-    SmartDashboard.putNumber("Arm Velocity", Units.radiansToDegrees(encoder.getVelocity()));
     SmartDashboard.putNumber("Arm Voltage", voltageCommand);
     SmartDashboard.putNumber("Arm Current", motor.getOutputCurrent());
     SmartDashboard.putNumber("Arm Temp", motor.getMotorTemperature());
-    SmartDashboard.putNumber("Arm Feedforward", newFeedforward);
-    SmartDashboard.putNumber("Arm PID output", output);
     SmartDashboard.putNumber("Arm SetPt Pos", Units.radiansToDegrees(setpoint.position));
-    SmartDashboard.putNumber("Arm SetPt Vel", Units.radiansToDegrees(setpoint.velocity));
+
+    if (Constants.SD_SHOW_ARM_EXTENDED_LOGGING_DATA) {
+      SmartDashboard.putNumber("Arm Feedforward", newFeedforward);
+      SmartDashboard.putNumber("Arm PID output", output);
+      SmartDashboard.putNumber("Arm SetPt Vel", Units.radiansToDegrees(setpoint.velocity));
+      SmartDashboard.putNumber("Arm Velocity", Units.radiansToDegrees(encoder.getVelocity()));
+    }
   }
 
   /** Generate the motor command using the PID controller and feedforward. */

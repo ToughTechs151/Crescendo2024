@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.RobotPreferences;
 
@@ -187,8 +188,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Intake Voltage", intakeVoltageCommand);
     SmartDashboard.putNumber("Intake Temp", intakeMotor.getMotorTemperature());
     SmartDashboard.putNumber("Intake Current", intakeMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Intake Feedforward", newFeedforward);
-    SmartDashboard.putNumber("Intake PID output", pidOutput);
+
+    if (Constants.SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA) {
+      SmartDashboard.putNumber("Intake Feedforward", newFeedforward);
+      SmartDashboard.putNumber("Intake PID output", pidOutput);
+    }
   }
 
   /** Generate the motor command using the PID controller output and feedforward. */
