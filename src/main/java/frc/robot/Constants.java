@@ -31,6 +31,15 @@ public final class Constants {
   // to disable it.
   public static final boolean LW_TELEMETRY_ENABLE = false;
 
+  // Set a Global Constant to either Show or Hide extended logging data for each of the 5 subsystems
+  // Set to true to show extended logging data.
+  // Set to false to hide extended logging data.
+  public static final boolean SD_SHOW_ARM_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_DRIVE_EXTENDED_LOGGING_DATA = false;
+
   public static final boolean LOOP_TIMING_LOG = false;
 
   // Set to true to log each frame of command execution. To false to disable.

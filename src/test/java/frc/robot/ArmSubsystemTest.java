@@ -150,8 +150,10 @@ class ArmSubsystemTest {
         Units.radiansToDegrees(ArmConstants.ARM_OFFSET_RADS + fakePosition),
         telemetryDoubleMap.get("Arm Angle"),
         DELTA);
-    assertEquals(
-        Units.radiansToDegrees(fakeVelocity), telemetryDoubleMap.get("Arm Velocity"), DELTA);
+    if (Constants.SD_SHOW_ARM_EXTENDED_LOGGING_DATA) {
+      assertEquals(
+          Units.radiansToDegrees(fakeVelocity), telemetryDoubleMap.get("Arm Velocity"), DELTA);
+    }
   }
 
   @Test

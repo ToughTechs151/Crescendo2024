@@ -243,20 +243,25 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Climber Goal", climberLeftController.getGoal().position);
     SmartDashboard.putNumber("Climber Left Position", getMeasurementLeft());
     SmartDashboard.putNumber("Climber Right Position", getMeasurementRight());
-    SmartDashboard.putNumber("Climber Left Velocity", encoderLeft.getVelocity());
-    SmartDashboard.putNumber("Climber Right Velocity", encoderRight.getVelocity());
     SmartDashboard.putNumber("Climber Left Voltage", leftVoltageCommand);
     SmartDashboard.putNumber("Climber Right Voltage", leftVoltageCommand);
     SmartDashboard.putNumber("Climber Left Current", motorLeft.getOutputCurrent());
     SmartDashboard.putNumber("Climber Right Current", motorRight.getOutputCurrent());
-    SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
-    SmartDashboard.putNumber("Climber Right Feedforward", rightFeedforward);
-    SmartDashboard.putNumber("Climber Left PID output", leftPidOutput);
-    SmartDashboard.putNumber("Climber Right PID output", rightPidOutput);
+    SmartDashboard.putNumber("Climber Left Temp", motorLeft.getMotorTemperature());
+    SmartDashboard.putNumber("Climber Right Temp", motorRight.getMotorTemperature());
     SmartDashboard.putNumber("Climber Left SetPt Pos", leftSetpoint.position);
-    SmartDashboard.putNumber("Climber Left SetPt Vel", leftSetpoint.velocity);
     SmartDashboard.putNumber("Climber Right SetPt Pos", rightSetpoint.position);
-    SmartDashboard.putNumber("Climber Right SetPt Vel", rightSetpoint.velocity);
+
+    if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {
+      SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
+      SmartDashboard.putNumber("Climber Left PID output", leftPidOutput);
+      SmartDashboard.putNumber("Climber Left SetPt Vel", leftSetpoint.velocity);
+      SmartDashboard.putNumber("Climber Left Velocity", encoderLeft.getVelocity());
+      SmartDashboard.putNumber("Climber Right Feedforward", rightFeedforward);
+      SmartDashboard.putNumber("Climber Right PID output", rightPidOutput);
+      SmartDashboard.putNumber("Climber Right SetPt Vel", rightSetpoint.velocity);
+      SmartDashboard.putNumber("Climber Right Velocity", encoderRight.getVelocity());
+    }
   }
 
   /** Generate the motor commands using the PID controller outputs and feedforward. */

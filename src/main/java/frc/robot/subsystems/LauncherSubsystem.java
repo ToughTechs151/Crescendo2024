@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.RobotPreferences;
 
@@ -343,6 +344,13 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Launcher Top Right Voltage", launcherVoltageTopRightCommand);
     SmartDashboard.putNumber("Launcher Bottom Left Voltage", launcherVoltageBottomLeftCommand);
     SmartDashboard.putNumber("Launcher Bottom Right Voltage", launcherVoltageBottomRightCommand);
+    SmartDashboard.putNumber("Launcher Top Left Temp", launcherMotorTopLeft.getMotorTemperature());
+    SmartDashboard.putNumber(
+        "Launcher Top Right Temp", launcherMotorTopRight.getMotorTemperature());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Left Temp", launcherMotorBottomLeft.getMotorTemperature());
+    SmartDashboard.putNumber(
+        "Launcher Bottom Right Temp", launcherMotorBottomRight.getMotorTemperature());
 
     SmartDashboard.putNumber(
         "Launcher Top Right Current", launcherMotorTopRight.getOutputCurrent());
@@ -352,15 +360,16 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber(
         "Launcher Bottom Left Current", launcherMotorBottomLeft.getOutputCurrent());
 
-    SmartDashboard.putNumber("Launcher Top Left Feedforward", newTopLeftFeedforward);
-    SmartDashboard.putNumber("Launcher Top Right Feedforward", newTopRightFeedforward);
-    SmartDashboard.putNumber("Launcher Bottom Left Feedforward", newBottomLeftFeedforward);
-    SmartDashboard.putNumber("Launcher Bottom Right Feedforward", newBottomRightFeedforward);
-
-    SmartDashboard.putNumber("Launcher Top Left PID output", pidTopLeftOutput);
-    SmartDashboard.putNumber("Launcher Top Right PID output", pidTopRightOutput);
-    SmartDashboard.putNumber("Launcher Bottom Left PID output", pidBottomLeftOutput);
-    SmartDashboard.putNumber("Launcher Bottom Right PID output", pidBottomRightOutput);
+    if (Constants.SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA) {
+      SmartDashboard.putNumber("Launcher Bottom Left Feedforward", newBottomLeftFeedforward);
+      SmartDashboard.putNumber("Launcher Bottom Left PID output", pidBottomLeftOutput);
+      SmartDashboard.putNumber("Launcher Bottom Right Feedforward", newBottomRightFeedforward);
+      SmartDashboard.putNumber("Launcher Bottom Right PID output", pidBottomRightOutput);
+      SmartDashboard.putNumber("Launcher Top Left Feedforward", newTopLeftFeedforward);
+      SmartDashboard.putNumber("Launcher Top Left PID output", pidTopLeftOutput);
+      SmartDashboard.putNumber("Launcher Top Right Feedforward", newTopRightFeedforward);
+      SmartDashboard.putNumber("Launcher Top Right PID output", pidTopRightOutput);
+    }
   }
 
   /** Generate the motor command using the PID controller output and feedforward. */
