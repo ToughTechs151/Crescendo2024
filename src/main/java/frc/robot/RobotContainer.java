@@ -280,8 +280,8 @@ public class RobotContainer {
                     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.75, 0.2, -0.11),
-                robotDrive.driveDistanceCommand(1.4, 0.1, 0.0))
+                robotDrive.driveDistanceCommand(0.5, 0.2, -0.2),
+                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
             .withName("Launch Left and Drive");
 
       case "LaunchLeftAndTaxiFar":
