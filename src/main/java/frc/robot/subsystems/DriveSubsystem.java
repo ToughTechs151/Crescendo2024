@@ -14,16 +14,22 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotPreferences;
+import java.util.Map;
 
 /** Drive subsystem using differential drive. */
 public class DriveSubsystem extends SubsystemBase {
@@ -66,6 +72,8 @@ public class DriveSubsystem extends SubsystemBase {
   private double normalSpeedMax = 1.0;
   private double crawlSpeedMax = 0.5;
 
+  private final SendableChooser<Integer> startPoseChooser = new SendableChooser<>();
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
 
@@ -105,11 +113,8 @@ public class DriveSubsystem extends SubsystemBase {
     frontRight.setInverted(true);
 
     // Set starting pose (position and heading)
-    resetOdometry(
-        new Pose2d(
-            DriveConstants.START_XPOS_METERS,
-            DriveConstants.START_YPOS_METERS,
-            new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
+    setupStartPoseChooser();
+    resetOdometry();
 
     SmartDashboard.putData(this.drive);
   }
@@ -262,36 +267,56 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  /**
-   * Resets the odometry to the specified pose (position and heading).
-   *
-   * @param pose The pose to which to set the odometry.
-   */
-  public void resetOdometry(Pose2d pose) {
+  /** Setup the options for the starting position chooser. */
+  private void setupStartPoseChooser() {
+
+    // Add the list of start poses to the chooser
+    startPoseChooser.setDefaultOption(DriveConstants.START_NAME[0], 0);
+    for (int index = 1; index < DriveConstants.START_NAME.length; index++) {
+      startPoseChooser.addOption(DriveConstants.START_NAME[index], index);
+    }
+
+    // Put the chooser on the Shuffleboard Driver tab
+    ShuffleboardLayout startPoseChooserLayout =
+        Shuffleboard.getTab("Driver")
+            .getLayout("Start Pose", BuiltInLayouts.kList)
+            .withSize(3, 1)
+            .withPosition(0, 0)
+            .withProperties(Map.of("Label position", "HIDDEN"));
+    startPoseChooserLayout.add(startPoseChooser);
+  }
+
+  /** Resets the odometry to the specified pose (position and heading). */
+  public void resetOdometry() {
+
     resetEncoders();
     gyro.reset();
+
     this.odometry.resetPosition(
         this.gyro.getRotation2d(),
         frontLeftEncoder.getPosition(),
         frontRightEncoder.getPosition(),
-        pose);
+        getStartPose());
 
     if (RobotBase.isSimulation()) {
       odometryReset = true;
     }
   }
 
+  /** Get the selected starting pose. */
+  public Pose2d getStartPose() {
+
+    Integer choice = startPoseChooser.getSelected();
+
+    return new Pose2d(
+        DriveConstants.START_XPOS_METERS[choice],
+        DriveConstants.START_YPOS_METERS[choice],
+        new Rotation2d(Units.degreesToRadians(DriveConstants.START_HEADING_DEGREES[choice])));
+  }
+
   /** Returns a Command that resets robot position and heading to the start position. */
   public Command resetOdometryToStart() {
-    return runOnce(
-            () ->
-                resetOdometry(
-                    new Pose2d(
-                        DriveConstants.START_XPOS_METERS,
-                        DriveConstants.START_YPOS_METERS,
-                        new Rotation2d(DriveConstants.START_HEADING_RADIANS))))
-        .ignoringDisable(true)
-        .withName("Reset Start Pose");
+    return runOnce(this::resetOdometry).ignoringDisable(true).withName("Reset Start Pose");
   }
 
   /** Resets the drive encoders to currently read a position of 0. */

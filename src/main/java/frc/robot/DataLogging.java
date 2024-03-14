@@ -263,18 +263,18 @@ public class DataLogging {
     // Add the chooser to select the autonomous mode command
     SendableChooser<String> autoChooser = robotContainer.getAutoChooser();
     ShuffleboardLayout autoChooserLayout =
-        sbCommandsTab
+        sbDriverTab
             .getLayout("Autonomous Command", BuiltInLayouts.kList)
             .withSize(3, 1)
-            .withPosition(6, 0)
+            .withPosition(0, 2)
             .withProperties(Map.of("Label position", "HIDDEN"));
     autoChooserLayout.add(autoChooser);
 
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
     // Start Pose command.
     sbField = new Field2d();
-    sbDriverTab.add("Field", sbField).withSize(8, 4);
-    sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
+    sbDriverTab.add("Field", sbField).withSize(8, 4).withPosition(3, 0);
+    sbDriverTab.add(drive.resetOdometryToStart()).withSize(3, 1).withPosition(0, 1);
 
     // Add hardware sendables here
     PowerDistribution pdp = robotContainer.getPdp();

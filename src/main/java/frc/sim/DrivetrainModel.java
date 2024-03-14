@@ -5,12 +5,10 @@
 package frc.sim;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import frc.robot.Constants.DriveConstants;
@@ -75,26 +73,14 @@ public class DrivetrainModel {
     rearRightSparkSim = new CANSparkMaxSim(DriveConstants.REAR_RIGHT_MOTOR_PORT);
 
     // Set the simulated robot to start at the same position as the real robot.
-    drivetrainSimulator.setPose(
-        new Pose2d(
-            DriveConstants.START_XPOS_METERS,
-            DriveConstants.START_YPOS_METERS,
-            new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
+    setStartPose();
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
   public void updateSim() {
     // If the drive subsystem odometry has been reset, then reset the simulator to match
     if (driveSubsystem.odometryWasReset()) {
-      drivetrainSimulator.setPose(
-          new Pose2d(
-              DriveConstants.START_XPOS_METERS,
-              DriveConstants.START_YPOS_METERS,
-              new Rotation2d(DriveConstants.START_HEADING_RADIANS)));
-
-      // The gyro is reset to zero, so save the offset from the starting heading
-      startAngle = Units.radiansToDegrees(DriveConstants.START_HEADING_RADIANS);
-
+      setStartPose();
       driveSubsystem.clearOdometryReset();
 
     } else {
@@ -147,6 +133,14 @@ public class DrivetrainModel {
     gyroSim.setAngle(newAngle);
     gyroSim.setRate(((newAngle - lastAngle) / 0.02));
     lastAngle = newAngle;
+  }
+
+  private void setStartPose() {
+    Pose2d newPose = driveSubsystem.getStartPose();
+    drivetrainSimulator.setPose(newPose);
+
+    // The gyro is reset to zero, so save the offset from the starting heading
+    startAngle = newPose.getRotation().getDegrees();
   }
 
   /** Return the left side total simulated current. */

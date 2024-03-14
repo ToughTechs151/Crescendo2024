@@ -99,8 +99,9 @@ public class Robot extends TimedRobot {
 
       this.autonomousCommand = this.robotContainer.getAutonomousCommand();
 
-      // Set drive mode to brake while autonomous
+      // Set drive mode to brake and reset odometry and encoders
       this.robotContainer.getDriveSubsystem().setBrakeMode(true);
+      this.robotContainer.getDriveSubsystem().resetOdometry();
 
       // schedule the autonomous command (example)
       if (this.autonomousCommand != null) {

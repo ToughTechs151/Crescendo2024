@@ -82,9 +82,23 @@ public final class Constants {
     // position. The pose is applied at initialization and can be set back to this position
     // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
     // is the start for trajectories.
-    public static final double START_XPOS_METERS = 1.35;
-    public static final double START_YPOS_METERS = 5.5;
-    public static final double START_HEADING_RADIANS = Units.degreesToRadians(0.0);
+    public static final String[] START_NAME = {
+      "Blue Left",
+      "Blue Center",
+      "Blue Right",
+      "Blue Far Right",
+      "Red Left",
+      "Red Center",
+      "Red Right",
+      "Red Far Left",
+    };
+    public static final double[] START_XPOS_METERS = {
+      0.8, 1.35, 0.8, 1.35, 15.75, 15.2, 15.75, 15.2
+    };
+    public static final double[] START_YPOS_METERS = {6.7, 5.6, 4.4, 2.0, 4.4, 5.6, 6.7, 2.0};
+    public static final double[] START_HEADING_DEGREES = {
+      60.0, 0.0, -60.0, 0.0, -120.0, 180.0, 120.0, 180.0
+    };
 
     public static final boolean SQUARE_INPUTS = true;
     public static final boolean ENABLE_BRAKE = false;
