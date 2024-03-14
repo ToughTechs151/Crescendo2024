@@ -136,11 +136,6 @@ public class RobotContainer {
     // Disable the climber controller when the 'X' button is pressed.
     driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
 
-    // Run the launcher at the defined speed while the right trigger is held.
-    // operatorController
-    //     .rightTrigger()
-    //     .whileTrue(robotLauncher.runLauncher().withName("Launcher: Run Full Speed"));
-
     // This command runs the launcher at high speed to launch a note into the speaker, then run
     // the intake when the launcher is up to speed.
     operatorController
@@ -259,8 +254,8 @@ public class RobotContainer {
                     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
                         .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.75, 0.2, 0.11),
-                robotDrive.driveDistanceCommand(1.4, 0.1, 0.0))
+                robotDrive.driveDistanceCommand(0.5, 0.2, 0.2),
+                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
             .withName("Launch Right and Drive");
 
       case "LaunchAndTaxiFarRight":

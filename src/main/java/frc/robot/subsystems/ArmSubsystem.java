@@ -190,6 +190,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
 
     SmartDashboard.putBoolean("Arm Enabled", armEnabled);
+    SmartDashboard.putBoolean("Note Loaded", isNoteInsideIntake());
     SmartDashboard.putNumber("Arm Goal", Units.radiansToDegrees(armController.getGoal().position));
     SmartDashboard.putNumber("Arm Angle", Units.radiansToDegrees(getMeasurement()));
     SmartDashboard.putNumber("Arm Voltage", voltageCommand);
@@ -405,8 +406,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     feedforward = new ArmFeedforward(staticGain, gravityGain, velocityGain, 0);
   }
 
-  /** Return true if the Note is inside the ARM's intake */
-  public boolean IsNoteInsideIntake() {
+  /** Return true if the Note is inside the ARM's intake. */
+  public boolean isNoteInsideIntake() {
     return !beamBreaker.get();
   }
 
