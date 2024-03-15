@@ -311,13 +311,14 @@ public final class Constants {
       return CLIMBER_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 32.0; // 16:1 transmission and 2:1 pulley
-    public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(1.1);
+    public static final double GEAR_RATIO = 16.0; // 16:1 transmission
+    // Spool is 1.75 inch diameter, assume additional 0.125 for the cord
+    public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(1.875 / 2.0);
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
         2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.378;
-    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.0;
+    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.3;
     public static final double CLIMBER_OFFSET_RADS = 0.0;
 
     // Encoder is reset to measure 0 at the top, so minimum pull is 0.

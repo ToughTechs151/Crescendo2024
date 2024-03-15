@@ -87,21 +87,21 @@ public class RobotContainer {
         .onTrue(new InstantCommand(this.robotDrive::setCrawlSpeed))
         .onFalse(new InstantCommand(this.robotDrive::setNormalSpeed));
 
-    // Move the climber to the low position when the 'A' button is pressed.
+    // Extend the climber arms when the 'A' button is pressed.
     driverController
         .a()
         .onTrue(
             robotClimber
                 .moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS)
-                .withName("Climber: Lower"));
+                .withName("Climber: Extend"));
 
-    // Move the climber to the high position when the 'Y' button is pressed.
+    // Retract the climber arms when the 'Y' button is pressed.
     driverController
         .y()
         .onTrue(
             robotClimber
                 .moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS)
-                .withName("Climber: Pull Up"));
+                .withName("Climber: Retract"));
 
     // Command the climber relays to forward/lock position when POV Up is pressed, and then turn
     // relay off when button is released.
