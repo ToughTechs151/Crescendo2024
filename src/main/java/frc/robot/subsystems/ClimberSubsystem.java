@@ -14,8 +14,10 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -113,17 +115,23 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     CANSparkMax motorRight;
     RelativeEncoder encoderLeft;
     RelativeEncoder encoderRight;
+    Relay relayLeft;
+    Relay relayRight;
 
     /** Save the hardware components when the object is constructed. */
     public Hardware(
         CANSparkMax motorLeft,
         CANSparkMax motorRight,
         RelativeEncoder encoderLeft,
-        RelativeEncoder encoderRight) {
+        RelativeEncoder encoderRight,
+        Relay relayLeft,
+        Relay relayRight) {
       this.motorLeft = motorLeft;
       this.motorRight = motorRight;
       this.encoderLeft = encoderLeft;
       this.encoderRight = encoderRight;
+      this.relayLeft = relayLeft;
+      this.relayRight = relayRight;
     }
   }
 
@@ -131,6 +139,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   private final CANSparkMax motorRight;
   private final RelativeEncoder encoderLeft;
   private final RelativeEncoder encoderRight;
+  private final Relay relayLeft;
+  private final Relay relayRight;
 
   private ProfiledPIDController climberLeftController =
       new ProfiledPIDController(
@@ -166,6 +176,7 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean climberEnabled;
   private double leftVoltageCommand = 0.0;
   private double rightVoltageCommand = 0.0;
+  private double relayCommand = 0.0;
 
   /** Create a new ClimberSubsystem controlled by Profiled PID COntrollers. */
   public ClimberSubsystem(Hardware climberHardware) {
@@ -173,6 +184,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     this.motorRight = climberHardware.motorRight;
     this.encoderLeft = climberHardware.encoderLeft;
     this.encoderRight = climberHardware.encoderRight;
+    this.relayLeft = climberHardware.relayLeft;
+    this.relayRight = climberHardware.relayRight;
 
     initializeClimber();
   }
@@ -232,8 +245,10 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
         new CANSparkMax(ClimberConstants.RIGHT_MOTOR_PORT, MotorType.kBrushless);
     RelativeEncoder encoderLeft = motorLeft.getEncoder();
     RelativeEncoder encoderRight = motorRight.getEncoder();
+    Relay relayLeft = new Relay(ClimberConstants.LEFT_RELAY_PORT);
+    Relay relayRight = new Relay(ClimberConstants.RIGHT_RELAY_PORT);
 
-    return new Hardware(motorLeft, motorRight, encoderLeft, encoderRight);
+    return new Hardware(motorLeft, motorRight, encoderLeft, encoderRight, relayLeft, relayRight);
   }
 
   @Override
@@ -251,6 +266,7 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Climber Right Temp", motorRight.getMotorTemperature());
     SmartDashboard.putNumber("Climber Left SetPt Pos", leftSetpoint.position);
     SmartDashboard.putNumber("Climber Right SetPt Pos", rightSetpoint.position);
+    SmartDashboard.putNumber("Climber Relay", relayCommand);
 
     if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {
       SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
@@ -344,6 +360,35 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns whether the climber has reached the goal position and velocity is within limits. */
   public boolean atGoalPosition() {
     return (climberLeftController.atGoal() && climberRightController.atGoal());
+  }
+
+  /**
+   * Returns a Command that sets the climber motor voltage to a fixed value, then sets to 0 when
+   * stopped.
+   */
+  public Command commandVoltage() {
+    return Commands.startEnd(this::setVoltage, this::zeroVoltage, this)
+        .withName("Climber: Set Voltage");
+  }
+
+  /** Set both motors to a fixed value set via Preferences. */
+  private void setVoltage() {
+    double fixedVoltage = ClimberConstants.CLIMBER_FIXED_VOLTS.getValue();
+
+    motorLeft.setVoltage(fixedVoltage);
+    motorRight.setVoltage(fixedVoltage);
+
+    leftVoltageCommand = fixedVoltage;
+    rightVoltageCommand = fixedVoltage;
+  }
+
+  /** Set both motors to a zero volts. */
+  private void zeroVoltage() {
+    motorLeft.setVoltage(0);
+    motorRight.setVoltage(0);
+
+    leftVoltageCommand = 0;
+    rightVoltageCommand = 0;
   }
 
   /**
@@ -481,6 +526,28 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     double gravityGain = ClimberConstants.CLIMBER_KG.getValue();
     double velocityGain = ClimberConstants.CLIMBER_KV_VOLTS_PER_METER_PER_SEC.getValue();
     feedforward = new ElevatorFeedforward(staticGain, gravityGain, velocityGain, 0);
+  }
+
+  /** Set the relays driving the solenoids. */
+  public void setRelay(boolean forward, boolean reverse) {
+    /*
+     * Drive the relays based on whether it is being commanded forward, reverse, or neither.
+     * kOff sets both to 0V, kForward sets forward to 12V and reverse to 0V, and kReverse sets
+     * reverse to 12V and forward to 0V. If both are set, we will treat that as Off.
+     */
+    if (forward) {
+      relayLeft.set(Relay.Value.kForward);
+      relayRight.set(Relay.Value.kForward);
+      relayCommand = 1.0;
+    } else if (reverse) {
+      relayLeft.set(Relay.Value.kReverse);
+      relayRight.set(Relay.Value.kReverse);
+      relayCommand = -1.0;
+    } else {
+      relayLeft.set(Relay.Value.kOff);
+      relayRight.set(Relay.Value.kOff);
+      relayCommand = 0.0;
+    }
   }
 
   /** Close any objects that support it. */

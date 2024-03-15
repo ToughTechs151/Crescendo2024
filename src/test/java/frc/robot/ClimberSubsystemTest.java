@@ -17,6 +17,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -40,6 +41,8 @@ class ClimberSubsystemTest {
   private CANSparkMax mockMotorRight;
   private RelativeEncoder mockEncoderLeft;
   private RelativeEncoder mockEncoderRight;
+  private Relay relayLeft;
+  private Relay relayRight;
 
   @BeforeEach
   public void initEach() {
@@ -48,6 +51,8 @@ class ClimberSubsystemTest {
     mockMotorRight = mock(CANSparkMax.class);
     mockEncoderLeft = mock(RelativeEncoder.class);
     mockEncoderRight = mock(RelativeEncoder.class);
+    relayLeft = mock(Relay.class);
+    relayRight = mock(Relay.class);
 
     // Reset preferences to default values so test results are consistent
     RobotPreferences.resetAllPreferences();
@@ -55,7 +60,12 @@ class ClimberSubsystemTest {
     // Create subsystem object using mock hardware
     climberHardware =
         new ClimberSubsystem.Hardware(
-            mockMotorLeft, mockMotorRight, mockEncoderLeft, mockEncoderRight);
+            mockMotorLeft,
+            mockMotorRight,
+            mockEncoderLeft,
+            mockEncoderRight,
+            relayLeft,
+            relayRight);
     climber = new ClimberSubsystem(climberHardware);
   }
 
