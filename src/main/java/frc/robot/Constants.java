@@ -280,6 +280,8 @@ public final class Constants {
 
     public static final int LEFT_MOTOR_PORT = 8;
     public static final int RIGHT_MOTOR_PORT = 9;
+    public static final int LEFT_RELAY_PORT = 1;
+    public static final int RIGHT_RELAY_PORT = 0;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
@@ -292,6 +294,8 @@ public final class Constants {
         new PreferenceKeyValue("ClimberVelocityMax", 0.2);
     public static final PreferenceKeyValue CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2 =
         new PreferenceKeyValue("ClimberAccelerationMax", 0.5);
+    public static final PreferenceKeyValue CLIMBER_FIXED_VOLTS =
+        new PreferenceKeyValue("ClimberFixedVolts", 3.0);
 
     private static final PreferenceKeyValue[] CLIMBER_PREFERENCES = {
       CLIMBER_KP,
@@ -299,7 +303,8 @@ public final class Constants {
       CLIMBER_KG,
       CLIMBER_KV_VOLTS_PER_METER_PER_SEC,
       CLIMBER_MAX_VELOCITY_METERS_PER_SEC,
-      CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2
+      CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2,
+      CLIMBER_FIXED_VOLTS
     };
 
     public static PreferenceKeyValue[] getClimberPreferences() {
