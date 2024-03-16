@@ -142,7 +142,7 @@ public final class Constants {
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
         new PreferenceKeyValue("ArmKV", 2.0);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
+        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(120));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
         new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
 
@@ -267,8 +267,8 @@ public final class Constants {
     public static final double LAUNCHER_TOLERANCE_RPM_AMP = 100;
     public static final double LAUNCHER_TOP_SPEED = 5300;
     public static final double LAUNCHER_BOTTOM_SPEED = 4000;
-    public static final double LAUNCHER_TOP_SPEED_AMP = 650;
-    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 650;
+    public static final double LAUNCHER_TOP_SPEED_AMP = 600;
+    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 600;
   }
 
   /** Constants used for the Climber subsystem. */
