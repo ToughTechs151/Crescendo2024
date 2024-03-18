@@ -87,6 +87,46 @@ public class RobotContainer {
         .onTrue(new InstantCommand(this.robotDrive::setCrawlSpeed))
         .onFalse(new InstantCommand(this.robotDrive::setNormalSpeed));
 
+    // Extend the climber arms when the 'A' button is pressed.
+    driverController
+        .a()
+        .onTrue(
+            robotClimber
+                .moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS)
+                .withName("Climber: Extend"));
+
+    // Retract the climber arms when the 'Y' button is pressed.
+    driverController
+        .y()
+        .onTrue(
+            robotClimber
+                .moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS)
+                .withName("Climber: Retract"));
+
+    // Command the climber relays to forward/lock position when POV Up is pressed, and then turn
+    // relay off when button is released.
+    driverController
+        .povUp()
+        .whileTrue(
+            Commands.startEnd(
+                    () -> robotClimber.setRelay(true, false),
+                    () -> robotClimber.setRelay(false, false))
+                .withName("Relay Forward"));
+
+    // Command the climber relays to reverse/unlock position when POV Down is pressed, and then turn
+    // relay off when button is released.
+    driverController
+        .povDown()
+        .whileTrue(
+            Commands.startEnd(
+                    () -> robotClimber.setRelay(false, true),
+                    () -> robotClimber.setRelay(false, false))
+                .withName("Relay Reverse"));
+
+    // Command the climber motors to a set voltage while the B button is pressed, and set to 0
+    // when released.
+    driverController.b().whileTrue(robotClimber.commandVoltage());
+
     // Move the arm to the low position when the 'A' button is pressed on the operator's controller.
     operatorController
         .a()
@@ -116,22 +156,6 @@ public class RobotContainer {
     // NOTE: This is intended for initial arm testing and should be removed in the final robot
     // to prevent accidental disable resulting in lowering of the arm.
     operatorController.x().onTrue(Commands.runOnce(robotArm::disable));
-
-    // Move the climber to the low position when the 'A' button is pressed.
-    driverController
-        .a()
-        .onTrue(
-            robotClimber
-                .moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS)
-                .withName("Climber: Lower"));
-
-    // Move the climber to the high position when the 'Y' button is pressed.
-    driverController
-        .y()
-        .onTrue(
-            robotClimber
-                .moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS)
-                .withName("Climber: Pull Up"));
 
     // Disable the climber controller when the 'X' button is pressed.
     driverController.x().onTrue(Commands.runOnce(robotClimber::disable));

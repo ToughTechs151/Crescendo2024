@@ -120,7 +120,7 @@ public final class Constants {
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
         new PreferenceKeyValue("ArmKV", 2.0);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(90));
+        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(120));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
         new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
 
@@ -216,7 +216,7 @@ public final class Constants {
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
     public static final PreferenceKeyValue LAUNCHER_SLEW_VOLTS_PER_SEC =
-        new PreferenceKeyValue("LauncherSlew", 12.0);
+        new PreferenceKeyValue("LauncherSlew", 24.0);
     public static final PreferenceKeyValue LAUNCHER_KP =
         new PreferenceKeyValue("LauncherKP", 0.001);
     public static final PreferenceKeyValue LAUNCHER_KS_VOLTS =
@@ -245,8 +245,8 @@ public final class Constants {
     public static final double LAUNCHER_TOLERANCE_RPM_AMP = 100;
     public static final double LAUNCHER_TOP_SPEED = 5300;
     public static final double LAUNCHER_BOTTOM_SPEED = 4000;
-    public static final double LAUNCHER_TOP_SPEED_AMP = 650;
-    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 650;
+    public static final double LAUNCHER_TOP_SPEED_AMP = 600;
+    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 600;
   }
 
   /** Constants used for the Climber subsystem. */
@@ -258,6 +258,8 @@ public final class Constants {
 
     public static final int LEFT_MOTOR_PORT = 8;
     public static final int RIGHT_MOTOR_PORT = 9;
+    public static final int LEFT_RELAY_PORT = 1;
+    public static final int RIGHT_RELAY_PORT = 0;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
@@ -270,6 +272,8 @@ public final class Constants {
         new PreferenceKeyValue("ClimberVelocityMax", 0.2);
     public static final PreferenceKeyValue CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2 =
         new PreferenceKeyValue("ClimberAccelerationMax", 0.5);
+    public static final PreferenceKeyValue CLIMBER_FIXED_VOLTS =
+        new PreferenceKeyValue("ClimberFixedVolts", 3.0);
 
     private static final PreferenceKeyValue[] CLIMBER_PREFERENCES = {
       CLIMBER_KP,
@@ -277,20 +281,22 @@ public final class Constants {
       CLIMBER_KG,
       CLIMBER_KV_VOLTS_PER_METER_PER_SEC,
       CLIMBER_MAX_VELOCITY_METERS_PER_SEC,
-      CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2
+      CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2,
+      CLIMBER_FIXED_VOLTS
     };
 
     public static PreferenceKeyValue[] getClimberPreferences() {
       return CLIMBER_PREFERENCES;
     }
 
-    public static final double GEAR_RATIO = 32.0; // 16:1 transmission and 2:1 pulley
-    public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(1.1);
+    public static final double GEAR_RATIO = 16.0; // 16:1 transmission
+    // Spool is 1.75 inch diameter, assume additional 0.125 for the cord
+    public static final double SPOOL_RADIUS_METERS = Units.inchesToMeters(1.875 / 2.0);
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
         2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.378;
-    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.0;
+    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.3;
     public static final double CLIMBER_OFFSET_RADS = 0.0;
 
     // Encoder is reset to measure 0 at the top, so minimum pull is 0.
