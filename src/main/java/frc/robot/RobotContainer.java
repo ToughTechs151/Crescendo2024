@@ -229,7 +229,7 @@ public class RobotContainer {
 
     autoChooser.setDefaultOption("Nothing", "Nothing");
     autoChooser.addOption("Taxi", "DriveStraight");
-    autoChooser.addOption("Launch", "Launch");
+    autoChooser.addOption("Launch", "OnlyLaunch");
     autoChooser.addOption("Launch and Taxi Straight", "LaunchAndTaxiStraight");
     autoChooser.addOption("Launch Right and Taxi", "LaunchRightAndTaxi");
     autoChooser.addOption("Launch Right and Taxi Far", "LaunchAndTaxiFarRight");

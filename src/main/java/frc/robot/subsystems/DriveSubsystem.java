@@ -29,6 +29,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotPreferences;
+import frc.robot.StartPose;
+import frc.robot.StartPose.NamedPose;
 import java.util.Map;
 
 /** Drive subsystem using differential drive. */
@@ -271,9 +273,11 @@ public class DriveSubsystem extends SubsystemBase {
   private void setupStartPoseChooser() {
 
     // Add the list of start poses to the chooser
-    startPoseChooser.setDefaultOption(DriveConstants.START_NAME[0], 0);
-    for (int index = 1; index < DriveConstants.START_NAME.length; index++) {
-      startPoseChooser.addOption(DriveConstants.START_NAME[index], index);
+    NamedPose[] poseArray = StartPose.get();
+
+    startPoseChooser.setDefaultOption(poseArray[0].name(), 0);
+    for (int index = 1; index < poseArray.length; index++) {
+      startPoseChooser.addOption(poseArray[index].name(), index);
     }
 
     // Put the chooser on the Shuffleboard Driver tab
@@ -303,15 +307,12 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  /** Get the selected starting pose. */
+  /** Get the selected starting pose from the chooser. */
   public Pose2d getStartPose() {
 
-    Integer choice = startPoseChooser.getSelected();
+    NamedPose pose = StartPose.get()[startPoseChooser.getSelected()];
 
-    return new Pose2d(
-        DriveConstants.START_XPOS_METERS[choice],
-        DriveConstants.START_YPOS_METERS[choice],
-        new Rotation2d(Units.degreesToRadians(DriveConstants.START_HEADING_DEGREES[choice])));
+    return new Pose2d(pose.x(), pose.y(), new Rotation2d(Units.degreesToRadians(pose.heading())));
   }
 
   /** Returns a Command that resets robot position and heading to the start position. */
