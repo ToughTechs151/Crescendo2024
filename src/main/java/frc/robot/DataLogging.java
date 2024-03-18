@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -40,6 +42,8 @@ public class DataLogging {
   private ShuffleboardTab sbDriverTab;
   private Field2d sbField;
   private DriveSubsystem drive;
+  private ArmSubsystem arm;
+  private BlinkinSubsystem blinkin;
 
   private DataLogging() {
     // Starts recording to data log
@@ -151,6 +155,20 @@ public class DataLogging {
     // Get the pose from the drivetrain subsystem and update the field display
     sbField.setRobotPose(drive.getPose());
 
+    // Set the LEDs to show arm angle
+    if (arm.getMeasurement() > Constants.ArmConstants.ARM_BACK_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.RED);
+    } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
+      if (arm.isNoteInsideIntake()) {
+        blinkin.setValue(BlinkinSubsystem.ORANGE);
+      } else {
+        blinkin.setValue(BlinkinSubsystem.BLUE);
+      }
+    } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_BACK_POSITION_RADS
+        && arm.getMeasurement() > Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
+      blinkin.setValue(BlinkinSubsystem.ORANGE);
+    }
+
     if (Constants.LOOP_TIMING_LOG) {
       loopTime.append(Timer.getFPGATimestamp() - startTime);
     }
@@ -163,8 +181,9 @@ public class DataLogging {
    */
   public void dataLogRobotContainerInit(RobotContainer robotContainer) {
 
+    blinkin = robotContainer.getBlinkin();
     drive = robotContainer.getDriveSubsystem();
-    ArmSubsystem arm = robotContainer.getArmSubsystem();
+    arm = robotContainer.getArmSubsystem();
     ClimberSubsystem climber = robotContainer.getClimberSubsystem();
     IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
@@ -241,12 +260,21 @@ public class DataLogging {
                 .withName("Reset All Preferences"))
         .withSize(2, 1);
 
+    // Add the chooser to select the autonomous mode command
+    SendableChooser<String> autoChooser = robotContainer.getAutoChooser();
+    ShuffleboardLayout autoChooserLayout =
+        sbDriverTab
+            .getLayout("Autonomous Command", BuiltInLayouts.kList)
+            .withSize(3, 1)
+            .withPosition(0, 2)
+            .withProperties(Map.of("Label position", "HIDDEN"));
+    autoChooserLayout.add(autoChooser);
+
     // Add widgets to the Driver tab to display the robot pose and a button to run the Reset
-    // Start Pose command.  Using that command in simulation mode will cause the robot position
-    // to be displayed incorrectly on the field.
+    // Start Pose command.
     sbField = new Field2d();
-    sbDriverTab.add("Field", sbField).withSize(8, 4);
-    sbDriverTab.add(drive.resetOdometryToStart()).withSize(2, 1);
+    sbDriverTab.add("Field", sbField).withSize(8, 4).withPosition(3, 0);
+    sbDriverTab.add(drive.resetOdometryToStart()).withSize(3, 1).withPosition(0, 1);
 
     // Add hardware sendables here
     PowerDistribution pdp = robotContainer.getPdp();
@@ -261,7 +289,7 @@ public class DataLogging {
         .withWidget(BuiltInWidgets.kDial)
         .withProperties(Map.of("min", 15, "max", 50));
 
-    /* HW Test tab */
+    // HW Test tab for buttons to control hardware for testing and maintenance
     ShuffleboardTab sbHardwareTestTab = Shuffleboard.getTab("HW Test");
 
     sbHardwareTestTab

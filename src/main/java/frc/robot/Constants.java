@@ -31,10 +31,26 @@ public final class Constants {
   // to disable it.
   public static final boolean LW_TELEMETRY_ENABLE = false;
 
+  // Set a Global Constant to either Show or Hide extended logging data for each of the 5 subsystems
+  // Set to true to show extended logging data.
+  // Set to false to hide extended logging data.
+  public static final boolean SD_SHOW_ARM_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_DRIVE_EXTENDED_LOGGING_DATA = false;
+
   public static final boolean LOOP_TIMING_LOG = false;
 
   // Set to true to log each frame of command execution. To false to disable.
   public static final boolean COMMAND_EXECUTE_LOG = false;
+
+  // Camera ID
+  public static final int CAMERA_0 = 0;
+  public static final int CAMERA_1 = 1;
+
+  // Blinkin
+  public static final int BLINKIN_PORT = 1;
 
   /** Constants used for the Drive subsystem. */
   public static final class DriveConstants {
@@ -61,14 +77,6 @@ public final class Constants {
         (WHEEL_DIAMETER_METERS * Math.PI) / GEAR_RATIO;
     public static final double ENCODER_VELOCITY_CONVERSION =
         (WHEEL_DIAMETER_METERS * Math.PI) / (GEAR_RATIO * 60);
-
-    // Starting field pose (position and heading) for odometry which tracks movements from this
-    // position. The pose is applied at initialization and can be set back to this position
-    // using the Reset Start Pose button on the Shuffleboard driver tab. This position also
-    // is the start for trajectories.
-    public static final double START_XPOS_METERS = 0.5;
-    public static final double START_YPOS_METERS = 2.5;
-    public static final double START_HEADING_RADIANS = Units.degreesToRadians(0.0);
 
     public static final boolean SQUARE_INPUTS = true;
     public static final boolean ENABLE_BRAKE = false;
@@ -103,6 +111,7 @@ public final class Constants {
     }
 
     public static final int MOTOR_PORT = 6;
+    public static final int BEAM_BREAKER_PORT = 1;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
@@ -167,7 +176,7 @@ public final class Constants {
     public static final PreferenceKeyValue INTAKE_SET_POINT_REVERSE_RPM =
         new PreferenceKeyValue("IntakeReverseRPM", -400.0);
     public static final PreferenceKeyValue INTAKE_SPEED_THRESHOLD_RPM =
-        new PreferenceKeyValue("IntakeThresholdRPM", 300.0);
+        new PreferenceKeyValue("IntakeThresholdRPM", 250.0);
     public static final PreferenceKeyValue INTAKE_CURRENT_THRESHOLD_AMPS =
         new PreferenceKeyValue("IntakeThresholdAmps", 8.0);
 
@@ -232,9 +241,12 @@ public final class Constants {
     public static final double LAUNCHER_GEAR_RATIO =
         1.0; // Ratio of motor rotations to output rotations
     public static final double LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION = 1.0 / LAUNCHER_GEAR_RATIO;
-    public static final double LAUNCHER_TOLERANCE_RPM = 500;
+    public static final double LAUNCHER_TOLERANCE_RPM = 400;
+    public static final double LAUNCHER_TOLERANCE_RPM_AMP = 100;
     public static final double LAUNCHER_TOP_SPEED = 5300;
     public static final double LAUNCHER_BOTTOM_SPEED = 4000;
+    public static final double LAUNCHER_TOP_SPEED_AMP = 650;
+    public static final double LAUNCHER_BOTTOM_SPEED_AMP = 650;
   }
 
   /** Constants used for the Climber subsystem. */

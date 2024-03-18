@@ -95,7 +95,7 @@ class LauncherSubsystemTest {
   void testMoveCommand() {
 
     // Create a command to run the launcher then initialize
-    Command runLauncherCommand = launcher.runLauncher();
+    Command runLauncherCommand = launcher.runLauncherSpeaker();
     runLauncherCommand.initialize();
 
     // Run the periodic method to generate telemetry and verify it was published
@@ -169,7 +169,7 @@ class LauncherSubsystemTest {
 
     // The motor voltages should be set twice: once to 0 when configured and once to a
     // positive value for left and negative value for right when controller is run.
-    Command runLauncherCommand = launcher.runLauncher();
+    Command runLauncherCommand = launcher.runLauncherSpeaker();
     runLauncherCommand.initialize();
     runLauncherCommand.execute();
     verify(mockMotorTopLeft, times(2)).setVoltage(anyDouble());

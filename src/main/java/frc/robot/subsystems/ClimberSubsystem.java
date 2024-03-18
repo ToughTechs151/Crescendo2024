@@ -16,7 +16,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -192,6 +191,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
         ClimberConstants.POSITION_TOLERANCE_METERS, ClimberConstants.VELOCITY_TOLERANCE_METERS);
 
     disable();
+
+    setDefaultCommand(runOnce(this::disable).andThen(run(() -> {})).withName("Idle"));
   }
 
   private void initMotors() {
@@ -242,20 +243,25 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Climber Goal", climberLeftController.getGoal().position);
     SmartDashboard.putNumber("Climber Left Position", getMeasurementLeft());
     SmartDashboard.putNumber("Climber Right Position", getMeasurementRight());
-    SmartDashboard.putNumber("Climber Left Velocity", encoderLeft.getVelocity());
-    SmartDashboard.putNumber("Climber Right Velocity", encoderRight.getVelocity());
     SmartDashboard.putNumber("Climber Left Voltage", leftVoltageCommand);
     SmartDashboard.putNumber("Climber Right Voltage", leftVoltageCommand);
     SmartDashboard.putNumber("Climber Left Current", motorLeft.getOutputCurrent());
     SmartDashboard.putNumber("Climber Right Current", motorRight.getOutputCurrent());
-    SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
-    SmartDashboard.putNumber("Climber Right Feedforward", rightFeedforward);
-    SmartDashboard.putNumber("Climber Left PID output", leftPidOutput);
-    SmartDashboard.putNumber("Climber Right PID output", rightPidOutput);
+    SmartDashboard.putNumber("Climber Left Temp", motorLeft.getMotorTemperature());
+    SmartDashboard.putNumber("Climber Right Temp", motorRight.getMotorTemperature());
     SmartDashboard.putNumber("Climber Left SetPt Pos", leftSetpoint.position);
-    SmartDashboard.putNumber("Climber Left SetPt Vel", leftSetpoint.velocity);
     SmartDashboard.putNumber("Climber Right SetPt Pos", rightSetpoint.position);
-    SmartDashboard.putNumber("Climber Right SetPt Vel", rightSetpoint.velocity);
+
+    if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {
+      SmartDashboard.putNumber("Climber Left Feedforward", leftFeedforward);
+      SmartDashboard.putNumber("Climber Left PID output", leftPidOutput);
+      SmartDashboard.putNumber("Climber Left SetPt Vel", leftSetpoint.velocity);
+      SmartDashboard.putNumber("Climber Left Velocity", encoderLeft.getVelocity());
+      SmartDashboard.putNumber("Climber Right Feedforward", rightFeedforward);
+      SmartDashboard.putNumber("Climber Right PID output", rightPidOutput);
+      SmartDashboard.putNumber("Climber Right SetPt Vel", rightSetpoint.velocity);
+      SmartDashboard.putNumber("Climber Right Velocity", encoderRight.getVelocity());
+    }
   }
 
   /** Generate the motor commands using the PID controller outputs and feedforward. */
@@ -382,13 +388,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     // Clear the enabled flag and call useOutput to zero the motor command
     climberEnabled = false;
     useOutput();
+    setDefaultCommand(run(() -> {}).withName("Idle"));
 
-    // Remove the default command and cancel any command that is active
-    removeDefaultCommand();
-    Command currentCommand = CommandScheduler.getInstance().requiring(this);
-    if (currentCommand != null) {
-      CommandScheduler.getInstance().cancel(currentCommand);
-    }
     DataLogManager.log(
         "Climber Disabled: LeftPos="
             + getMeasurementLeft()

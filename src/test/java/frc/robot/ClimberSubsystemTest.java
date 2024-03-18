@@ -161,14 +161,18 @@ class ClimberSubsystemTest {
         ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition,
         telemetryDoubleMap.get("Climber Left Position"),
         DELTA);
-    assertEquals(fakeVelocity, telemetryDoubleMap.get("Climber Left Velocity"), DELTA);
+    if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {
+      assertEquals(fakeVelocity, telemetryDoubleMap.get("Climber Left Velocity"), DELTA);
+    }
 
     assertEquals(fakeCurrent, telemetryDoubleMap.get("Climber Right Current"), DELTA);
     assertEquals(
         ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition,
         telemetryDoubleMap.get("Climber Right Position"),
         DELTA);
-    assertEquals(fakeVelocity, telemetryDoubleMap.get("Climber Right Velocity"), DELTA);
+    if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {
+      assertEquals(fakeVelocity, telemetryDoubleMap.get("Climber Right Velocity"), DELTA);
+    }
   }
 
   @Test

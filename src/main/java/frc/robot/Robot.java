@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +39,9 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     this.robotContainer = new RobotContainer();
+
+    // Start the Camera server
+    CameraServer.startAutomaticCapture(Constants.CAMERA_0);
 
     datalog.dataLogRobotContainerInit(this.robotContainer);
   }
@@ -95,6 +99,10 @@ public class Robot extends TimedRobot {
 
       this.autonomousCommand = this.robotContainer.getAutonomousCommand();
 
+      // Set drive mode to brake and reset odometry and encoders
+      this.robotContainer.getDriveSubsystem().setBrakeMode(true);
+      this.robotContainer.getDriveSubsystem().resetOdometry();
+
       // schedule the autonomous command (example)
       if (this.autonomousCommand != null) {
         this.autonomousCommand.schedule();
@@ -122,6 +130,9 @@ public class Robot extends TimedRobot {
 
     // Get the selected drive mode to use in TeleOp mode
     Command driveCommand = robotContainer.getTeleopDriveCommand();
+
+    // Set drive mode to coast while teleop
+    this.robotContainer.getDriveSubsystem().setBrakeMode(false);
 
     // schedule the drive command
     if (driveCommand != null) {
