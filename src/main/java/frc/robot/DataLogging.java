@@ -43,6 +43,7 @@ public class DataLogging {
   private Field2d sbField;
   private DriveSubsystem drive;
   private ArmSubsystem arm;
+  private IntakeSubsystem intake;
   private BlinkinSubsystem blinkin;
 
   private DataLogging() {
@@ -159,7 +160,7 @@ public class DataLogging {
     if (arm.getMeasurement() > Constants.ArmConstants.ARM_BACK_POSITION_RADS) {
       blinkin.setValue(BlinkinSubsystem.RED);
     } else if (arm.getMeasurement() < Constants.ArmConstants.ARM_FORWARD_POSITION_RADS) {
-      if (arm.isNoteInsideIntake()) {
+      if (intake.isNoteInsideIntake()) {
         blinkin.setValue(BlinkinSubsystem.ORANGE);
       } else {
         blinkin.setValue(BlinkinSubsystem.BLUE);
@@ -185,7 +186,7 @@ public class DataLogging {
     drive = robotContainer.getDriveSubsystem();
     arm = robotContainer.getArmSubsystem();
     ClimberSubsystem climber = robotContainer.getClimberSubsystem();
-    IntakeSubsystem intake = robotContainer.getIntakeSubsystem();
+    intake = robotContainer.getIntakeSubsystem();
     LauncherSubsystem launcher = robotContainer.getLauncherSubsystem();
 
     // Add widgets to the Commands tab

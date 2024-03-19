@@ -11,6 +11,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -122,6 +123,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   // limitation that motor speed is sometimes reset to 0 at times during the frame.
   private double speed;
 
+  private DigitalInput beamBreaker;
+
   /** Create a new IntakeSubsystem controlled by a Profiled PID COntroller . */
   public IntakeSubsystem(Hardware intakeHardware) {
     this.intakeMotor = intakeHardware.motor;
@@ -136,6 +139,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
     initIntakeMotor();
     initIntakeEncoder();
+
+    // Initialize Bean Breaker
+    beamBreaker = new DigitalInput(Constants.ArmConstants.BEAM_BREAKER_PORT);
+
+    SmartDashboard.putBoolean("Force Note Loaded", false);
 
     // Set tolerances that will be used to determine when the intake is at the goal velocity.
     intakeController.setTolerance(IntakeConstants.INTAKE_TOLERANCE_RPM);
@@ -183,6 +191,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
     speed = intakeEncoder.getVelocity();
     SmartDashboard.putBoolean("Intake Enabled", intakeEnabled);
+    SmartDashboard.putBoolean("Note Loaded", isNoteInsideIntake());
     SmartDashboard.putNumber("Intake Setpoint", intakeController.getSetpoint());
     SmartDashboard.putNumber("Intake Speed", speed);
     SmartDashboard.putNumber("Intake Voltage", intakeVoltageCommand);
@@ -231,7 +240,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
         this::setMotorSetPointForward,
         this::updateMotorController,
         interrupted -> disableIntake(),
-        this::noteFullyLoaded,
+        this::isNoteInsideIntake,
         this);
   }
 
@@ -281,6 +290,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public boolean noteFullyLoaded() {
     return ((Math.abs(speed) >= speedThreshold)
         && (intakeMotor.getOutputCurrent() > currentThreshold));
+  }
+
+  /** Return true if the Note is inside the ARM's intake. */
+  public boolean isNoteInsideIntake() {
+    return !beamBreaker.get() || SmartDashboard.getBoolean("Force Note Loaded", false);
   }
 
   /**
@@ -361,5 +375,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void close() {
     intakeMotor.close();
+    beamBreaker.close();
   }
 }

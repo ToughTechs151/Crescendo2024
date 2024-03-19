@@ -15,7 +15,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -128,7 +127,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double newFeedforward = 0;
   private boolean armEnabled;
   private double voltageCommand = 0.0;
-  private DigitalInput beamBreaker;
 
   /** Create a new ArmSubsystem controlled by a Profiled PID COntroller . */
   public ArmSubsystem(Hardware armHardware) {
@@ -139,9 +137,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   private void initializeArm() {
-
-    // Initialize Bean Breaker
-    beamBreaker = new DigitalInput(Constants.ArmConstants.BEAM_BREAKER_PORT);
 
     RobotPreferences.initPreferencesArray(ArmConstants.getArmPreferences());
     initMotor();
@@ -190,7 +185,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
 
     SmartDashboard.putBoolean("Arm Enabled", armEnabled);
-    SmartDashboard.putBoolean("Note Loaded", isNoteInsideIntake());
     SmartDashboard.putNumber("Arm Goal", Units.radiansToDegrees(armController.getGoal().position));
     SmartDashboard.putNumber("Arm Angle", Units.radiansToDegrees(getMeasurement()));
     SmartDashboard.putNumber("Arm Voltage", voltageCommand);
@@ -406,15 +400,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     feedforward = new ArmFeedforward(staticGain, gravityGain, velocityGain, 0);
   }
 
-  /** Return true if the Note is inside the ARM's intake. */
-  public boolean isNoteInsideIntake() {
-    return !beamBreaker.get();
-  }
-
   /** Close any objects that support it. */
   @Override
   public void close() {
     motor.close();
-    beamBreaker.close();
   }
 }

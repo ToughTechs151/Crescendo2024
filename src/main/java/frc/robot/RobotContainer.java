@@ -235,6 +235,7 @@ public class RobotContainer {
     autoChooser.addOption("Launch Right and Taxi Far", "LaunchAndTaxiFarRight");
     autoChooser.addOption("Launch Left and Taxi", "LaunchLeftAndTaxi");
     autoChooser.addOption("Launch Left and Taxi Far", "LaunchLeftAndTaxiFar");
+    autoChooser.addOption("Launch Left and Load", "LaunchLeftAndLoad");
   }
 
   /**
@@ -264,6 +265,7 @@ public class RobotContainer {
       case "LaunchAndTaxiStraight":
         // Launch a note then Drive forward slowly until the robot moves a set distance
         return Commands.sequence(
+                Commands.waitSeconds(5),
                 Commands.race(
                     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
                     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
@@ -312,6 +314,25 @@ public class RobotContainer {
                         .andThen(robotIntake.runReverse()))),
                 robotDrive.driveDistanceCommand(3.0, 0.15, -0.01))
             .withName("Launch Left and Drive Far");
+
+      case "LaunchLeftAndLoad":
+        // Start angled left and launch a note then curve right slowly until the robot is straight.
+        // Lower the arm and run the intake to load a note while driving forward.
+        return Commands.sequence(
+                Commands.race(
+                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                    Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                        .andThen(robotIntake.runReverse())),
+                robotDrive.driveDistanceCommand(0.5, 0.2, -0.2),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                Commands.parallel(
+                    robotDrive.driveDistanceCommand(1.775, 0.15, 0.0), robotIntake.loadNote()),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
+                    .andThen(robotArm::disable))
+            .withName("Launch Left and Load");
 
       default:
         return new PrintCommand("No Auto Selected");
