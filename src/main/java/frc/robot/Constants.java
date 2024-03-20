@@ -295,13 +295,13 @@ public final class Constants {
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
         2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.0;
-    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.3;
-    public static final double CLIMBER_OFFSET_RADS = 0.0;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.35;
+    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
+    public static final double CLIMBER_OFFSET_METERS = CLIMBER_EXTEND_POSITION_METERS;
 
-    // Encoder is reset to measure 0 at the top, so minimum pull is 0.
+    // Encoder is offset to measure 0 at the top, so minimum pull is 0.
     public static final double CLIMBER_MIN_PULL_METERS = 0.0;
-    public static final double CLIMBER_MAX_PULL_METERS = 0.5;
+    public static final double CLIMBER_MAX_PULL_METERS = 0.40;
 
     public static final double POSITION_TOLERANCE_METERS = 0.03;
     public static final double VELOCITY_TOLERANCE_METERS = 0.01;

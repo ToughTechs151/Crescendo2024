@@ -84,8 +84,8 @@ class ClimberSubsystemTest {
     assertThat(climber.getRightVoltageCommand()).isZero();
 
     // Position should be set to starting position
-    assertThat(climber.getMeasurementLeft()).isEqualTo(ClimberConstants.CLIMBER_OFFSET_RADS);
-    assertThat(climber.getMeasurementRight()).isEqualTo(ClimberConstants.CLIMBER_OFFSET_RADS);
+    assertThat(climber.getMeasurementLeft()).isEqualTo(ClimberConstants.CLIMBER_OFFSET_METERS);
+    assertThat(climber.getMeasurementRight()).isEqualTo(ClimberConstants.CLIMBER_OFFSET_METERS);
   }
 
   @Test
@@ -157,10 +157,10 @@ class ClimberSubsystemTest {
 
     // Test position measurements from the encoder
     assertThat(climber.getMeasurementLeft())
-        .isEqualTo(ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition);
+        .isEqualTo(ClimberConstants.CLIMBER_OFFSET_METERS + fakePosition);
 
     assertThat(climber.getMeasurementRight())
-        .isEqualTo(ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition);
+        .isEqualTo(ClimberConstants.CLIMBER_OFFSET_METERS + fakePosition);
 
     // Check that telemetry was sent to dashboard
     climber.periodic();
@@ -168,7 +168,7 @@ class ClimberSubsystemTest {
 
     assertEquals(fakeCurrent, telemetryDoubleMap.get("Climber Left Current"), DELTA);
     assertEquals(
-        ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition,
+        ClimberConstants.CLIMBER_OFFSET_METERS + fakePosition,
         telemetryDoubleMap.get("Climber Left Position"),
         DELTA);
     if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {
@@ -177,7 +177,7 @@ class ClimberSubsystemTest {
 
     assertEquals(fakeCurrent, telemetryDoubleMap.get("Climber Right Current"), DELTA);
     assertEquals(
-        ClimberConstants.CLIMBER_OFFSET_RADS + fakePosition,
+        ClimberConstants.CLIMBER_OFFSET_METERS + fakePosition,
         telemetryDoubleMap.get("Climber Right Position"),
         DELTA);
     if (Constants.SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA) {

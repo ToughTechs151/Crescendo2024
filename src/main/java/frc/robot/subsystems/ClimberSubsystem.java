@@ -447,23 +447,25 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Returns the left climber position for PID control and logging (Units are meters from low
-   * position).
+   * Returns the left climber position for PID control and logging. Units are meters from the
+   * extended position, but encoders are zeroed at the bottom, so we need to offset to shift
+   * measured zero to the extend position.
    */
   public double getMeasurementLeft() {
     // Add the offset from the starting point. The climber must be at this position at startup for
     // the relative encoder to provide a correct position.
-    return encoderLeft.getPosition() + ClimberConstants.CLIMBER_OFFSET_RADS;
+    return encoderLeft.getPosition() + ClimberConstants.CLIMBER_OFFSET_METERS;
   }
 
   /**
-   * Returns the right climber position for PID control and logging (Units are meters from low
-   * position).
+   * Returns the right climber position for PID control and logging. Units are meters from the
+   * extended position, but encoders are zeroed at the bottom, so we need to offset to shift
+   * measured zero to the extend position.
    */
   public double getMeasurementRight() {
     // Add the offset from the starting point. The climber must be at this position at startup for
     // the relative encoder to provide a correct position.
-    return encoderRight.getPosition() + ClimberConstants.CLIMBER_OFFSET_RADS;
+    return encoderRight.getPosition() + ClimberConstants.CLIMBER_OFFSET_METERS;
   }
 
   /** Returns the Left Motor Commanded Voltage. */
