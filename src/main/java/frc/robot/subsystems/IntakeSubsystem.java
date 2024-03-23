@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -242,6 +243,18 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
         interrupted -> disableIntake(),
         this::isNoteInsideIntake,
         this);
+  }
+
+  /**
+   * Returns a Command that runs the motor forward until a note is loaded, then runs longer before
+   * stopping the intake.
+   */
+  public Command loadNoteDelayStop() {
+    return Commands.sequence(
+        Commands.runOnce(this::setMotorSetPointForward, this),
+        Commands.run(this::updateMotorController).until(this::isNoteInsideIntake),
+        Commands.run(this::updateMotorController).withTimeout(0.5),
+        Commands.runOnce(this::disableIntake));
   }
 
   /** Returns a Command that runs the motor in reverse at the current set speed. */

@@ -199,7 +199,7 @@ public class RobotContainer {
         .y()
         .whileTrue(
             robotIntake
-                .loadNote()
+                .loadNoteDelayStop()
                 .andThen(robotArm.moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS))
                 .andThen(robotArm::disable)
                 .withName("Intake: Load Note"));
