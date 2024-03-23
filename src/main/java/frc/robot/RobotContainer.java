@@ -267,7 +267,7 @@ public class RobotContainer {
         return Commands.sequence(
                 launcherSequence(),
                 robotDrive.driveDistanceCommand(0.5, 0.2, 0.2),
-                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
+                robotDrive.driveDistanceCommand(1.275, 0.15, 0.0))
             .withName("Launch Right and Drive");
 
       case "LaunchAndTaxiFarRight":
@@ -281,7 +281,7 @@ public class RobotContainer {
         return Commands.sequence(
                 launcherSequence(),
                 robotDrive.driveDistanceCommand(0.5, 0.2, -0.2),
-                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
+                robotDrive.driveDistanceCommand(1.275, 0.15, 0.0))
             .withName("Launch Left and Drive");
 
       case "LaunchLeftAndTaxiFar":
@@ -292,7 +292,15 @@ public class RobotContainer {
 
       case "DriveAndLoadNote":
         // Start angled left and launch a note then curve right slowly until the robot is straight
-        return loadNote().withName("Drive and load note");
+        return Commands.sequence(
+                launcherSequence(),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .withTimeout(3)
+                    .andThen(robotArm::disable),
+                loadNote(),
+                robotDrive.driveDistanceCommand(1.0, -0.1, 0.0))
+            .withName("Drive and Load Note");
 
       default:
         return new PrintCommand("No Auto Selected");
@@ -371,8 +379,14 @@ public class RobotContainer {
 
   /** Build a Command that runs the motor forward until a note is loaded. */
   public Command loadNote() {
-    return Commands.parallel(
-        robotIntake.runForward().withTimeout(1), robotDrive.driveDistanceCommand(1.0, 0.1, 0.0));
+    return Commands.sequence(
+        Commands.parallel(
+            robotIntake.runForward().withTimeout(5),
+            robotDrive.driveDistanceCommand(1.0, 0.1, 0.0)),
+        robotArm
+            .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
+            .withTimeout(3)
+            .andThen(robotArm::disable));
   }
 
   /**

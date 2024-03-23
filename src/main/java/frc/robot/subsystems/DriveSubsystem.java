@@ -222,11 +222,13 @@ public class DriveSubsystem extends SubsystemBase {
   public Command driveDistanceCommand(double distanceMeters, double speed, double rot) {
     return
     // Drive forward at specified speed
-    run(() -> arcadeDrive(speed, rot, false))
-        // End command when we've traveled the specified distance
-        .until(() -> getAverageDistanceMeters() >= distanceMeters)
-        // Stop the drive when the command ends
-        .finallyDo(interrupted -> drive.stopMotor());
+    runOnce(this::resetEncoders)
+        .andThen(
+            run(() -> arcadeDrive(speed, rot, false))
+                // End command when we've traveled the specified distance
+                .until(() -> Math.abs(getAverageDistanceMeters()) >= distanceMeters)
+                // Stop the drive when the command ends
+                .finallyDo(interrupted -> drive.stopMotor()));
   }
 
   /**
