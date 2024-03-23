@@ -254,30 +254,31 @@ public class RobotContainer {
 
       case "Launch":
         // Launch a note into the speaker
-        return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))))
-            .withName("Launch into speaker");
+        return // Commands.sequence(
+        // Commands.race(
+        //     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+        //     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+        //         .andThen(robotIntake.runReverse()))),
+        launcherSequence().withName("Launch into speaker");
 
       case "LaunchAndTaxiStraight":
         // Launch a note then Drive forward slowly until the robot moves a set distance
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.1, 0.0))
+                // Commands.race(
+                //     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                //     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                //         .andThen(robotIntake.runReverse()))),
+                launcherSequence(), robotDrive.driveDistanceCommand(1.0, 0.1, 0.0))
             .withName("Launch and Drive Forward");
 
       case "LaunchRightAndTaxi":
         // Start angled right and launch a note then curve left slowly until the robot is straight
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
+                // Commands.race(
+                //     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                //     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                //         .andThen(robotIntake.runReverse()))),
+                launcherSequence(),
                 robotDrive.driveDistanceCommand(0.5, 0.2, 0.2),
                 robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
             .withName("Launch Right and Drive");
@@ -285,20 +286,21 @@ public class RobotContainer {
       case "LaunchAndTaxiFarRight":
         // Start angled right and launch a note then drive straight to end on right of the field
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(3.0, 0.15, 0.01))
+                // Commands.race(
+                //     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                //     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                //         .andThen(robotIntake.runReverse()))),
+                launcherSequence(), robotDrive.driveDistanceCommand(3.0, 0.15, 0.01))
             .withName("Launch Right and Drive Far");
 
       case "LaunchLeftAndTaxi":
         // Start angled left and launch a note then curve right slowly until the robot is straight
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
+                // Commands.race(
+                //     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                //     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                //         .andThen(robotIntake.runReverse()))),
+                launcherSequence(),
                 robotDrive.driveDistanceCommand(0.5, 0.2, -0.2),
                 robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
             .withName("Launch Left and Drive");
@@ -306,11 +308,11 @@ public class RobotContainer {
       case "LaunchLeftAndTaxiFar":
         // Start angled left and launch a note then drive straight to end on Left of the field
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(3.0, 0.15, -0.01))
+                // Commands.race(
+                //     robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+                //     (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
+                //         .andThen(robotIntake.runReverse()))),
+                launcherSequence(), robotDrive.driveDistanceCommand(3.0, 0.15, -0.01))
             .withName("Launch Left and Drive Far");
 
       default:
@@ -379,6 +381,13 @@ public class RobotContainer {
    */
   public IntakeSubsystem getIntakeSubsystem() {
     return robotIntake;
+  }
+
+  public Command launcherSequence() {
+
+    return Commands.race(
+        robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+        (Commands.waitUntil(robotLauncher::launcherAtSetpoint).andThen(robotIntake.runReverse())));
   }
 
   /**
