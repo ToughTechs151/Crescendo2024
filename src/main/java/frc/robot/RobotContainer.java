@@ -299,7 +299,8 @@ public class RobotContainer {
                     .andThen(robotArm::disable),
                 robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
                 loadNote(),
-                robotDrive.driveReverseCommand(0.1, 0.1, 0.0))
+                robotDrive.driveReverseCommand(0.1, 0.1, 0.0),
+                launcherSequence())
             .withName("Drive and Load Note");
 
       default:
@@ -382,7 +383,8 @@ public class RobotContainer {
   public Command loadNote() {
     return Commands.sequence(
         Commands.parallel(
-            robotIntake.runForward().withTimeout(5), robotDrive.driveForwardCommand(1.0, 0.1, 0.0)),
+            robotIntake.runForward().until(robotArm::isNoteInsideIntake).withTimeout(5),
+            robotDrive.driveForwardCommand(1.0, 0.1, 0.0)),
         robotArm
             .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
             .andThen(robotArm::disable));
