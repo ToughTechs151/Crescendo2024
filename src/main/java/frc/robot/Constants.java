@@ -36,7 +36,7 @@ public final class Constants {
   // Set to false to hide extended logging data.
   public static final boolean SD_SHOW_ARM_EXTENDED_LOGGING_DATA = false;
   public static final boolean SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA = false;
-  public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = true;
   public static final boolean SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA = false;
   public static final boolean SD_SHOW_DRIVE_EXTENDED_LOGGING_DATA = false;
 
@@ -295,11 +295,11 @@ public final class Constants {
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
         2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.0;
-    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.3;
-    public static final double CLIMBER_OFFSET_RADS = 0.0;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.46;
+    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
+    public static final double CLIMBER_OFFSET_METERS = 0.36;
 
-    // Encoder is reset to measure 0 at the top, so minimum pull is 0.
+    // Encoder is offset to measure 0 at the top, so minimum pull is 0.
     public static final double CLIMBER_MIN_PULL_METERS = 0.0;
     public static final double CLIMBER_MAX_PULL_METERS = 0.5;
 
