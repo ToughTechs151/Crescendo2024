@@ -253,7 +253,7 @@ public class RobotContainer {
             .withTimeout(5)
             .withName("Drive Forward 1m");
 
-      case "Launch":
+      case "OnlyLaunch":
         // Launch a note into the speaker
         return launcherSequence().withName("Launch into speaker");
 
@@ -375,7 +375,7 @@ public class RobotContainer {
   public Command launcherSequence() {
 
     return Commands.race(
-        robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+        robotLauncher.runLauncherSpeaker().withTimeout(2.5),
         (Commands.waitUntil(robotLauncher::launcherAtSetpoint).andThen(robotIntake.runReverse())));
   }
 
