@@ -235,6 +235,7 @@ public class RobotContainer {
     autoChooser.addOption("Launch Right and Taxi Far", "LaunchAndTaxiFarRight");
     autoChooser.addOption("Launch Left and Taxi", "LaunchLeftAndTaxi");
     autoChooser.addOption("Launch Left and Taxi Far", "LaunchLeftAndTaxiFar");
+    autoChooser.addOption("Drive and load note", "DriveAndLoadNote");
   }
 
   /**
@@ -248,70 +249,59 @@ public class RobotContainer {
       case "DriveStraight":
         // Drive forward slowly until the robot moves 1 meter
         return robotDrive
-            .driveDistanceCommand(1.0, 0.1, 0.0)
+            .driveForwardCommand(1.0, 0.1, 0.0)
             .withTimeout(5)
             .withName("Drive Forward 1m");
 
       case "Launch":
         // Launch a note into the speaker
-        return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))))
-            .withName("Launch into speaker");
+        return launcherSequence().withName("Launch into speaker");
 
       case "LaunchAndTaxiStraight":
         // Launch a note then Drive forward slowly until the robot moves a set distance
-        return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.1, 0.0))
+        return Commands.sequence(launcherSequence(), robotDrive.driveForwardCommand(1.0, 0.1, 0.0))
             .withName("Launch and Drive Forward");
 
       case "LaunchRightAndTaxi":
         // Start angled right and launch a note then curve left slowly until the robot is straight
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.5, 0.2, 0.2),
-                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.5, 0.2, 0.2),
+                robotDrive.driveForwardCommand(1.775, 0.15, 0.0))
             .withName("Launch Right and Drive");
 
       case "LaunchAndTaxiFarRight":
         // Start angled right and launch a note then drive straight to end on right of the field
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(3.0, 0.15, 0.01))
+                launcherSequence(), robotDrive.driveForwardCommand(3.0, 0.15, 0.01))
             .withName("Launch Right and Drive Far");
 
       case "LaunchLeftAndTaxi":
         // Start angled left and launch a note then curve right slowly until the robot is straight
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.5, 0.2, -0.2),
-                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.5, 0.2, -0.2),
+                robotDrive.driveForwardCommand(1.775, 0.15, 0.0))
             .withName("Launch Left and Drive");
 
       case "LaunchLeftAndTaxiFar":
         // Start angled left and launch a note then drive straight to end on Left of the field
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(3.0, 0.15, -0.01))
+                launcherSequence(), robotDrive.driveForwardCommand(3.0, 0.15, -0.01))
             .withName("Launch Left and Drive Far");
+
+      case "DriveAndLoadNote":
+        // Launch note, pick up a second note, drive back and launch
+        return Commands.sequence(
+                launcherSequence(),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
+                loadNote(),
+                robotDrive.driveReverseCommand(0.1, 0.1, 0.0),
+                launcherSequence())
+            .withName("Drive and Load Note");
 
       default:
         return new PrintCommand("No Auto Selected");
@@ -379,6 +369,25 @@ public class RobotContainer {
    */
   public IntakeSubsystem getIntakeSubsystem() {
     return robotIntake;
+  }
+
+  /** Build a Command that runs the launcher and intake to score into to speaker. */
+  public Command launcherSequence() {
+
+    return Commands.race(
+        robotLauncher.runLauncherSpeaker().withTimeout(4.0),
+        (Commands.waitUntil(robotLauncher::launcherAtSetpoint).andThen(robotIntake.runReverse())));
+  }
+
+  /** Build a Command that drive forward while loading a note and then brings the arm back. */
+  public Command loadNote() {
+    return Commands.sequence(
+        Commands.parallel(
+            robotIntake.runForward().until(robotArm::isNoteInsideIntake).withTimeout(5),
+            robotDrive.driveForwardCommand(1.0, 0.1, 0.0)),
+        robotArm
+            .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
+            .andThen(robotArm::disable));
   }
 
   /**

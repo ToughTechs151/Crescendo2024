@@ -214,18 +214,27 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Returns a command that drives the robot forward a specified distance at a specified speed.
+   * Returns a command that drives the robot forward to a specified position at a specified speed.
    *
-   * @param distanceMeters The distance to drive forward in meters
+   * @param stopPositionMeters The position in meters at which to stop
    * @param speed The fraction of max speed at which to drive
    */
-  public Command driveDistanceCommand(double distanceMeters, double speed, double rot) {
-    return
-    // Drive forward at specified speed
-    run(() -> arcadeDrive(speed, rot, false))
-        // End command when we've traveled the specified distance
-        .until(() -> getAverageDistanceMeters() >= distanceMeters)
-        // Stop the drive when the command ends
+  public Command driveForwardCommand(double stopPositionMeters, double speed, double rot) {
+    return run(() -> arcadeDrive(speed, rot, false))
+        .until(() -> getAverageDistanceMeters() >= stopPositionMeters)
+        .finallyDo(interrupted -> drive.stopMotor());
+  }
+
+  /**
+   * Returns a command that drives the robot in reverse to a specified position at a specified
+   * speed.
+   *
+   * @param stopPositionMeters The position in meters at which to stop
+   * @param speed The fraction of max speed at which to drive
+   */
+  public Command driveReverseCommand(double stopPositionMeters, double speed, double rot) {
+    return run(() -> arcadeDrive(-speed, rot, false))
+        .until(() -> getAverageDistanceMeters() < stopPositionMeters)
         .finallyDo(interrupted -> drive.stopMotor());
   }
 

@@ -18,7 +18,7 @@ public final class Constants {
     }
 
     public static final double ARM_REDUCTION = ArmConstants.GEAR_RATIO;
-    public static final double ARM_MASS_KG = 4.0;
+    public static final double ARM_MASS_KG = 3.0;
     public static final double ARM_LENGTH_INCHES = 12;
     public static final double ARM_LENGTH_METERS = Units.inchesToMeters(ARM_LENGTH_INCHES);
     public static final double START_ANGLE_RADS = ArmConstants.MAX_ANGLE_RADS;
@@ -69,6 +69,6 @@ public final class Constants {
       throw new IllegalStateException("LauncherSimConstants Utility Class");
     }
 
-    public static final double LAUNCHER_MOI_KG_METERS2 = 0.005;
+    public static final double LAUNCHER_MOI_KG_METERS2 = 0.001;
   }
 }
