@@ -299,39 +299,36 @@ public class RobotContainer {
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
-                // robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
                 loadNote(1.0),
-                robotDrive.driveReverseCommand(0.1, 0.2, 0.0),
+                robotDrive.driveReverseCommand(0.1, 0.2, 0.0).withTimeout(3.0),
                 launcherSequence())
             .withName("2 Note Center");
 
       case "2NoteLeft":
-        // Launch note, pick up a second note, drive back and launch
+        // Launch note from left side, pick up a second note, drive back and launch
         return Commands.sequence(
                 launcherSequence(),
                 robotDrive.driveForwardCommand(0.45, 0.2, -0.2),
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
-                // robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
                 loadNote(1.775),
                 robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
-                robotDrive.driveReverseCommand(0.0, 0.2, 0.2),
+                robotDrive.driveReverseCommand(0.0, 0.2, 0.2).withTimeout(1.5),
                 launcherSequence())
             .withName("2 Note Left");
 
       case "2NoteRight":
-        // Launch note, pick up a second note, drive back and launch
+        // Launch note from right side, pick up a second note, drive back and launch
         return Commands.sequence(
                 launcherSequence(),
                 robotDrive.driveForwardCommand(0.45, 0.2, 0.2),
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
-                // robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
                 loadNote(1.775),
                 robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
-                robotDrive.driveReverseCommand(0.0, 0.2, -0.2),
+                robotDrive.driveReverseCommand(0.0, 0.2, -0.2).withTimeout(1.5),
                 launcherSequence())
             .withName("2 Note Right");
 
