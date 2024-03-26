@@ -235,7 +235,9 @@ public class RobotContainer {
     autoChooser.addOption("Launch Right and Taxi Far", "LaunchAndTaxiFarRight");
     autoChooser.addOption("Launch Left and Taxi", "LaunchLeftAndTaxi");
     autoChooser.addOption("Launch Left and Taxi Far", "LaunchLeftAndTaxiFar");
-    autoChooser.addOption("Drive and load note", "DriveAndLoadNote");
+    autoChooser.addOption("2 Note Center", "2NoteCenter");
+    autoChooser.addOption("2 Note Left", "2NoteLeft");
+    autoChooser.addOption("2 Note Right", "2NoteRight");
   }
 
   /**
@@ -290,18 +292,48 @@ public class RobotContainer {
                 launcherSequence(), robotDrive.driveForwardCommand(3.0, 0.15, -0.01))
             .withName("Launch Left and Drive Far");
 
-      case "DriveAndLoadNote":
+      case "2NoteCenter":
         // Launch note, pick up a second note, drive back and launch
         return Commands.sequence(
                 launcherSequence(),
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
-                robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
-                loadNote(),
-                robotDrive.driveReverseCommand(0.1, 0.1, 0.0),
+                // robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
+                loadNote(1.0),
+                robotDrive.driveReverseCommand(0.1, 0.2, 0.0),
                 launcherSequence())
-            .withName("Drive and Load Note");
+            .withName("2 Note Center");
+
+      case "2NoteLeft":
+        // Launch note, pick up a second note, drive back and launch
+        return Commands.sequence(
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.45, 0.2, -0.2),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                // robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
+                loadNote(1.775),
+                robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
+                robotDrive.driveReverseCommand(0.0, 0.2, 0.2),
+                launcherSequence())
+            .withName("2 Note Left");
+
+      case "2NoteRight":
+        // Launch note, pick up a second note, drive back and launch
+        return Commands.sequence(
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.45, 0.2, 0.2),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                // robotDrive.driveForwardCommand(1.0, 0.1, 0.0),
+                loadNote(1.775),
+                robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
+                robotDrive.driveReverseCommand(0.0, 0.2, -0.2),
+                launcherSequence())
+            .withName("2 Note Right");
 
       default:
         return new PrintCommand("No Auto Selected");
@@ -375,16 +407,20 @@ public class RobotContainer {
   public Command launcherSequence() {
 
     return Commands.race(
-        robotLauncher.runLauncherSpeaker().withTimeout(2.5),
+        robotLauncher.runLauncherSpeaker().withTimeout(2),
         (Commands.waitUntil(robotLauncher::launcherAtSetpoint).andThen(robotIntake.runReverse())));
   }
 
   /** Build a Command that drive forward while loading a note and then brings the arm back. */
-  public Command loadNote() {
+  public Command loadNote(double position) {
     return Commands.sequence(
         Commands.parallel(
-            robotIntake.runForward().until(robotArm::isNoteInsideIntake).withTimeout(5),
-            robotDrive.driveForwardCommand(1.0, 0.1, 0.0)),
+                robotIntake
+                    .runForward()
+                    .until(robotArm::isNoteInsideIntake)
+                    .andThen(robotIntake.runForward().withTimeout(0.25)),
+                robotDrive.driveForwardCommand(position, 0.2, 0.0))
+            .withTimeout(5),
         robotArm
             .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
             .andThen(robotArm::disable));
