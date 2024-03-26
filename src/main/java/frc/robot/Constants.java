@@ -273,7 +273,7 @@ public final class Constants {
     public static final PreferenceKeyValue CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2 =
         new PreferenceKeyValue("ClimberAccelerationMax", 0.5);
     public static final PreferenceKeyValue CLIMBER_FIXED_VOLTS =
-        new PreferenceKeyValue("ClimberFixedVolts", 3.0);
+        new PreferenceKeyValue("ClimberFixedVolts", 1.5);
 
     private static final PreferenceKeyValue[] CLIMBER_PREFERENCES = {
       CLIMBER_KP,
