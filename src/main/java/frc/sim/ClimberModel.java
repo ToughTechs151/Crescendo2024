@@ -41,7 +41,7 @@ public class ClimberModel implements AutoCloseable {
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
           ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
-          VecBuilder.fill(0.002));
+          VecBuilder.fill(0.0005));
 
   private final ElevatorSim climberRightSim =
       new ElevatorSim(

@@ -400,7 +400,6 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     // Don't enable if already enabled since this may cause control transients
     if (!climberEnabled) {
       loadPreferences();
-      setDefaultCommand(holdPosition());
 
       // Reset the PID controller to clear any previous state
       climberLeftController.reset(getMeasurementLeft());
