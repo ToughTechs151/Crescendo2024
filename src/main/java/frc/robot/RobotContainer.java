@@ -126,7 +126,7 @@ public class RobotContainer {
 
     // Disable the climber controller when the 'X' button is pressed.
     driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
-    
+
     // Command the climber relays to forward/lock position when POV Up is pressed, and then turn
     // relay off when button is released.
     driverController
@@ -165,7 +165,8 @@ public class RobotContainer {
     //                     Commands.runOnce(() -> robotClimber.setRelay(false, false))))
     //             .withName("Climber Unlock"));
 
-    // // Move climber solenoids to forward/lock position when POV right is pressed. This should only
+    // // Move climber solenoids to forward/lock position when POV right is pressed. This should
+    // only
     // // be used when climber is being driven to full retract position.
     // driverController
     //     .povRight()
@@ -355,7 +356,7 @@ public class RobotContainer {
         // Launch note from left side, pick up a second note, drive back and launch
         return Commands.sequence(
                 launcherSequence(),
-                robotDrive.driveForwardCommand(0.45, 0.2, -0.2),
+                robotDrive.driveForwardCommand(0.5, 0.2, -0.2),
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
@@ -369,7 +370,7 @@ public class RobotContainer {
         // Launch note from right side, pick up a second note, drive back and launch
         return Commands.sequence(
                 launcherSequence(),
-                robotDrive.driveForwardCommand(0.45, 0.2, 0.2),
+                robotDrive.driveForwardCommand(0.5, 0.2, 0.2),
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
