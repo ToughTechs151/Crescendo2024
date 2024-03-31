@@ -212,8 +212,8 @@
             ],
             "content": {
               "_type": "Graph",
-              "_source0": "network_table:///SmartDashboard/Intake Current",
-              "_source1": "network_table:///SmartDashboard/Intake Speed",
+              "_source0": "network_table:///SmartDashboard/Intake Speed",
+              "_source1": "network_table:///SmartDashboard/Intake Current",
               "_title": "SmartDashboard/Intake Current",
               "_glyph": 148,
               "_showGlyph": false,
@@ -507,7 +507,7 @@
   "windowGeometry": {
     "x": -8.0,
     "y": -8.0,
-    "width": 1553.5999755859375,
-    "height": 881.5999755859375
+    "width": 1554.0,
+    "height": 882.0
   }
 }

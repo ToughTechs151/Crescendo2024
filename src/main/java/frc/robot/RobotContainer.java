@@ -360,7 +360,7 @@ public class RobotContainer {
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
-                loadNote(1.775),
+                loadNote(2.0),
                 robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
                 robotDrive.driveReverseCommand(0.0, 0.2, 0.2).withTimeout(1.5),
                 launcherSequence())
@@ -374,7 +374,7 @@ public class RobotContainer {
                 robotArm
                     .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
                     .andThen(robotArm::disable),
-                loadNote(1.775),
+                loadNote(2.0),
                 robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
                 robotDrive.driveReverseCommand(0.0, 0.2, -0.2).withTimeout(1.5),
                 launcherSequence())
