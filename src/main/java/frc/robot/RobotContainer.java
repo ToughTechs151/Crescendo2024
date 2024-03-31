@@ -367,7 +367,7 @@ public class RobotContainer {
             .withName("2 Note Left");
 
       case "2NoteRight":
-        // Launch note from right side, pick up a second note, drive back and launch
+        // Launch note from right side, pick up a second note, drive back and launchgit
         return Commands.sequence(
                 launcherSequence(),
                 robotDrive.driveForwardCommand(0.5, 0.2, 0.2),
