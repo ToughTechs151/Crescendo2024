@@ -151,32 +151,6 @@ public class RobotContainer {
     // when released.
     driverController.b().whileTrue(robotClimber.commandVoltage());
 
-    // Command the climber against the stop and move solenoids to reverse/unlock position when
-    // POV left is pressed, and then turn motors and relays off when done.
-    // driverController
-    //     .povLeft()
-    //     .onTrue(
-    //         Commands.race(
-    //                 robotClimber.commandVoltage(),
-    //                 Commands.sequence(
-    //                     Commands.waitSeconds(1.0),
-    //                     Commands.runOnce(() -> robotClimber.setRelay(false, true)),
-    //                     Commands.waitSeconds(3.0),
-    //                     Commands.runOnce(() -> robotClimber.setRelay(false, false))))
-    //             .withName("Climber Unlock"));
-
-    // // Move climber solenoids to forward/lock position when POV right is pressed. This should
-    // only
-    // // be used when climber is being driven to full retract position.
-    // driverController
-    //     .povRight()
-    //     .onTrue(
-    //         Commands.sequence(
-    //                 Commands.runOnce(() -> robotClimber.setRelay(true, false)),
-    //                 Commands.waitSeconds(3.0),
-    //                 Commands.runOnce(() -> robotClimber.setRelay(false, false)))
-    //             .withName("Climber Lock"));
-
     // ---------- Operator Controller ----------
     // Move the arm to the low position when the 'A' button is pressed on the operator's controller.
     operatorController
@@ -196,12 +170,6 @@ public class RobotContainer {
                 .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
                 .andThen(robotArm::disable)
                 .withName("Arm: Move to Back Position"));
-
-    // Shift position down a small amount when the POV Down is pressed on the operator's controller.
-    // operatorController.povDown().onTrue(robotArm.shiftDown());
-
-    // Shift position up a small amount when the POV Down is pressed on the operator's controller.
-    // operatorController.povUp().onTrue(robotArm.shiftUp());
 
     // Disable the arm controller when the 'X' button is pressed on the operator's controller.
     // NOTE: This is intended for initial arm testing and should be removed in the final robot
