@@ -120,9 +120,9 @@ public final class Constants {
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
         new PreferenceKeyValue("ArmKV", 1.8);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(120));
+        new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(240));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
-        new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(360));
+        new PreferenceKeyValue("ArmAccelerationMax", Units.degreesToRadians(720));
 
     private static final PreferenceKeyValue[] ARM_PREFERENCES = {
       ARM_KP,
