@@ -81,27 +81,51 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    // ---------- Driver Controller ----------
     // Drive at low speed when the right bumper is held, otherwise allow normal speed.
     driverController
         .rightBumper()
         .onTrue(new InstantCommand(this.robotDrive::setCrawlSpeed))
         .onFalse(new InstantCommand(this.robotDrive::setNormalSpeed));
 
-    // Extend the climber arms when the 'A' button is pressed.
-    driverController
-        .a()
-        .onTrue(
-            robotClimber
-                .moveToPosition(Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS)
-                .withName("Climber: Extend"));
-
-    // Retract the climber arms when the 'Y' button is pressed.
+    // Unlock the pins and then extend the climber arms when the 'Y' button is pressed. A fixed
+    // voltage command releases tension while pulling the pins out.
     driverController
         .y()
         .onTrue(
-            robotClimber
-                .moveToPosition(Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS)
+            Commands.sequence(
+                    Commands.race(
+                        robotClimber.commandVoltage(),
+                        Commands.sequence(
+                            Commands.waitSeconds(1.0),
+                            Commands.runOnce(() -> robotClimber.setRelay(false, true)),
+                            Commands.waitSeconds(3.0),
+                            Commands.runOnce(() -> robotClimber.setRelay(false, false)))),
+                    robotClimber.moveToPosition(
+                        Constants.ClimberConstants.CLIMBER_EXTEND_POSITION_METERS),
+                    Commands.runOnce(robotClimber::disable))
+                .withName("Climber: Extend"));
+
+    // Retract the climber arms when the 'A' button is pressed. Lock the pins when fully retracted
+    // and then disable.
+    driverController
+        .a()
+        .onTrue(
+            Commands.sequence(
+                    robotClimber.moveToPosition(
+                        Constants.ClimberConstants.CLIMBER_RETRACT_POSITION_METERS),
+                    Commands.race(
+                        robotClimber.holdPosition(),
+                        Commands.sequence(
+                            Commands.runOnce(() -> robotClimber.setRelay(true, false)),
+                            Commands.waitSeconds(3.0),
+                            Commands.runOnce(() -> robotClimber.setRelay(false, false)))),
+                    Commands.runOnce(robotClimber::disable))
                 .withName("Climber: Retract"));
+
+    // Disable the climber controller when the 'X' button is pressed.
+    driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
 
     // Command the climber relays to forward/lock position when POV Up is pressed, and then turn
     // relay off when button is released.
@@ -127,6 +151,7 @@ public class RobotContainer {
     // when released.
     driverController.b().whileTrue(robotClimber.commandVoltage());
 
+    // ---------- Operator Controller ----------
     // Move the arm to the low position when the 'A' button is pressed on the operator's controller.
     operatorController
         .a()
@@ -146,19 +171,10 @@ public class RobotContainer {
                 .andThen(robotArm::disable)
                 .withName("Arm: Move to Back Position"));
 
-    // Shift position down a small amount when the POV Down is pressed on the operator's controller.
-    operatorController.povDown().onTrue(robotArm.shiftDown());
-
-    // Shift position up a small amount when the POV Down is pressed on the operator's controller.
-    operatorController.povUp().onTrue(robotArm.shiftUp());
-
     // Disable the arm controller when the 'X' button is pressed on the operator's controller.
     // NOTE: This is intended for initial arm testing and should be removed in the final robot
     // to prevent accidental disable resulting in lowering of the arm.
     operatorController.x().onTrue(Commands.runOnce(robotArm::disable));
-
-    // Disable the climber controller when the 'X' button is pressed.
-    driverController.x().onTrue(Commands.runOnce(robotClimber::disable));
 
     // This command runs the launcher at high speed to launch a note into the speaker, then run
     // the intake when the launcher is up to speed.
@@ -235,6 +251,9 @@ public class RobotContainer {
     autoChooser.addOption("Launch Right and Taxi Far", "LaunchAndTaxiFarRight");
     autoChooser.addOption("Launch Left and Taxi", "LaunchLeftAndTaxi");
     autoChooser.addOption("Launch Left and Taxi Far", "LaunchLeftAndTaxiFar");
+    autoChooser.addOption("2 Note Center", "2NoteCenter");
+    autoChooser.addOption("2 Note Left", "2NoteLeft");
+    autoChooser.addOption("2 Note Right", "2NoteRight");
   }
 
   /**
@@ -248,70 +267,86 @@ public class RobotContainer {
       case "DriveStraight":
         // Drive forward slowly until the robot moves 1 meter
         return robotDrive
-            .driveDistanceCommand(1.0, 0.1, 0.0)
+            .driveForwardCommand(1.0, 0.1, 0.0)
             .withTimeout(5)
             .withName("Drive Forward 1m");
 
-      case "Launch":
+      case "OnlyLaunch":
         // Launch a note into the speaker
-        return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))))
-            .withName("Launch into speaker");
+        return launcherSequence().withName("Launch into speaker");
 
       case "LaunchAndTaxiStraight":
         // Launch a note then Drive forward slowly until the robot moves a set distance
-        return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(1.0, 0.1, 0.0))
+        return Commands.sequence(launcherSequence(), robotDrive.driveForwardCommand(1.0, 0.1, 0.0))
             .withName("Launch and Drive Forward");
 
       case "LaunchRightAndTaxi":
         // Start angled right and launch a note then curve left slowly until the robot is straight
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.5, 0.2, 0.2),
-                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.5, 0.2, 0.2),
+                robotDrive.driveForwardCommand(1.775, 0.15, 0.0))
             .withName("Launch Right and Drive");
 
       case "LaunchAndTaxiFarRight":
         // Start angled right and launch a note then drive straight to end on right of the field
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(3.0, 0.15, 0.01))
+                launcherSequence(), robotDrive.driveForwardCommand(3.0, 0.15, 0.01))
             .withName("Launch Right and Drive Far");
 
       case "LaunchLeftAndTaxi":
         // Start angled left and launch a note then curve right slowly until the robot is straight
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(0.5, 0.2, -0.2),
-                robotDrive.driveDistanceCommand(1.775, 0.15, 0.0))
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.5, 0.2, -0.2),
+                robotDrive.driveForwardCommand(1.775, 0.15, 0.0))
             .withName("Launch Left and Drive");
 
       case "LaunchLeftAndTaxiFar":
         // Start angled left and launch a note then drive straight to end on Left of the field
         return Commands.sequence(
-                Commands.race(
-                    robotLauncher.runLauncherSpeaker().withTimeout(4.0),
-                    (Commands.waitUntil(robotLauncher::launcherAtSetpoint)
-                        .andThen(robotIntake.runReverse()))),
-                robotDrive.driveDistanceCommand(3.0, 0.15, -0.01))
+                launcherSequence(), robotDrive.driveForwardCommand(3.0, 0.15, -0.01))
             .withName("Launch Left and Drive Far");
+
+      case "2NoteCenter":
+        // Launch note, pick up a second note, drive back and launch
+        return Commands.sequence(
+                launcherSequence(),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                loadNote(1.0),
+                robotDrive.driveReverseCommand(0.1, 0.2, 0.0).withTimeout(3.0),
+                launcherSequence())
+            .withName("2 Note Center");
+
+      case "2NoteLeft":
+        // Launch note from left side, pick up a second note, drive back and launch
+        return Commands.sequence(
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.5, 0.2, -0.2),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                loadNote(2.0),
+                robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
+                robotDrive.driveReverseCommand(0.0, 0.2, 0.2).withTimeout(1.5),
+                launcherSequence())
+            .withName("2 Note Left");
+
+      case "2NoteRight":
+        // Launch note from right side, pick up a second note, drive back and launchgit
+        return Commands.sequence(
+                launcherSequence(),
+                robotDrive.driveForwardCommand(0.5, 0.2, 0.2),
+                robotArm
+                    .moveToPosition(Constants.ArmConstants.ARM_FORWARD_POSITION_RADS)
+                    .andThen(robotArm::disable),
+                loadNote(2.0),
+                robotDrive.driveReverseCommand(0.6, 0.2, 0.0),
+                robotDrive.driveReverseCommand(0.0, 0.2, -0.2).withTimeout(1.5),
+                launcherSequence())
+            .withName("2 Note Right");
 
       default:
         return new PrintCommand("No Auto Selected");
@@ -379,6 +414,29 @@ public class RobotContainer {
    */
   public IntakeSubsystem getIntakeSubsystem() {
     return robotIntake;
+  }
+
+  /** Build a Command that runs the launcher and intake to score into to speaker. */
+  public Command launcherSequence() {
+
+    return Commands.race(
+        robotLauncher.runLauncherSpeaker().withTimeout(2),
+        (Commands.waitUntil(robotLauncher::launcherAtSetpoint).andThen(robotIntake.runReverse())));
+  }
+
+  /** Build a Command that drive forward while loading a note and then brings the arm back. */
+  public Command loadNote(double position) {
+    return Commands.sequence(
+        Commands.parallel(
+                robotIntake
+                    .runForward()
+                    .until(robotArm::isNoteInsideIntake)
+                    .andThen(robotIntake.runForward().withTimeout(0.25)),
+                robotDrive.driveForwardCommand(position, 0.2, 0.0))
+            .withTimeout(5),
+        robotArm
+            .moveToPosition(Constants.ArmConstants.ARM_BACK_POSITION_RADS)
+            .andThen(robotArm::disable));
   }
 
   /**

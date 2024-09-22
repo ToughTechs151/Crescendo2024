@@ -142,6 +142,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
     // Initialize Bean Breaker
     beamBreaker = new DigitalInput(Constants.ArmConstants.BEAM_BREAKER_PORT);
+    SmartDashboard.putBoolean("Force Note Loaded", false);
 
     RobotPreferences.initPreferencesArray(ArmConstants.getArmPreferences());
     initMotor();
@@ -408,7 +409,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Return true if the Note is inside the ARM's intake. */
   public boolean isNoteInsideIntake() {
-    return !beamBreaker.get();
+    // For test purposes also allow a dashboard value to tri[p] the sensor
+    return !beamBreaker.get() || SmartDashboard.getBoolean("Force Note Loaded", false);
   }
 
   /** Close any objects that support it. */

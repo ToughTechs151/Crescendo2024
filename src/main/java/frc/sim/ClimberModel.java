@@ -40,8 +40,8 @@ public class ClimberModel implements AutoCloseable {
           ClimberConstants.CLIMBER_MIN_PULL_METERS,
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
-          ClimberConstants.CLIMBER_MIN_PULL_METERS,
-          VecBuilder.fill(0.002));
+          ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
+          VecBuilder.fill(0.0005));
 
   private final ElevatorSim climberRightSim =
       new ElevatorSim(
@@ -52,7 +52,7 @@ public class ClimberModel implements AutoCloseable {
           ClimberConstants.CLIMBER_MIN_PULL_METERS,
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
-          ClimberConstants.CLIMBER_MIN_PULL_METERS,
+          ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
           VecBuilder.fill(0.002));
 
   // Create Mechanism2d visualizations of the climber mechanisms
@@ -108,8 +108,10 @@ public class ClimberModel implements AutoCloseable {
 
     // Finally, we set our simulated encoder's readings and save the current so it can be
     // retrieved later.
-    sparkLeftSim.setPosition(climberLeftSim.getPositionMeters());
-    sparkRightSim.setPosition(climberRightSim.getPositionMeters());
+    sparkLeftSim.setPosition(
+        climberLeftSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
+    sparkRightSim.setPosition(
+        climberRightSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
     sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
     sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
     simCurrentLeft = Math.abs(climberLeftSim.getCurrentDrawAmps());

@@ -36,7 +36,7 @@ public final class Constants {
   // Set to false to hide extended logging data.
   public static final boolean SD_SHOW_ARM_EXTENDED_LOGGING_DATA = false;
   public static final boolean SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA = false;
-  public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = true;
   public static final boolean SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA = false;
   public static final boolean SD_SHOW_DRIVE_EXTENDED_LOGGING_DATA = false;
 
@@ -116,9 +116,9 @@ public final class Constants {
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
     public static final PreferenceKeyValue ARM_KS = new PreferenceKeyValue("ArmKS", 0.2);
-    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 0.1);
+    public static final PreferenceKeyValue ARM_KG = new PreferenceKeyValue("ArmKG", 0.3);
     public static final PreferenceKeyValue ARM_KV_VOLTS_PER_RAD_PER_SEC =
-        new PreferenceKeyValue("ArmKV", 2.0);
+        new PreferenceKeyValue("ArmKV", 1.8);
     public static final PreferenceKeyValue ARM_MAX_VELOCITY_RAD_PER_SEC =
         new PreferenceKeyValue("ArmVelocityMax", Units.degreesToRadians(120));
     public static final PreferenceKeyValue ARM_MAX_ACCELERATION_RAD_PER_SEC2 =
@@ -143,7 +143,7 @@ public final class Constants {
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
     public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-10.0);
-    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(170.0);
+    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(173.0);
     public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-18.0);
     public static final double MAX_ANGLE_RADS = Units.degreesToRadians(180.0);
     public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
@@ -273,7 +273,7 @@ public final class Constants {
     public static final PreferenceKeyValue CLIMBER_MAX_ACCELERATION_METERS_PER_SEC2 =
         new PreferenceKeyValue("ClimberAccelerationMax", 0.5);
     public static final PreferenceKeyValue CLIMBER_FIXED_VOLTS =
-        new PreferenceKeyValue("ClimberFixedVolts", 3.0);
+        new PreferenceKeyValue("ClimberFixedVolts", 1.5);
 
     private static final PreferenceKeyValue[] CLIMBER_PREFERENCES = {
       CLIMBER_KP,
@@ -295,11 +295,11 @@ public final class Constants {
     public static final double CLIMBER_METERS_PER_ENCODER_ROTATION =
         2.0 * Math.PI * SPOOL_RADIUS_METERS / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = CLIMBER_METERS_PER_ENCODER_ROTATION / 60;
-    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.0;
-    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.3;
-    public static final double CLIMBER_OFFSET_RADS = 0.0;
+    public static final double CLIMBER_RETRACT_POSITION_METERS = 0.46;
+    public static final double CLIMBER_EXTEND_POSITION_METERS = 0.0;
+    public static final double CLIMBER_OFFSET_METERS = 0.36;
 
-    // Encoder is reset to measure 0 at the top, so minimum pull is 0.
+    // Encoder is offset to measure 0 at the top, so minimum pull is 0.
     public static final double CLIMBER_MIN_PULL_METERS = 0.0;
     public static final double CLIMBER_MAX_PULL_METERS = 0.5;
 
