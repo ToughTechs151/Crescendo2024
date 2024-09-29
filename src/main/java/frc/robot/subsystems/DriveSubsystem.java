@@ -114,6 +114,12 @@ public class DriveSubsystem extends SubsystemBase {
     // gearbox is constructed, you might have to invert the left side instead.
     frontRight.setInverted(true);
 
+    // Enable current limits
+    frontLeft.setSmartCurrentLimit(DriveConstants.CURRENT_LIMIT);
+    frontRight.setSmartCurrentLimit(DriveConstants.CURRENT_LIMIT);
+    rearLeft.setSmartCurrentLimit(DriveConstants.CURRENT_LIMIT);
+    rearRight.setSmartCurrentLimit(DriveConstants.CURRENT_LIMIT);
+
     // Set starting pose (position and heading)
     setupStartPoseChooser();
     resetOdometry();
