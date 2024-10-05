@@ -42,6 +42,9 @@ public final class Constants {
 
   public static final boolean LOOP_TIMING_LOG = false;
 
+  // Set to true to enable using Tunable Numbers
+  public static final boolean TUNING_MODE = false;
+
   // Set to true to log each frame of command execution. To false to disable.
   public static final boolean COMMAND_EXECUTE_LOG = false;
 
@@ -82,7 +85,7 @@ public final class Constants {
     public static final boolean ENABLE_BRAKE = false;
     public static final double DEADBAND = 0.05;
 
-    public static final int CURRENT_LIMIT = 60;
+    public static final int CURRENT_LIMIT = 80;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue DRIVE_TURN_FACTOR =
