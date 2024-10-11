@@ -85,7 +85,7 @@ public final class Constants {
     public static final boolean ENABLE_BRAKE = false;
     public static final double DEADBAND = 0.05;
 
-    public static final int CURRENT_LIMIT = 80;
+    public static final int CURRENT_LIMIT = 60;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue DRIVE_TURN_FACTOR =
