@@ -147,11 +147,11 @@ public final class Constants {
     public static final double RPM_TO_RAD_PER_SEC = ARM_RAD_PER_ENCODER_ROTATION / 60;
 
     // Arm positions.  Horizontal = 0 radians. Assume arm starts at lowest (rest) position
-    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-10.0);
-    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(173.0);
+    public static final double ARM_FORWARD_POSITION_RADS = Units.degreesToRadians(-7.0);
+    public static final double ARM_BACK_POSITION_RADS = Units.degreesToRadians(170.0);
+    public static final double ARM_OFFSET_RADS = Units.degreesToRadians(180.0);
     public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-18.0);
-    public static final double MAX_ANGLE_RADS = Units.degreesToRadians(180.0);
-    public static final double ARM_OFFSET_RADS = MAX_ANGLE_RADS;
+    public static final double MAX_ANGLE_RADS = ARM_OFFSET_RADS;
     public static final double POS_INCREMENT = Units.degreesToRadians(2.0); // For small adjustments
     public static final double POSITION_TOLERANCE = Units.degreesToRadians(4.0);
     public static final double VELOCITY_TOLERANCE = Units.degreesToRadians(10.0);
