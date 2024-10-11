@@ -43,7 +43,7 @@ public final class Constants {
   public static final boolean LOOP_TIMING_LOG = false;
 
   // Set to true to enable using Tunable Numbers
-  public static final boolean TUNING_MODE = false;
+  public static final boolean TUNING_MODE = true;
 
   // Set to true to log each frame of command execution. To false to disable.
   public static final boolean COMMAND_EXECUTE_LOG = false;
