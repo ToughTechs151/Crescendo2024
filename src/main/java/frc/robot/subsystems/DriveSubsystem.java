@@ -31,6 +31,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotPreferences;
 import frc.robot.StartPose;
 import frc.robot.StartPose.NamedPose;
+import frc.robot.util.TunableNumber;
 import java.util.Map;
 
 /** Drive subsystem using differential drive. */
@@ -74,6 +75,10 @@ public class DriveSubsystem extends SubsystemBase {
   private double normalSpeedMax = 1.0;
   private double crawlSpeedMax = 0.5;
 
+  // Setup tunable numbers for the drive.
+  private TunableNumber currentLimit =
+      new TunableNumber("Drive Current Limit", DriveConstants.CURRENT_LIMIT);
+
   private final SendableChooser<Integer> startPoseChooser = new SendableChooser<>();
 
   /** Creates a new DriveSubsystem. */
@@ -113,6 +118,9 @@ public class DriveSubsystem extends SubsystemBase {
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     frontRight.setInverted(true);
+
+    // Set the motor current limit to the default value
+    setCurrentLimit((int) Math.floor(currentLimit.get()));
 
     // Set starting pose (position and heading)
     setupStartPoseChooser();
@@ -187,6 +195,9 @@ public class DriveSubsystem extends SubsystemBase {
   /** Setup the drive command using the tunable settings. */
   public Command getDriveCommand(CommandXboxController driverController) {
 
+    // Set the motor current limit from the tunable number
+    setCurrentLimit((int) Math.floor(currentLimit.get()));
+
     // Read Preferences for the drive speeds
     normalSpeedMax = DriveConstants.DRIVE_NORMAL_SPEED.getValue();
     crawlSpeedMax = DriveConstants.DRIVE_CRAWL_SPEED.getValue();
@@ -255,6 +266,16 @@ public class DriveSubsystem extends SubsystemBase {
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     return new DifferentialDriveWheelSpeeds(
         frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
+  }
+
+  /** Set the motor current limit to the Tunable Number. */
+  public void setCurrentLimit(int newLimit) {
+
+    DataLogManager.log("Drive current limit: " + newLimit);
+    frontLeft.setSmartCurrentLimit(newLimit);
+    frontRight.setSmartCurrentLimit(newLimit);
+    rearLeft.setSmartCurrentLimit(newLimit);
+    rearRight.setSmartCurrentLimit(newLimit);
   }
 
   /**
