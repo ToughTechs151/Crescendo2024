@@ -256,8 +256,6 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     motorConfig.smartCurrentLimit(LauncherConstants.CURRENT_LIMIT);
 
     // Setup the encoder scale factors
-    motorConfig.encoder.positionConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
     motorConfig.encoder.velocityConversionFactor(
         LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
 
@@ -270,7 +268,6 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     launcherMotorBottomLeft.configure(
         motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    // Maybe we should print the faults if non-zero before clearing?
     launcherMotorTopRight.clearFaults();
     launcherMotorTopLeft.clearFaults();
     launcherMotorBottomRight.clearFaults();

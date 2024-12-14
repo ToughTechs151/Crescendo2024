@@ -102,14 +102,10 @@ public class DrivetrainModel {
     }
 
     // Finally, we run the spark simulation
-    frontLeftSparkSim.iterate(
-        drivetrainSimulator.getLeftVelocityMetersPerSecond() / DriveConstants.FUDGE, 12.0, 0.02);
-    rearLeftSparkSim.iterate(
-        drivetrainSimulator.getLeftVelocityMetersPerSecond() / DriveConstants.FUDGE, 12.0, 0.02);
-    frontRightSparkSim.iterate(
-        drivetrainSimulator.getRightVelocityMetersPerSecond() / DriveConstants.FUDGE, 12.0, 0.02);
-    rearRightSparkSim.iterate(
-        drivetrainSimulator.getRightVelocityMetersPerSecond() / DriveConstants.FUDGE, 12.0, 0.02);
+    frontLeftSparkSim.iterate(drivetrainSimulator.getLeftVelocityMetersPerSecond(), 12.0, 0.02);
+    rearLeftSparkSim.iterate(drivetrainSimulator.getLeftVelocityMetersPerSecond(), 12.0, 0.02);
+    frontRightSparkSim.iterate(drivetrainSimulator.getRightVelocityMetersPerSecond(), 12.0, 0.02);
+    rearRightSparkSim.iterate(drivetrainSimulator.getRightVelocityMetersPerSecond(), 12.0, 0.02);
 
     // SmartDashboard.putNumber("Dr Sim L Pos", drivetrainSimulator.getLeftPositionMeters());
     // SmartDashboard.putNumber("Dr Sim R Pos", drivetrainSimulator.getRightPositionMeters());

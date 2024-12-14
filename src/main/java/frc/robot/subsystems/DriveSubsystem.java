@@ -72,9 +72,7 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   DifferentialDriveOdometry odometry =
       new DifferentialDriveOdometry(
-          this.gyro.getRotation2d(),
-          frontLeftEncoder.getPosition(),
-          frontRightEncoder.getPosition());
+          this.gyro.getRotation2d(), getLeftDistanceMeters(), getRightDistanceMeters());
 
   // Flag to let simulation know when odometry was reset
   boolean odometryReset = false;
@@ -148,16 +146,12 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     this.odometry.update(
-        this.gyro.getRotation2d(), frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
+        this.gyro.getRotation2d(), getLeftDistanceMeters(), getRightDistanceMeters());
 
-    SmartDashboard.putNumber("Drive FL-Position", frontLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Drive RL-Position", rearLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Drive FR-Position", frontRightEncoder.getPosition());
-    SmartDashboard.putNumber("Drive RR-Position", rearRightEncoder.getPosition());
-    SmartDashboard.putNumber(
-        "Drive FL-Velocity", frontLeftEncoder.getVelocity() * DriveConstants.FUDGE);
-    SmartDashboard.putNumber(
-        "Drive FR-Velocity", frontRightEncoder.getVelocity() * DriveConstants.FUDGE);
+    SmartDashboard.putNumber("Drive FL-Position", getLeftDistanceMeters());
+    SmartDashboard.putNumber("Drive FR-Position", getRightDistanceMeters());
+    SmartDashboard.putNumber("Drive FL-Velocity", frontLeftEncoder.getVelocity());
+    SmartDashboard.putNumber("Drive FR-Velocity", frontRightEncoder.getVelocity());
 
     SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
     SmartDashboard.putNumber("Gyro rate", gyro.getRate());
@@ -290,8 +284,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(
-        frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
+    return new DifferentialDriveWheelSpeeds(getLeftDistanceMeters(), getRightDistanceMeters());
   }
 
   /**
@@ -348,8 +341,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     this.odometry.resetPosition(
         this.gyro.getRotation2d(),
-        frontLeftEncoder.getPosition(),
-        frontRightEncoder.getPosition(),
+        getLeftDistanceMeters(),
+        getRightDistanceMeters(),
         getStartPose());
 
     if (RobotBase.isSimulation()) {
@@ -404,7 +397,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the left wheel distance in meters.
    */
   public double getLeftDistanceMeters() {
-    return frontLeftEncoder.getPosition();
+    return frontLeftEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV / 17.9;
   }
 
   /**
@@ -413,7 +406,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the right wheel distance in meters.
    */
   public double getRightDistanceMeters() {
-    return frontRightEncoder.getPosition();
+    return frontRightEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV / 17.9;
   }
 
   /**
@@ -422,7 +415,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the average wheel distance in meters.
    */
   public double getAverageDistanceMeters() {
-    return (frontLeftEncoder.getPosition() + frontRightEncoder.getPosition()) / 2.0;
+    return (getLeftDistanceMeters() + getRightDistanceMeters()) / 2.0;
   }
 
   /** Zeroes the heading of the robot. */

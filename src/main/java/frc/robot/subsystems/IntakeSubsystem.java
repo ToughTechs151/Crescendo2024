@@ -154,8 +154,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     motorConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT);
 
     // Setup the encoder scale factors
-    motorConfig.encoder.positionConversionFactor(
-        IntakeConstants.INTAKE_ROTATIONS_PER_ENCODER_ROTATION);
     motorConfig.encoder.velocityConversionFactor(
         IntakeConstants.INTAKE_ROTATIONS_PER_ENCODER_ROTATION);
 
@@ -189,7 +187,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Intake Voltage", intakeVoltageCommand);
     SmartDashboard.putNumber("Intake Temp", intakeMotor.getMotorTemperature());
     SmartDashboard.putNumber("Intake Current", intakeMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Intake Position", intakeEncoder.getPosition());
 
     if (Constants.SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA) {
       SmartDashboard.putNumber("Intake Feedforward", newFeedforward);
