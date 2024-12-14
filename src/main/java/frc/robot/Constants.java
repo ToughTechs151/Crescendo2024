@@ -75,11 +75,12 @@ public final class Constants {
 
     public static final double GEAR_RATIO = 8.45;
     public static final double WHEEL_DIAMETER_METERS = 0.15;
-    public static final double ENCODER_DISTANCE_METERS_PER_REV =
-        // Assumes the encoders are directly mounted on the wheel shafts
+    public static final double METERS_PER_ENCODER_REV =
         (WHEEL_DIAMETER_METERS * Math.PI) / GEAR_RATIO;
-    public static final double ENCODER_VELOCITY_CONVERSION =
-        (WHEEL_DIAMETER_METERS * Math.PI) / (GEAR_RATIO * 60);
+    public static final double RPM_TO_METERS_PER_SEC = METERS_PER_ENCODER_REV / 60;
+
+    // Fudge factor to get simulation speed correct with 2025 Beta
+    public static final double FUDGE = 325.0;
 
     public static final boolean SQUARE_INPUTS = true;
     public static final boolean ENABLE_BRAKE = false;

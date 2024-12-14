@@ -91,14 +91,15 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Common motor / encoder settings
     frontLeftConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT);
-    frontLeftConfig.encoder.positionConversionFactor(
-        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
-    frontLeftConfig.encoder.velocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
+    frontLeftConfig.encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
+    // Velocity conversion doesn't work if different than position so use meters/minute
+    frontLeftConfig.encoder.velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC);
     rearLeftConfig.apply(frontLeftConfig);
     frontRightConfig.apply(frontLeftConfig);
     rearRightConfig.apply(frontLeftConfig);
 
     // Unique settings per position
+    // this attempt at follow is not working in 2025 Beta so set output to 0
     // rearLeftConfig.follow(frontLeft);
     // rearRightConfig.follow(frontRight);
     rearLeft.setVoltage(0);
@@ -149,29 +150,35 @@ public class DriveSubsystem extends SubsystemBase {
     this.odometry.update(
         this.gyro.getRotation2d(), frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
 
-    SmartDashboard.putNumber("Drive FL pos", frontLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Drive RL pos", rearLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Drive FR pos", frontRightEncoder.getPosition());
-    SmartDashboard.putNumber("Drive RR pos", rearRightEncoder.getPosition());
-    SmartDashboard.putNumber("Drive FL vel", frontLeftEncoder.getVelocity());
-    SmartDashboard.putNumber("Drive FL vel", frontRightEncoder.getVelocity());
+    SmartDashboard.putNumber("Drive FL-Position", frontLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Drive RL-Position", rearLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Drive FR-Position", frontRightEncoder.getPosition());
+    SmartDashboard.putNumber("Drive RR-Position", rearRightEncoder.getPosition());
+    SmartDashboard.putNumber(
+        "Drive FL-Velocity", frontLeftEncoder.getVelocity() * DriveConstants.FUDGE);
+    SmartDashboard.putNumber(
+        "Drive FR-Velocity", frontRightEncoder.getVelocity() * DriveConstants.FUDGE);
 
     SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
     SmartDashboard.putNumber("Gyro rate", gyro.getRate());
     // FRONT LEFT
-    SmartDashboard.putNumber("Drive FL-Voltage", frontLeft.getAppliedOutput());
+    SmartDashboard.putNumber(
+        "Drive FL-Voltage", frontLeft.getAppliedOutput() * frontLeft.getBusVoltage());
     SmartDashboard.putNumber("Drive FL-Current", frontLeft.getOutputCurrent());
     SmartDashboard.putNumber("Drive FL-Temp", frontLeft.getMotorTemperature());
     // REAR LEFT
-    SmartDashboard.putNumber("Drive RL-Voltage", rearLeft.getAppliedOutput());
+    SmartDashboard.putNumber(
+        "Drive RL-Voltage", rearLeft.getAppliedOutput() * rearLeft.getBusVoltage());
     SmartDashboard.putNumber("Drive RL-Current", rearLeft.getOutputCurrent());
     SmartDashboard.putNumber("Drive RL-Temp", rearLeft.getMotorTemperature());
     // FRONT RIGHT
-    SmartDashboard.putNumber("Drive FR-Voltage", frontRight.getAppliedOutput());
+    SmartDashboard.putNumber(
+        "Drive FR-Voltage", frontRight.getAppliedOutput() * frontRight.getBusVoltage());
     SmartDashboard.putNumber("Drive FR-Current", frontRight.getOutputCurrent());
     SmartDashboard.putNumber("Drive FR-Temp", frontRight.getMotorTemperature());
     // REAR RIGHT
-    SmartDashboard.putNumber("Drive RR-Voltage", rearRight.getAppliedOutput());
+    SmartDashboard.putNumber(
+        "Drive RR-Voltage", rearRight.getAppliedOutput() * rearRight.getBusVoltage());
     SmartDashboard.putNumber("Drive RR-Current", rearRight.getOutputCurrent());
     SmartDashboard.putNumber("Drive RR-Temp", rearRight.getMotorTemperature());
   }
@@ -196,7 +203,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   public void arcadeDrive(double speed, double rotation, boolean squareInputs) {
-    drive.arcadeDrive(speed, rotation, squareInputs);
+    // disable driving until follow is fixed
+    if (RobotBase.isSimulation()) {
+      drive.arcadeDrive(speed, rotation, squareInputs);
+    }
   }
 
   /**
