@@ -4,10 +4,16 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -60,7 +66,7 @@ import frc.robot.RobotPreferences;
  * - Main functionalities:
  *   - Control the speed of an launcher using a PID Controller
  * - Methods:
- *   - {@code periodic()}: Publish telemetry with information about the intake's state.
+ *   - {@code periodic()}: Publish telemetry with information about the launcher's state.
  *   - {@code updateLauncherController()}: Generates the motor command using the PID controller and
  *     feedforward.
  *   - {@code runLauncher()}: Returns a Command that runs the launcher at the
@@ -142,10 +148,10 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Hardware components for the launcher subsystem. */
   public static class Hardware {
-    CANSparkMax launcherMotorTopRight;
-    CANSparkMax launcherMotorTopLeft;
-    CANSparkMax launcherMotorBottomRight;
-    CANSparkMax launcherMotorBottomLeft;
+    SparkMax launcherMotorTopRight;
+    SparkMax launcherMotorTopLeft;
+    SparkMax launcherMotorBottomRight;
+    SparkMax launcherMotorBottomLeft;
     RelativeEncoder launcherEncoderTopRight;
     RelativeEncoder launcherEncoderTopLeft;
     RelativeEncoder launcherEncoderBottomRight;
@@ -153,10 +159,10 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
     /** Construct the hardware class to hold the motors and encoders. */
     public Hardware(
-        CANSparkMax launcherMotorTopRight,
-        CANSparkMax launcherMotorTopLeft,
-        CANSparkMax launcherMotorBottomRight,
-        CANSparkMax launcherMotorBottomLeft,
+        SparkMax launcherMotorTopRight,
+        SparkMax launcherMotorTopLeft,
+        SparkMax launcherMotorBottomRight,
+        SparkMax launcherMotorBottomLeft,
         RelativeEncoder launcherEncoderTopRight,
         RelativeEncoder launcherEncoderTopLeft,
         RelativeEncoder launcherEncoderBottomRight,
@@ -172,14 +178,15 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  private final CANSparkMax launcherMotorTopRight;
-  private final CANSparkMax launcherMotorTopLeft;
-  private final CANSparkMax launcherMotorBottomRight;
-  private final CANSparkMax launcherMotorBottomLeft;
+  private final SparkMax launcherMotorTopRight;
+  private final SparkMax launcherMotorTopLeft;
+  private final SparkMax launcherMotorBottomRight;
+  private final SparkMax launcherMotorBottomLeft;
   private final RelativeEncoder launcherEncoderTopRight;
   private final RelativeEncoder launcherEncoderTopLeft;
   private final RelativeEncoder launcherEncoderBottomRight;
   private final RelativeEncoder launcherEncoderBottomLeft;
+  private final SparkMaxConfig motorConfig = new SparkMaxConfig();
 
   private PIDController launcherTopRightController =
       new PIDController(LauncherConstants.LAUNCHER_KP.getValue(), 0.0, 0.0);
@@ -237,29 +244,35 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
 
     RobotPreferences.initPreferencesArray(LauncherConstants.getLauncherPreferences());
 
-    initLauncherMotor();
-    initLauncherEncoder();
+    initLauncherMotors();
 
     disableLauncher();
 
     setDefaultCommand(runOnce(this::disableLauncher).andThen(run(() -> {})).withName("Idle"));
   }
 
-  private void initLauncherMotor() {
-    launcherMotorTopRight.restoreFactoryDefaults();
-    launcherMotorTopLeft.restoreFactoryDefaults();
-    launcherMotorBottomRight.restoreFactoryDefaults();
-    launcherMotorBottomLeft.restoreFactoryDefaults();
-    // Maybe we should print the faults if non-zero before clearing?
+  private void initLauncherMotors() {
+    motorConfig.idleMode(IdleMode.kBrake);
+    motorConfig.smartCurrentLimit(LauncherConstants.CURRENT_LIMIT);
+
+    // Setup the encoder scale factors
+    motorConfig.encoder.velocityConversionFactor(
+        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
+
+    launcherMotorTopRight.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    launcherMotorTopLeft.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    launcherMotorBottomRight.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    launcherMotorBottomLeft.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     launcherMotorTopRight.clearFaults();
     launcherMotorTopLeft.clearFaults();
     launcherMotorBottomRight.clearFaults();
     launcherMotorBottomLeft.clearFaults();
-    // Configure the motor to use EMF braking when idle and set voltage to 0.
-    launcherMotorTopRight.setIdleMode(IdleMode.kBrake);
-    launcherMotorTopLeft.setIdleMode(IdleMode.kBrake);
-    launcherMotorBottomRight.setIdleMode(IdleMode.kBrake);
-    launcherMotorBottomLeft.setIdleMode(IdleMode.kBrake);
+
     DataLogManager.log(
         "Launcher TR motor firmware version:" + launcherMotorTopRight.getFirmwareString());
     DataLogManager.log(
@@ -270,42 +283,20 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
         "Launcher BL motor firmware version:" + launcherMotorBottomLeft.getFirmwareString());
   }
 
-  private void initLauncherEncoder() {
-    // Setup the encoder scale factors and reset encoder to 0. Since this is a relation encoder,
-    // launcher position will only be correct if the launcher is in the starting rest position when
-    // the subsystem is constructed.
-    launcherEncoderTopRight.setPositionConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderTopLeft.setPositionConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderBottomRight.setPositionConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderBottomLeft.setPositionConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderTopRight.setVelocityConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderTopLeft.setVelocityConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderBottomRight.setVelocityConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-    launcherEncoderBottomLeft.setVelocityConversionFactor(
-        LauncherConstants.LAUNCHER_ROTATIONS_PER_ENCODER_ROTATION);
-  }
-
   /**
    * Create hardware devices for the launcher subsystem.
    *
    * @return Hardware object containing all necessary devices for this subsystem
    */
   public static Hardware initializeHardware() {
-    CANSparkMax launcherMotorTopRight =
-        new CANSparkMax(LauncherConstants.TOP_RIGHT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
-    CANSparkMax launcherMotorTopLeft =
-        new CANSparkMax(LauncherConstants.TOP_LEFT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
-    CANSparkMax launcherMotorBottomRight =
-        new CANSparkMax(LauncherConstants.BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
-    CANSparkMax launcherMotorBottomLeft =
-        new CANSparkMax(LauncherConstants.BOTTOM_LEFT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax launcherMotorTopRight =
+        new SparkMax(LauncherConstants.TOP_RIGHT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax launcherMotorTopLeft =
+        new SparkMax(LauncherConstants.TOP_LEFT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax launcherMotorBottomRight =
+        new SparkMax(LauncherConstants.BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax launcherMotorBottomLeft =
+        new SparkMax(LauncherConstants.BOTTOM_LEFT_LAUNCHER_MOTOR_PORT, MotorType.kBrushless);
     RelativeEncoder launcherEncoderTopRight = launcherMotorTopRight.getEncoder();
     RelativeEncoder launcherEncoderTopLeft = launcherMotorTopLeft.getEncoder();
     RelativeEncoder launcherEncoderBottomRight = launcherMotorBottomRight.getEncoder();
@@ -321,7 +312,7 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
         launcherEncoderBottomLeft);
   }
 
-  /** Publish telemetry with information about the intake's state. */
+  /** Publish telemetry with information about the launcher's state. */
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Launcher Enabled", launcherEnabled);
@@ -381,11 +372,15 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
       pidTopLeftOutput = launcherTopLeftController.calculate(getLauncherSpeedTopLeft());
       pidBottomRightOutput = launcherBottomRightController.calculate(getLauncherSpeedBottomRight());
       pidBottomLeftOutput = launcherBottomLeftController.calculate(getLauncherSpeedBottomLeft());
-      newTopLeftFeedforward = feedforward.calculate(launcherTopLeftController.getSetpoint());
-      newBottomLeftFeedforward = feedforward.calculate(launcherBottomLeftController.getSetpoint());
-      newTopRightFeedforward = feedforward.calculate(launcherTopRightController.getSetpoint());
+
+      newTopLeftFeedforward =
+          feedforward.calculate(RPM.of(launcherTopLeftController.getSetpoint())).in(Volts);
+      newBottomLeftFeedforward =
+          feedforward.calculate(RPM.of(launcherBottomLeftController.getSetpoint())).in(Volts);
+      newTopRightFeedforward =
+          feedforward.calculate(RPM.of(launcherTopRightController.getSetpoint())).in(Volts);
       newBottomRightFeedforward =
-          feedforward.calculate(launcherBottomRightController.getSetpoint());
+          feedforward.calculate(RPM.of(launcherBottomRightController.getSetpoint())).in(Volts);
 
       launcherVoltageTopLeftCommand =
           topLeftLimiter.calculate(pidTopLeftOutput + newTopLeftFeedforward);
@@ -577,6 +572,26 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns the bottom right launcher motor commanded voltage. */
   public double getLauncherVoltageCommandBottomRight() {
     return launcherVoltageBottomRightCommand;
+  }
+
+  /** Returns the top left motor for simulation. */
+  public SparkMax getTopLeftMotor() {
+    return launcherMotorTopLeft;
+  }
+
+  /** Returns the top right motor for simulation. */
+  public SparkMax getTopRightMotor() {
+    return launcherMotorTopRight;
+  }
+
+  /** Returns the bottom left motor for simulation. */
+  public SparkMax getBottomLeftMotor() {
+    return launcherMotorBottomLeft;
+  }
+
+  /** Returns the bottom right motor for simulation. */
+  public SparkMax getBottomRightMotor() {
+    return launcherMotorBottomRight;
   }
 
   /**

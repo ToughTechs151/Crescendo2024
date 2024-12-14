@@ -4,10 +4,16 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -111,8 +117,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Hardware components for the climber subsystem with left and right motors. */
   public static class Hardware {
-    CANSparkMax motorLeft;
-    CANSparkMax motorRight;
+    SparkMax motorLeft;
+    SparkMax motorRight;
     RelativeEncoder encoderLeft;
     RelativeEncoder encoderRight;
     Relay relayLeft;
@@ -120,8 +126,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
     /** Save the hardware components when the object is constructed. */
     public Hardware(
-        CANSparkMax motorLeft,
-        CANSparkMax motorRight,
+        SparkMax motorLeft,
+        SparkMax motorRight,
         RelativeEncoder encoderLeft,
         RelativeEncoder encoderRight,
         Relay relayLeft,
@@ -135,12 +141,13 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  private final CANSparkMax motorLeft;
-  private final CANSparkMax motorRight;
+  private final SparkMax motorLeft;
+  private final SparkMax motorRight;
   private final RelativeEncoder encoderLeft;
   private final RelativeEncoder encoderRight;
   private final Relay relayLeft;
   private final Relay relayRight;
+  private final SparkMaxConfig motorConfig = new SparkMaxConfig();
 
   private ProfiledPIDController climberLeftController =
       new ProfiledPIDController(
@@ -195,7 +202,6 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     RobotPreferences.initPreferencesArray(ClimberConstants.getClimberPreferences());
 
     initMotors();
-    initEncoders();
 
     // Set tolerances that will be used to determine when the climber is at the goal position.
     climberLeftController.setTolerance(
@@ -209,9 +215,25 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   private void initMotors() {
-    motorLeft.restoreFactoryDefaults();
-    motorRight.restoreFactoryDefaults();
-    // Maybe we should print the faults if non-zero before clearing?
+
+    motorConfig.smartCurrentLimit(ClimberConstants.CURRENT_LIMIT);
+
+    // Setup the encoder scale factors. Since this is a relation encoder,
+    // climber position will only be correct if it is in the down and locked position when
+    // the subsystem is constructed.
+    motorConfig.encoder.positionConversionFactor(
+        ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION);
+    motorConfig.encoder.velocityConversionFactor(ClimberConstants.RPM_TO_METERS_PER_SEC);
+
+    motorLeft.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    motorRight.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    encoderLeft.setPosition(0);
+    encoderRight.setPosition(0);
+
     motorLeft.clearFaults();
     motorRight.clearFaults();
     // Configure the motor to use EMF braking when idle.
@@ -221,28 +243,14 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     DataLogManager.log("Climber motor right firmware version:" + motorRight.getFirmwareString());
   }
 
-  private void initEncoders() {
-    // Setup the encoder scale factors and reset encoder to 0. Since this is a relation encoder,
-    // climber position will only be correct if the climber is in the starting rest position when
-    // the subsystem is constructed.
-    encoderLeft.setPositionConversionFactor(ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION);
-    encoderLeft.setVelocityConversionFactor(ClimberConstants.RPM_TO_METERS_PER_SEC);
-    encoderLeft.setPosition(0);
-
-    encoderRight.setPositionConversionFactor(ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION);
-    encoderRight.setVelocityConversionFactor(ClimberConstants.RPM_TO_METERS_PER_SEC);
-    encoderRight.setPosition(0);
-  }
-
   /**
    * Initialize hardware devices for the climber subsystem.
    *
    * @return Hardware object containing all necessary devices for this subsystem
    */
   public static Hardware initializeHardware() {
-    CANSparkMax motorLeft = new CANSparkMax(ClimberConstants.LEFT_MOTOR_PORT, MotorType.kBrushless);
-    CANSparkMax motorRight =
-        new CANSparkMax(ClimberConstants.RIGHT_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax motorLeft = new SparkMax(ClimberConstants.LEFT_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax motorRight = new SparkMax(ClimberConstants.RIGHT_MOTOR_PORT, MotorType.kBrushless);
     RelativeEncoder encoderLeft = motorLeft.getEncoder();
     RelativeEncoder encoderRight = motorRight.getEncoder();
     Relay relayLeft = new Relay(ClimberConstants.LEFT_RELAY_PORT);
@@ -292,8 +300,9 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
       // Calculate the feedforward to move the climber at the desired velocity and offset
       // the effect of gravity. Voltage for acceleration is not used.
-      leftFeedforward = feedforward.calculate(leftSetpoint.velocity);
-      rightFeedforward = feedforward.calculate(rightSetpoint.velocity);
+      leftFeedforward = feedforward.calculate(MetersPerSecond.of(leftSetpoint.velocity)).in(Volts);
+      rightFeedforward =
+          feedforward.calculate(MetersPerSecond.of(rightSetpoint.velocity)).in(Volts);
 
       // Add the feedforward to the PID output to get the motor output
       leftVoltageCommand = leftPidOutput + leftFeedforward;
@@ -477,21 +486,34 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     return rightVoltageCommand;
   }
 
+  /** Returns the left motor for simulation. */
+  public SparkMax getLeftMotor() {
+    return motorLeft;
+  }
+
+  /** Returns the right motor for simulation. */
+  public SparkMax getRightMotor() {
+    return motorRight;
+  }
+
   /**
    * Set the motor idle mode to brake or coast.
    *
    * @param enableBrake Enable motor braking when idle
    */
   public void setBrakeMode(boolean enableBrake) {
+    SparkMaxConfig brakeConfig = new SparkMaxConfig();
     if (enableBrake) {
       DataLogManager.log("Climber motors set to brake mode");
-      this.motorLeft.setIdleMode(IdleMode.kBrake);
-      this.motorRight.setIdleMode(IdleMode.kBrake);
+      brakeConfig.idleMode(IdleMode.kBrake);
     } else {
       DataLogManager.log("Climber motors set to coast mode");
-      this.motorLeft.setIdleMode(IdleMode.kCoast);
-      this.motorRight.setIdleMode(IdleMode.kCoast);
+      brakeConfig.idleMode(IdleMode.kCoast);
     }
+    motorLeft.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    motorRight.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   /**

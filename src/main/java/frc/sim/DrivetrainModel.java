@@ -4,6 +4,7 @@
 
 package frc.sim;
 
+import com.revrobotics.sim.SparkMaxSim;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -20,10 +21,10 @@ public class DrivetrainModel {
 
   private final DriveSubsystem driveSubsystem;
 
-  private CANSparkMaxSim frontLeftSparkSim;
-  private CANSparkMaxSim rearLeftSparkSim;
-  private CANSparkMaxSim frontRightSparkSim;
-  private CANSparkMaxSim rearRightSparkSim;
+  private SparkMaxSim frontLeftSparkSim;
+  private SparkMaxSim rearLeftSparkSim;
+  private SparkMaxSim frontRightSparkSim;
+  private SparkMaxSim rearRightSparkSim;
 
   private final ADXRS450_GyroSim gyroSim;
   private double lastAngle = 0.0;
@@ -66,11 +67,12 @@ public class DrivetrainModel {
   /** Initialize the drivetrain simulation. */
   public void simulationInit() {
 
-    // Setup simulation of the CANSparkMax motor controllers and methods to set values
-    frontLeftSparkSim = new CANSparkMaxSim(DriveConstants.FRONT_LEFT_MOTOR_PORT);
-    rearLeftSparkSim = new CANSparkMaxSim(DriveConstants.REAR_LEFT_MOTOR_PORT);
-    frontRightSparkSim = new CANSparkMaxSim(DriveConstants.FRONT_RIGHT_MOTOR_PORT);
-    rearRightSparkSim = new CANSparkMaxSim(DriveConstants.REAR_RIGHT_MOTOR_PORT);
+    // Setup simulation of the SparkMax motor controllers and methods to set values
+    DCMotor motorParameters = DCMotor.getNEO(1);
+    frontLeftSparkSim = new SparkMaxSim(driveSubsystem.getFrontLeftMotor(), motorParameters);
+    rearLeftSparkSim = new SparkMaxSim(driveSubsystem.getRearLeftMotor(), motorParameters);
+    frontRightSparkSim = new SparkMaxSim(driveSubsystem.getFrontRightMotor(), motorParameters);
+    rearRightSparkSim = new SparkMaxSim(driveSubsystem.getRearRightMotor(), motorParameters);
 
     // Set the simulated robot to start at the same position as the real robot.
     setStartPose();
@@ -99,33 +101,18 @@ public class DrivetrainModel {
       drivetrainSimulator.update(0.02);
     }
 
-    // Set our simulated encoder's position and rate
-    double leftSimPosition = drivetrainSimulator.getLeftPositionMeters();
-    double rightSimPosition = drivetrainSimulator.getRightPositionMeters();
+    // Finally, we run the spark simulation
+    frontLeftSparkSim.iterate(drivetrainSimulator.getLeftVelocityMetersPerSecond(), 12.0, 0.02);
+    rearLeftSparkSim.iterate(drivetrainSimulator.getLeftVelocityMetersPerSecond(), 12.0, 0.02);
+    frontRightSparkSim.iterate(drivetrainSimulator.getRightVelocityMetersPerSecond(), 12.0, 0.02);
+    rearRightSparkSim.iterate(drivetrainSimulator.getRightVelocityMetersPerSecond(), 12.0, 0.02);
 
-    frontLeftSparkSim.setPosition(leftSimPosition);
-    rearLeftSparkSim.setPosition(leftSimPosition);
-    frontRightSparkSim.setPosition(rightSimPosition);
-    rearRightSparkSim.setPosition(rightSimPosition);
-
-    double encoderLeftSimRate = drivetrainSimulator.getLeftVelocityMetersPerSecond();
-    double encoderRightSimRate = drivetrainSimulator.getRightVelocityMetersPerSecond();
-
-    frontLeftSparkSim.setVelocity(encoderLeftSimRate);
-    rearLeftSparkSim.setVelocity(encoderLeftSimRate);
-    frontRightSparkSim.setVelocity(encoderRightSimRate);
-    rearRightSparkSim.setVelocity(encoderRightSimRate);
-
-    // Set our simulated motor current based on the simulated drivetrain
-    double leftSimCurrent = Math.abs(drivetrainSimulator.getLeftCurrentDrawAmps());
-    double rightSimCurrent = Math.abs(drivetrainSimulator.getRightCurrentDrawAmps());
-
-    // Current in simulation is total per side so set individual motor current based on number of
-    // motors per side.
-    frontLeftSparkSim.setCurrent(leftSimCurrent / DriveSimConstants.NUM_MOTORS);
-    rearLeftSparkSim.setCurrent(leftSimCurrent / DriveSimConstants.NUM_MOTORS);
-    frontRightSparkSim.setCurrent(rightSimCurrent / DriveSimConstants.NUM_MOTORS);
-    rearRightSparkSim.setCurrent(rightSimCurrent / DriveSimConstants.NUM_MOTORS);
+    // SmartDashboard.putNumber("Dr Sim L Pos", drivetrainSimulator.getLeftPositionMeters());
+    // SmartDashboard.putNumber("Dr Sim R Pos", drivetrainSimulator.getRightPositionMeters());
+    // SmartDashboard.putNumber("Dr Sim L Vel",
+    // drivetrainSimulator.getLeftVelocityMetersPerSecond());
+    // SmartDashboard.putNumber("Dr Sim R Vel",
+    // drivetrainSimulator.getRightVelocityMetersPerSecond());
 
     // Set gyro angle with offset from the angle at last reset. Set the rate based on change in
     // angle since last iteration.
