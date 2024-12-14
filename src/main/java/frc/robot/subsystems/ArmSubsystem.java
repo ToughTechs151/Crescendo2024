@@ -148,7 +148,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private void initializeArm() {
 
-    // Initialize Bean Breaker
+    // Initialize Beam Breaker
     beamBreaker = new DigitalInput(Constants.ArmConstants.BEAM_BREAKER_PORT);
     SmartDashboard.putBoolean("Force Note Loaded", false);
 

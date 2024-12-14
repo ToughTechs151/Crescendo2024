@@ -54,7 +54,7 @@ public class ClimberModel implements AutoCloseable {
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
           ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
-          0.002,
+          0.0005,
           0.0);
 
   // Create Mechanism2d visualizations of the climber mechanisms
@@ -94,7 +94,7 @@ public class ClimberModel implements AutoCloseable {
 
     // Setup simulations of the CANSparkMax and methods to set values
     sparkLeftSim = new SparkMaxSim(climberSubsystem.getLeftMotor(), climberGearbox);
-    sparkRightSim = new SparkMaxSim(climberSubsystem.getLeftMotor(), climberGearbox);
+    sparkRightSim = new SparkMaxSim(climberSubsystem.getRightMotor(), climberGearbox);
   }
 
   /** Update the simulation model. */
@@ -110,15 +110,15 @@ public class ClimberModel implements AutoCloseable {
 
     // Finally, we  run the spark simulations, set our simulated encoder's readings and save the
     // current so it can be retrieved later.
-    sparkLeftSim.iterate(climberLeftSim.getVelocityMetersPerSecond(), 12.0, 0.02);
-    sparkRightSim.iterate(climberRightSim.getVelocityMetersPerSecond(), 12.0, 0.02);
+    sparkLeftSim.iterate(climberLeftSim.getVelocityMetersPerSecond() / 325.0, 12.0, 0.02);
+    sparkRightSim.iterate(climberRightSim.getVelocityMetersPerSecond() / 325.0, 12.0, 0.02);
 
-    sparkLeftSim.setPosition(
-        climberLeftSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
-    sparkRightSim.setPosition(
-        climberRightSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
-    sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
-    sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
+    // sparkLeftSim.setPosition(
+    //     climberLeftSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
+    // sparkRightSim.setPosition(
+    //     climberRightSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
+    // sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
+    // sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
     simCurrentLeft = Math.abs(climberLeftSim.getCurrentDrawAmps());
     simCurrentRight = Math.abs(climberRightSim.getCurrentDrawAmps());
 
