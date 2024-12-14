@@ -4,8 +4,14 @@
 
 package frc.sim;
 
+import com.revrobotics.sim.SparkMaxSim;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.sim.Constants.IntakeSimConstants;
@@ -15,14 +21,16 @@ public class IntakeModel implements AutoCloseable {
 
   private final IntakeSubsystem intakeSubsystem;
   private double simIntakeCurrent = 0.0;
-  private CANSparkMaxSim sparkSim;
+  private SparkMaxSim sparkSim;
 
   // The intake driven by one motor.
   private final DCMotor motors = DCMotor.getNEO(1);
 
-  private final FlywheelSim intakeMotorSim =
-      new FlywheelSim(
-          motors, IntakeConstants.INTAKE_GEAR_RATIO, IntakeSimConstants.INTAKE_MOI_KG_METERS2);
+  private final LinearSystem<N2, N1, N2> plant =
+      LinearSystemId.createDCMotorSystem(
+          motors, IntakeSimConstants.INTAKE_MOI_KG_METERS2, IntakeConstants.INTAKE_GEAR_RATIO);
+
+  private final DCMotorSim intakeMotorSim = new DCMotorSim(plant, motors);
 
   /** Create a new ElevatorModel. */
   public IntakeModel(IntakeSubsystem intakeSubsystemToSimulate) {
@@ -36,32 +44,27 @@ public class IntakeModel implements AutoCloseable {
   /** Initialize the arm simulation. */
   public void simulationInit() {
 
-    // Setup a simulation of the CANSparkMax and methods to set values
-    sparkSim = new CANSparkMaxSim(IntakeConstants.INTAKE_MOTOR_PORT);
+    // Setup a simulation of the SparkMax and methods to set values
+    sparkSim = new SparkMaxSim(intakeSubsystem.getMotor(), motors);
   }
 
   /** Update the simulation model. */
   public void updateSim() {
 
-    double inputVoltage = intakeSubsystem.getIntakeVoltageCommand();
-
-    intakeMotorSim.setInput(inputVoltage);
+    intakeMotorSim.setInput(intakeSubsystem.getIntakeVoltageCommand());
 
     // Next, we update it. The standard loop time is 20ms.
     intakeMotorSim.update(0.020);
 
-    double newPosition = 0.0;
-
-    // Finally, we set our simulated encoder's readings and save the current so it can be
+    // Finally, we run the spark simulation and save the current so it can be
     // retrieved later.
-    sparkSim.setVelocity(intakeMotorSim.getAngularVelocityRPM());
-    sparkSim.setPosition(newPosition);
+    sparkSim.iterate(intakeMotorSim.getAngularVelocityRPM(), 12.0, 0.02);
+    SmartDashboard.putNumber("Sim Intake input", intakeMotorSim.getAngularVelocityRPM());
     simIntakeCurrent =
         Math.abs(
             motors.getCurrent(
                 intakeMotorSim.getAngularVelocityRadPerSec(),
                 intakeSubsystem.getIntakeVoltageCommand()));
-    sparkSim.setCurrent(simIntakeCurrent);
   }
 
   /** Return the simulated current. */

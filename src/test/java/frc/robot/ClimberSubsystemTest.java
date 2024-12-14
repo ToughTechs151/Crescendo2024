@@ -12,8 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
@@ -37,8 +37,8 @@ class ClimberSubsystemTest {
 
   private ClimberSubsystem climber;
   private ClimberSubsystem.Hardware climberHardware;
-  private CANSparkMax mockMotorLeft;
-  private CANSparkMax mockMotorRight;
+  private SparkMax mockMotorLeft;
+  private SparkMax mockMotorRight;
   private RelativeEncoder mockEncoderLeft;
   private RelativeEncoder mockEncoderRight;
   private Relay relayLeft;
@@ -47,8 +47,8 @@ class ClimberSubsystemTest {
   @BeforeEach
   public void initEach() {
     // Create mock hardware devices
-    mockMotorLeft = mock(CANSparkMax.class);
-    mockMotorRight = mock(CANSparkMax.class);
+    mockMotorLeft = mock(SparkMax.class);
+    mockMotorRight = mock(SparkMax.class);
     mockEncoderLeft = mock(RelativeEncoder.class);
     mockEncoderRight = mock(RelativeEncoder.class);
     relayLeft = mock(Relay.class);

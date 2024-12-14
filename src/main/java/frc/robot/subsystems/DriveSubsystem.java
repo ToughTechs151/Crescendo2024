@@ -4,10 +4,13 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,19 +34,18 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotPreferences;
 import frc.robot.StartPose;
 import frc.robot.StartPose.NamedPose;
-import frc.robot.util.TunableNumber;
 import java.util.Map;
 
 /** Drive subsystem using differential drive. */
 public class DriveSubsystem extends SubsystemBase {
-  private final CANSparkMax frontLeft =
-      new CANSparkMax(DriveConstants.FRONT_LEFT_MOTOR_PORT, MotorType.kBrushless);
-  private final CANSparkMax rearLeft =
-      new CANSparkMax(DriveConstants.REAR_LEFT_MOTOR_PORT, MotorType.kBrushless);
-  private final CANSparkMax frontRight =
-      new CANSparkMax(DriveConstants.FRONT_RIGHT_MOTOR_PORT, MotorType.kBrushless);
-  private final CANSparkMax rearRight =
-      new CANSparkMax(DriveConstants.REAR_RIGHT_MOTOR_PORT, MotorType.kBrushless);
+  private final SparkMax frontLeft =
+      new SparkMax(DriveConstants.FRONT_LEFT_MOTOR_PORT, MotorType.kBrushless);
+  private final SparkMax rearLeft =
+      new SparkMax(DriveConstants.REAR_LEFT_MOTOR_PORT, MotorType.kBrushless);
+  private final SparkMax frontRight =
+      new SparkMax(DriveConstants.FRONT_RIGHT_MOTOR_PORT, MotorType.kBrushless);
+  private final SparkMax rearRight =
+      new SparkMax(DriveConstants.REAR_RIGHT_MOTOR_PORT, MotorType.kBrushless);
 
   private final DifferentialDrive drive = new DifferentialDrive(frontLeft, frontRight);
 
@@ -58,6 +60,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The rear-right-side drive encoder
   private final RelativeEncoder rearRightEncoder = this.rearRight.getEncoder();
+
+  private final SparkMaxConfig frontLeftConfig = new SparkMaxConfig();
+  private final SparkMaxConfig rearLeftConfig = new SparkMaxConfig();
+  private final SparkMaxConfig frontRightConfig = new SparkMaxConfig();
+  private final SparkMaxConfig rearRightConfig = new SparkMaxConfig();
 
   // The gyro sensor
   private final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
@@ -75,10 +82,6 @@ public class DriveSubsystem extends SubsystemBase {
   private double normalSpeedMax = 1.0;
   private double crawlSpeedMax = 0.5;
 
-  // Setup tunable numbers for the drive.
-  private TunableNumber currentLimit =
-      new TunableNumber("Drive Current Limit", DriveConstants.CURRENT_LIMIT);
-
   private final SendableChooser<Integer> startPoseChooser = new SendableChooser<>();
 
   /** Creates a new DriveSubsystem. */
@@ -86,41 +89,52 @@ public class DriveSubsystem extends SubsystemBase {
 
     RobotPreferences.initPreferencesArray(DriveConstants.getDrivePreferences());
 
-    this.frontLeft.restoreFactoryDefaults();
-    this.frontRight.restoreFactoryDefaults();
-    this.rearLeft.restoreFactoryDefaults();
-    this.rearRight.restoreFactoryDefaults();
+    // Common motor / encoder settings
+    frontLeftConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT);
+    frontLeftConfig.encoder.positionConversionFactor(
+        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
+    frontLeftConfig.encoder.velocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
+    rearLeftConfig.apply(frontLeftConfig);
+    frontRightConfig.apply(frontLeftConfig);
+    rearRightConfig.apply(frontLeftConfig);
+
+    // Unique settings per position
+    // rearLeftConfig.follow(frontLeft);
+    // rearRightConfig.follow(frontRight);
+    rearLeft.setVoltage(0);
+    rearRight.setVoltage(0);
+
+    // We need to invert right side so that positive voltages result in both sides moving forward.
+    frontRightConfig.inverted(true);
+
+    // Set the configurations for the motor controllers
+    frontLeft.configure(
+        frontLeftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    rearLeft.configure(
+        rearLeftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    frontRight.configure(
+        frontRightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    rearRight.configure(
+        rearRightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    frontLeft.clearFaults();
+    rearLeft.clearFaults();
+    frontRight.clearFaults();
+    rearRight.clearFaults();
+
+    frontLeftEncoder.setPosition(0);
+    rearLeftEncoder.setPosition(0);
+    frontRightEncoder.setPosition(0);
+    rearRightEncoder.setPosition(0);
 
     // Set the default brake mode to coast and disable the built in deadband since we will apply our
     // own. Set the default drive speed to normal.
     setBrakeMode(false);
     drive.setDeadband(0.0);
     setNormalSpeed();
-
-    rearLeft.follow(frontLeft);
-    rearRight.follow(frontRight);
-
-    // Sets the distance per pulse for the encoders
-    this.frontLeftEncoder.setPositionConversionFactor(
-        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
-    this.rearLeftEncoder.setPositionConversionFactor(
-        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
-    this.frontRightEncoder.setPositionConversionFactor(
-        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
-    this.rearRightEncoder.setPositionConversionFactor(
-        DriveConstants.ENCODER_DISTANCE_METERS_PER_REV);
-    this.frontLeftEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
-    this.rearLeftEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
-    this.frontRightEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
-    this.rearRightEncoder.setVelocityConversionFactor(DriveConstants.ENCODER_VELOCITY_CONVERSION);
-
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    frontRight.setInverted(true);
-
-    // Set the motor current limit to the default value
-    setCurrentLimit((int) Math.floor(currentLimit.get()));
 
     // Set starting pose (position and heading)
     setupStartPoseChooser();
@@ -135,26 +149,31 @@ public class DriveSubsystem extends SubsystemBase {
     this.odometry.update(
         this.gyro.getRotation2d(), frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
 
-    SmartDashboard.putNumber("Left pos", frontLeftEncoder.getPosition());
-    SmartDashboard.putNumber("Right pos", frontRightEncoder.getPosition());
+    SmartDashboard.putNumber("Drive FL pos", frontLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Drive RL pos", rearLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Drive FR pos", frontRightEncoder.getPosition());
+    SmartDashboard.putNumber("Drive RR pos", rearRightEncoder.getPosition());
+    SmartDashboard.putNumber("Drive FL vel", frontLeftEncoder.getVelocity());
+    SmartDashboard.putNumber("Drive FL vel", frontRightEncoder.getVelocity());
+
     SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
     SmartDashboard.putNumber("Gyro rate", gyro.getRate());
     // FRONT LEFT
-    SmartDashboard.putNumber("FL-Voltage", frontLeft.getBusVoltage());
-    SmartDashboard.putNumber("FL-Current", frontLeft.getOutputCurrent());
-    SmartDashboard.putNumber("FL-Temp", frontLeft.getMotorTemperature());
+    SmartDashboard.putNumber("Drive FL-Voltage", frontLeft.getAppliedOutput());
+    SmartDashboard.putNumber("Drive FL-Current", frontLeft.getOutputCurrent());
+    SmartDashboard.putNumber("Drive FL-Temp", frontLeft.getMotorTemperature());
     // REAR LEFT
-    SmartDashboard.putNumber("RL-Voltage", rearLeft.getBusVoltage());
-    SmartDashboard.putNumber("RL-Current", rearLeft.getOutputCurrent());
-    SmartDashboard.putNumber("RL-Temp", rearLeft.getMotorTemperature());
+    SmartDashboard.putNumber("Drive RL-Voltage", rearLeft.getAppliedOutput());
+    SmartDashboard.putNumber("Drive RL-Current", rearLeft.getOutputCurrent());
+    SmartDashboard.putNumber("Drive RL-Temp", rearLeft.getMotorTemperature());
     // FRONT RIGHT
-    SmartDashboard.putNumber("FR-Voltage", frontRight.getBusVoltage());
-    SmartDashboard.putNumber("FR-Current", frontRight.getOutputCurrent());
-    SmartDashboard.putNumber("FR-Temp", frontRight.getMotorTemperature());
+    SmartDashboard.putNumber("Drive FR-Voltage", frontRight.getAppliedOutput());
+    SmartDashboard.putNumber("Drive FR-Current", frontRight.getOutputCurrent());
+    SmartDashboard.putNumber("Drive FR-Temp", frontRight.getMotorTemperature());
     // REAR RIGHT
-    SmartDashboard.putNumber("RR-Voltage", rearRight.getBusVoltage());
-    SmartDashboard.putNumber("RR-Current", rearRight.getOutputCurrent());
-    SmartDashboard.putNumber("RR-Temp", rearRight.getMotorTemperature());
+    SmartDashboard.putNumber("Drive RR-Voltage", rearRight.getAppliedOutput());
+    SmartDashboard.putNumber("Drive RR-Current", rearRight.getOutputCurrent());
+    SmartDashboard.putNumber("Drive RR-Temp", rearRight.getMotorTemperature());
   }
 
   /**
@@ -194,9 +213,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Setup the drive command using the tunable settings. */
   public Command getDriveCommand(CommandXboxController driverController) {
-
-    // Set the motor current limit from the tunable number
-    setCurrentLimit((int) Math.floor(currentLimit.get()));
 
     // Read Preferences for the drive speeds
     normalSpeedMax = DriveConstants.DRIVE_NORMAL_SPEED.getValue();
@@ -268,35 +284,29 @@ public class DriveSubsystem extends SubsystemBase {
         frontLeftEncoder.getPosition(), frontRightEncoder.getPosition());
   }
 
-  /** Set the motor current limit to the Tunable Number. */
-  public void setCurrentLimit(int newLimit) {
-
-    DataLogManager.log("Drive current limit: " + newLimit);
-    frontLeft.setSmartCurrentLimit(newLimit);
-    frontRight.setSmartCurrentLimit(newLimit);
-    rearLeft.setSmartCurrentLimit(newLimit);
-    rearRight.setSmartCurrentLimit(newLimit);
-  }
-
   /**
    * Set the motor idle mode to brake or coast.
    *
    * @param enableBrake Enable motor braking when idle
    */
   public void setBrakeMode(boolean enableBrake) {
+    SparkMaxConfig brakeConfig = new SparkMaxConfig();
     if (enableBrake) {
       DataLogManager.log("Drive is currently set to brake mode");
-      this.frontLeft.setIdleMode(IdleMode.kBrake);
-      this.frontRight.setIdleMode(IdleMode.kBrake);
-      this.rearLeft.setIdleMode(IdleMode.kBrake);
-      this.rearRight.setIdleMode(IdleMode.kBrake);
+      brakeConfig.idleMode(IdleMode.kBrake);
+
     } else {
       DataLogManager.log("Drive is currently set to coast mode");
-      this.frontLeft.setIdleMode(IdleMode.kCoast);
-      this.frontRight.setIdleMode(IdleMode.kCoast);
-      this.rearLeft.setIdleMode(IdleMode.kCoast);
-      this.rearRight.setIdleMode(IdleMode.kCoast);
+      brakeConfig.idleMode(IdleMode.kCoast);
     }
+    frontLeft.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    frontRight.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    rearLeft.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    rearLeft.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   /** Setup the options for the starting position chooser. */
@@ -469,6 +479,26 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getRightMotorVolts() {
     return frontRight.get();
+  }
+
+  /** Returns the front left motor for simulation. */
+  public SparkMax getFrontLeftMotor() {
+    return frontLeft;
+  }
+
+  /** Returns the rear left motor for simulation. */
+  public SparkMax getRearLeftMotor() {
+    return rearLeft;
+  }
+
+  /** Returns the front right motor for simulation. */
+  public SparkMax getFrontRightMotor() {
+    return frontRight;
+  }
+
+  /** Returns the rear right motor for simulation. */
+  public SparkMax getRearRightMotor() {
+    return rearRight;
   }
 
   /**

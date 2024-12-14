@@ -12,8 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableType;
@@ -36,10 +36,10 @@ class LauncherSubsystemTest {
 
   private LauncherSubsystem.Hardware launcherHardware;
   private LauncherSubsystem launcher;
-  private CANSparkMax mockMotorTopLeft;
-  private CANSparkMax mockMotorTopRight;
-  private CANSparkMax mockMotorBottomLeft;
-  private CANSparkMax mockMotorBottomRight;
+  private SparkMax mockMotorTopLeft;
+  private SparkMax mockMotorTopRight;
+  private SparkMax mockMotorBottomLeft;
+  private SparkMax mockMotorBottomRight;
   private RelativeEncoder mockEncoderTopLeft;
   private RelativeEncoder mockEncoderTopRight;
   private RelativeEncoder mockEncoderBottomLeft;
@@ -48,10 +48,10 @@ class LauncherSubsystemTest {
   @BeforeEach
   public void initEach() {
     // Create mock hardware devices
-    mockMotorTopLeft = mock(CANSparkMax.class);
-    mockMotorTopRight = mock(CANSparkMax.class);
-    mockMotorBottomLeft = mock(CANSparkMax.class);
-    mockMotorBottomRight = mock(CANSparkMax.class);
+    mockMotorTopLeft = mock(SparkMax.class);
+    mockMotorTopRight = mock(SparkMax.class);
+    mockMotorBottomLeft = mock(SparkMax.class);
+    mockMotorBottomRight = mock(SparkMax.class);
     mockEncoderTopLeft = mock(RelativeEncoder.class);
     mockEncoderTopRight = mock(RelativeEncoder.class);
     mockEncoderBottomLeft = mock(RelativeEncoder.class);

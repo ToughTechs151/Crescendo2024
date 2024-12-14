@@ -4,7 +4,7 @@
 
 package frc.sim;
 
-import edu.wpi.first.math.VecBuilder;
+import com.revrobotics.sim.SparkMaxSim;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -23,10 +23,10 @@ public class ArmModel implements AutoCloseable {
 
   private final ArmSubsystem armSubsystem;
   private double simCurrent = 0.0;
-  private CANSparkMaxSim sparkSim;
+  private SparkMaxSim sparkSim;
 
-  // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  private final DCMotor armGearbox = DCMotor.getVex775Pro(2);
+  // The arm gearbox represents a gearbox containing one motor.
+  private final DCMotor armGearbox = DCMotor.getNEO(1);
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
@@ -41,7 +41,8 @@ public class ArmModel implements AutoCloseable {
           ArmConstants.MAX_ANGLE_RADS,
           true,
           ArmSim.START_ANGLE_RADS,
-          VecBuilder.fill(ArmSim.ENCODER_DISTANCE_PER_PULSE) // Add noise with a std-dev of 1 tick
+          ArmSim.ENCODER_DISTANCE_PER_PULSE,
+          0.0 // Add noise with a std-dev of 1 tick
           );
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
@@ -73,7 +74,7 @@ public class ArmModel implements AutoCloseable {
   public void simulationInit() {
 
     // Setup a simulation of the CANSparkMax and methods to set values
-    sparkSim = new CANSparkMaxSim(ArmConstants.MOTOR_PORT);
+    sparkSim = new SparkMaxSim(armSubsystem.getMotor(), armGearbox);
 
     // This shouldn't be needed in 2024 since SingleJointedArmSim will allow setting in constructor
     armSim.setState(ArmConstants.ARM_OFFSET_RADS, 0);
@@ -88,12 +89,12 @@ public class ArmModel implements AutoCloseable {
     // Next, we update it. The standard loop time is 20ms.
     armSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and save the current so it can be
-    // retrieved later.
+    // Finally, we  run the spark simulation, set our simulated encoder's readings and save the
+    // current so it can be retrieved later.
+    // sparkSim.iterate(armSim.getVelocityRadPerSec(), 12.0, 0.02);
     sparkSim.setPosition(armSim.getAngleRads() - ArmConstants.ARM_OFFSET_RADS);
-    sparkSim.setVelocity(armSim.getVelocityRadPerSec());
+
     simCurrent = Math.abs(armSim.getCurrentDrawAmps());
-    sparkSim.setCurrent(simCurrent);
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     mechArm.setAngle(Units.radiansToDegrees(armSim.getAngleRads()));

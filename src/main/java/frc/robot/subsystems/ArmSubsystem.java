@@ -4,10 +4,17 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -95,17 +102,18 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Hardware components for the arm subsystem. */
   public static class Hardware {
-    CANSparkMax motor;
+    SparkMax motor;
     RelativeEncoder encoder;
 
-    public Hardware(CANSparkMax motor, RelativeEncoder encoder) {
+    public Hardware(SparkMax motor, RelativeEncoder encoder) {
       this.motor = motor;
       this.encoder = encoder;
     }
   }
 
-  private final CANSparkMax motor;
+  private final SparkMax motor;
   private final RelativeEncoder encoder;
+  private final SparkMaxConfig motorConfig = new SparkMaxConfig();
 
   private ProfiledPIDController armController =
       new ProfiledPIDController(
@@ -146,7 +154,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
     RobotPreferences.initPreferencesArray(ArmConstants.getArmPreferences());
     initMotor();
-    initEncoder();
 
     // Set tolerances that will be used to determine when the arm is at the goal position.
     armController.setTolerance(
@@ -158,21 +165,21 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   private void initMotor() {
-    motor.restoreFactoryDefaults();
-    // Maybe we should print the faults if non-zero before clearing?
+    motorConfig.smartCurrentLimit(ArmConstants.CURRENT_LIMIT);
+
+    // Setup the encoder scale factors. Since this is a relation encoder,
+    // arm position will only be correct if the arm is in the starting rest position when
+    // the subsystem is constructed.
+    motorConfig.encoder.positionConversionFactor(ArmConstants.ARM_RAD_PER_ENCODER_ROTATION);
+    motorConfig.encoder.velocityConversionFactor(ArmConstants.RPM_TO_RAD_PER_SEC);
+
+    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motor.clearFaults();
+    encoder.setPosition(0);
+
     // Configure the motor to use EMF braking when idle.
     setBrakeMode(true);
     DataLogManager.log("Arm motor firmware version:" + motor.getFirmwareString());
-  }
-
-  private void initEncoder() {
-    // Setup the encoder scale factors and reset encoder to 0. Since this is a relation encoder,
-    // arm position will only be correct if the arm is in the starting rest position when the
-    // subsystem is constructed.
-    encoder.setPositionConversionFactor(ArmConstants.ARM_RAD_PER_ENCODER_ROTATION);
-    encoder.setVelocityConversionFactor(ArmConstants.RPM_TO_RAD_PER_SEC);
-    encoder.setPosition(0);
   }
 
   /**
@@ -181,7 +188,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
    * @return Hardware object containing all necessary devices for this subsystem
    */
   public static Hardware initializeHardware() {
-    CANSparkMax motor = new CANSparkMax(ArmConstants.MOTOR_PORT, MotorType.kBrushless);
+    SparkMax motor = new SparkMax(ArmConstants.MOTOR_PORT, MotorType.kBrushless);
     RelativeEncoder encoder = motor.getEncoder();
 
     return new Hardware(motor, encoder);
@@ -218,7 +225,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       // Calculate the feedforward to move the arm at the desired velocity and offset
       // the effect of gravity at the desired position. Voltage for acceleration is not
       // used.
-      newFeedforward = feedforward.calculate(setpoint.position, setpoint.velocity);
+      newFeedforward =
+          feedforward
+              .calculate(Radians.of(setpoint.position), RadiansPerSecond.of(setpoint.velocity))
+              .in(Volts);
 
       // Add the feedforward to the PID output to get the motor output
       voltageCommand = output + newFeedforward;
@@ -353,19 +363,27 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     return voltageCommand;
   }
 
+  /** Returns the motor for simulation. */
+  public SparkMax getMotor() {
+    return motor;
+  }
+
   /**
    * Set the motor idle mode to brake or coast.
    *
    * @param enableBrake Enable motor braking when idle
    */
   public void setBrakeMode(boolean enableBrake) {
+    SparkMaxConfig brakeConfig = new SparkMaxConfig();
     if (enableBrake) {
       DataLogManager.log("Arm motor set to brake mode");
-      this.motor.setIdleMode(IdleMode.kBrake);
+      brakeConfig.idleMode(IdleMode.kBrake);
     } else {
       DataLogManager.log("Arm motor set to coast mode");
-      this.motor.setIdleMode(IdleMode.kCoast);
+      brakeConfig.idleMode(IdleMode.kCoast);
     }
+    motor.configure(
+        brakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   /**

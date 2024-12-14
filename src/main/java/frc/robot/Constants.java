@@ -117,6 +117,7 @@ public final class Constants {
 
     public static final int MOTOR_PORT = 6;
     public static final int BEAM_BREAKER_PORT = 1;
+    public static final int CURRENT_LIMIT = 40;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
@@ -165,6 +166,7 @@ public final class Constants {
     }
 
     public static final int INTAKE_MOTOR_PORT = 7;
+    public static final int CURRENT_LIMIT = 40;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
@@ -217,6 +219,7 @@ public final class Constants {
     public static final int TOP_LEFT_LAUNCHER_MOTOR_PORT = 13;
     public static final int BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT = 10;
     public static final int BOTTOM_LEFT_LAUNCHER_MOTOR_PORT = 11;
+    public static final int CURRENT_LIMIT = 40;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
@@ -265,6 +268,7 @@ public final class Constants {
     public static final int RIGHT_MOTOR_PORT = 9;
     public static final int LEFT_RELAY_PORT = 1;
     public static final int RIGHT_RELAY_PORT = 0;
+    public static final int CURRENT_LIMIT = 40;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences

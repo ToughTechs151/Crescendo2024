@@ -278,7 +278,7 @@ public class DataLogging {
 
     // Add hardware sendables here
     PowerDistribution pdp = robotContainer.getPdp();
-    pdpWidget.add("PDP", pdp);
+    pdpWidget.add("PDP", pdp).withWidget(BuiltInWidgets.kPowerDistribution);
 
     // Log configuration info here
     DataLogManager.log(String.format("PDP Can ID: %d", pdp.getModule()));
