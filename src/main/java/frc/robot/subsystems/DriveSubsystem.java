@@ -61,10 +61,10 @@ public class DriveSubsystem extends SubsystemBase {
   // The rear-right-side drive encoder
   private final RelativeEncoder rearRightEncoder = this.rearRight.getEncoder();
 
-  private final SparkMaxConfig frontLeftConfig = new SparkMaxConfig();
-  private final SparkMaxConfig rearLeftConfig = new SparkMaxConfig();
-  private final SparkMaxConfig frontRightConfig = new SparkMaxConfig();
-  private final SparkMaxConfig rearRightConfig = new SparkMaxConfig();
+  private final SparkMaxConfig globalConfig = new SparkMaxConfig();
+  private final SparkMaxConfig leftFollowerConfig = new SparkMaxConfig();
+  private final SparkMaxConfig rightLeaderConfig = new SparkMaxConfig();
+  private final SparkMaxConfig rightFollowerConfig = new SparkMaxConfig();
 
   // The gyro sensor
   private final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
@@ -88,36 +88,33 @@ public class DriveSubsystem extends SubsystemBase {
     RobotPreferences.initPreferencesArray(DriveConstants.getDrivePreferences());
 
     // Common motor / encoder settings
-    frontLeftConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT);
-    // frontLeftConfig.encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
+    globalConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT).idleMode(IdleMode.kCoast);
+    
+    globalConfig.encoder.velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC);
+
+    // .encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
     // Not working in 2025 Beta 3 for simulation
-    frontLeftConfig.encoder.velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC);
-    rearLeftConfig.apply(frontLeftConfig);
-    frontRightConfig.apply(frontLeftConfig);
-    rearRightConfig.apply(frontLeftConfig);
 
-    // Unique settings per position
-    // this attempt at follow is not working in 2025 Beta so set output to 0
-    // rearLeftConfig.follow(frontLeft);
-    // rearRightConfig.follow(frontRight);
-    rearLeft.setVoltage(0);
-    rearRight.setVoltage(0);
+    // Unique settings per position. Set followers and invert right side so that positive voltages
+    // result in both sides moving forward.
+    leftFollowerConfig.apply(globalConfig).follow(frontLeft);
 
-    // We need to invert right side so that positive voltages result in both sides moving forward.
-    frontRightConfig.inverted(true);
+    rightLeaderConfig.apply(globalConfig).inverted(true);
+
+    rightFollowerConfig.apply(globalConfig).follow(frontRight);
 
     // Set the configurations for the motor controllers
     frontLeft.configure(
-        frontLeftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     rearLeft.configure(
-        rearLeftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     frontRight.configure(
-        frontRightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     rearRight.configure(
-        rearRightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     frontLeft.clearFaults();
     rearLeft.clearFaults();
@@ -129,9 +126,8 @@ public class DriveSubsystem extends SubsystemBase {
     frontRightEncoder.setPosition(0);
     rearRightEncoder.setPosition(0);
 
-    // Set the default brake mode to coast and disable the built in deadband since we will apply our
-    // own. Set the default drive speed to normal.
-    setBrakeMode(false);
+    // Disable the built in deadband since we will apply our own. 
+    // Set the default drive speed to normal.
     drive.setDeadband(0.0);
     setNormalSpeed();
 
