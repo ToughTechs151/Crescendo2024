@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalMatchers;
@@ -125,6 +126,8 @@ class ClimberSubsystemTest {
     assertThat(telemetryBooleanMap.get("Climber Enabled")).isFalse();
   }
 
+  // Disable due to bug in RevLib for 2025 Beta 3
+  @Disabled("RevLib bug")
   @Test
   @DisplayName("Test Motors and Encoders Sensors.")
   void testSensors() {

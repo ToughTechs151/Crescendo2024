@@ -221,8 +221,9 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
     // Setup the encoder scale factors. Since this is a relation encoder,
     // climber position will only be correct if it is in the down and locked position when
     // the subsystem is constructed.
-    motorConfig.encoder.positionConversionFactor(
-        ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION);
+    // motorConfig.encoder.positionConversionFactor(
+    //     ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION);
+    // Not working in 2025 Beta 3 for simulation
     motorConfig.encoder.velocityConversionFactor(ClimberConstants.RPM_TO_METERS_PER_SEC);
 
     motorLeft.configure(
@@ -462,7 +463,9 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   public double getMeasurementLeft() {
     // Add the offset from the starting point. The climber must be at this position at startup for
     // the relative encoder to provide a correct position.
-    return encoderLeft.getPosition() + ClimberConstants.CLIMBER_OFFSET_METERS;
+    return encoderLeft.getPosition() * ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION
+        + ClimberConstants.CLIMBER_OFFSET_METERS;
+    // scale factor workaround for 2025 Beta 3
   }
 
   /**
@@ -473,7 +476,9 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
   public double getMeasurementRight() {
     // Add the offset from the starting point. The climber must be at this position at startup for
     // the relative encoder to provide a correct position.
-    return encoderRight.getPosition() + ClimberConstants.CLIMBER_OFFSET_METERS;
+    return encoderRight.getPosition() * ClimberConstants.CLIMBER_METERS_PER_ENCODER_ROTATION
+        + ClimberConstants.CLIMBER_OFFSET_METERS;
+    // scale factor workaround for 2025 Beta 3
   }
 
   /** Returns the Left Motor Commanded Voltage. */

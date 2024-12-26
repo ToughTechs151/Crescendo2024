@@ -89,8 +89,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Common motor / encoder settings
     frontLeftConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT);
-    frontLeftConfig.encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
-    // Velocity conversion doesn't work if different than position so use meters/minute
+    // frontLeftConfig.encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
+    // Not working in 2025 Beta 3 for simulation
     frontLeftConfig.encoder.velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC);
     rearLeftConfig.apply(frontLeftConfig);
     frontRightConfig.apply(frontLeftConfig);
@@ -397,7 +397,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the left wheel distance in meters.
    */
   public double getLeftDistanceMeters() {
-    return frontLeftEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV / 17.9;
+    return frontLeftEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV;
+    // scale factor workaround for 2025 Beta 3
   }
 
   /**
@@ -406,7 +407,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the right wheel distance in meters.
    */
   public double getRightDistanceMeters() {
-    return frontRightEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV / 17.9;
+    return frontRightEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV;
+    // scale factor workaround for 2025 Beta 3
   }
 
   /**

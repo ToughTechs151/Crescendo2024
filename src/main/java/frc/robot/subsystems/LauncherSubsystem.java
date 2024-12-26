@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -373,14 +370,11 @@ public class LauncherSubsystem extends SubsystemBase implements AutoCloseable {
       pidBottomRightOutput = launcherBottomRightController.calculate(getLauncherSpeedBottomRight());
       pidBottomLeftOutput = launcherBottomLeftController.calculate(getLauncherSpeedBottomLeft());
 
-      newTopLeftFeedforward =
-          feedforward.calculate(RPM.of(launcherTopLeftController.getSetpoint())).in(Volts);
-      newBottomLeftFeedforward =
-          feedforward.calculate(RPM.of(launcherBottomLeftController.getSetpoint())).in(Volts);
-      newTopRightFeedforward =
-          feedforward.calculate(RPM.of(launcherTopRightController.getSetpoint())).in(Volts);
+      newTopLeftFeedforward = feedforward.calculate(launcherTopLeftController.getSetpoint());
+      newBottomLeftFeedforward = feedforward.calculate(launcherBottomLeftController.getSetpoint());
+      newTopRightFeedforward = feedforward.calculate(launcherTopRightController.getSetpoint());
       newBottomRightFeedforward =
-          feedforward.calculate(RPM.of(launcherBottomRightController.getSetpoint())).in(Volts);
+          feedforward.calculate(launcherBottomRightController.getSetpoint());
 
       launcherVoltageTopLeftCommand =
           topLeftLimiter.calculate(pidTopLeftOutput + newTopLeftFeedforward);
