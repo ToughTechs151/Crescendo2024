@@ -89,7 +89,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Common motor / encoder settings
     globalConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT).idleMode(IdleMode.kCoast);
-    
+
     globalConfig.encoder.velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC);
 
     // .encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
@@ -126,7 +126,7 @@ public class DriveSubsystem extends SubsystemBase {
     frontRightEncoder.setPosition(0);
     rearRightEncoder.setPosition(0);
 
-    // Disable the built in deadband since we will apply our own. 
+    // Disable the built in deadband since we will apply our own.
     // Set the default drive speed to normal.
     drive.setDeadband(0.0);
     setNormalSpeed();
