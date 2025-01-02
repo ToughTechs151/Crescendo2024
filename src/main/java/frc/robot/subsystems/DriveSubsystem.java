@@ -193,10 +193,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   public void arcadeDrive(double speed, double rotation, boolean squareInputs) {
-    // disable driving until follow is fixed
-    if (RobotBase.isSimulation()) {
-      drive.arcadeDrive(speed, rotation, squareInputs);
-    }
+    drive.arcadeDrive(speed, rotation, squareInputs);
   }
 
   /**
