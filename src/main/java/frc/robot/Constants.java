@@ -34,11 +34,11 @@ public final class Constants {
   // Set a Global Constant to either Show or Hide extended logging data for each of the 5 subsystems
   // Set to true to show extended logging data.
   // Set to false to hide extended logging data.
-  public static final boolean SD_SHOW_ARM_EXTENDED_LOGGING_DATA = false;
-  public static final boolean SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_ARM_EXTENDED_LOGGING_DATA = true;
+  public static final boolean SD_SHOW_LAUNCHER_EXTENDED_LOGGING_DATA = true;
   public static final boolean SD_SHOW_CLIMBER_EXTENDED_LOGGING_DATA = true;
-  public static final boolean SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA = false;
-  public static final boolean SD_SHOW_DRIVE_EXTENDED_LOGGING_DATA = false;
+  public static final boolean SD_SHOW_INTAKE_EXTENDED_LOGGING_DATA = true;
+  public static final boolean SD_SHOW_DRIVE_EXTENDED_LOGGING_DATA = true;
 
   public static final boolean LOOP_TIMING_LOG = false;
 
@@ -75,11 +75,12 @@ public final class Constants {
 
     public static final double GEAR_RATIO = 8.45;
     public static final double WHEEL_DIAMETER_METERS = 0.15;
-    public static final double ENCODER_DISTANCE_METERS_PER_REV =
-        // Assumes the encoders are directly mounted on the wheel shafts
+    public static final double METERS_PER_ENCODER_REV =
         (WHEEL_DIAMETER_METERS * Math.PI) / GEAR_RATIO;
-    public static final double ENCODER_VELOCITY_CONVERSION =
-        (WHEEL_DIAMETER_METERS * Math.PI) / (GEAR_RATIO * 60);
+    public static final double RPM_TO_METERS_PER_SEC = METERS_PER_ENCODER_REV / 60;
+
+    // Fudge factor to get simulation speed correct with 2025 Beta
+    public static final double FUDGE = 325.0;
 
     public static final boolean SQUARE_INPUTS = true;
     public static final boolean ENABLE_BRAKE = false;
@@ -117,6 +118,7 @@ public final class Constants {
 
     public static final int MOTOR_PORT = 6;
     public static final int BEAM_BREAKER_PORT = 1;
+    public static final int CURRENT_LIMIT = 40;
 
     // Constants tunable through preferences
     public static final PreferenceKeyValue ARM_KP = new PreferenceKeyValue("ArmKP", 6.0);
@@ -165,6 +167,7 @@ public final class Constants {
     }
 
     public static final int INTAKE_MOTOR_PORT = 7;
+    public static final int CURRENT_LIMIT = 40;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
@@ -217,6 +220,7 @@ public final class Constants {
     public static final int TOP_LEFT_LAUNCHER_MOTOR_PORT = 13;
     public static final int BOTTOM_RIGHT_LAUNCHER_MOTOR_PORT = 10;
     public static final int BOTTOM_LEFT_LAUNCHER_MOTOR_PORT = 11;
+    public static final int CURRENT_LIMIT = 40;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences
@@ -265,6 +269,7 @@ public final class Constants {
     public static final int RIGHT_MOTOR_PORT = 9;
     public static final int LEFT_RELAY_PORT = 1;
     public static final int RIGHT_RELAY_PORT = 0;
+    public static final int CURRENT_LIMIT = 40;
 
     // TO DO - update these constants for the real design
     // Constants tunable through preferences

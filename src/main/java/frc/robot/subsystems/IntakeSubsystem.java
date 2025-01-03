@@ -4,10 +4,13 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -87,17 +90,18 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   /** Hardware components for the intake subsystem. */
   public static class Hardware {
-    CANSparkMax motor;
+    SparkMax motor;
     RelativeEncoder encoder;
 
-    public Hardware(CANSparkMax motor, RelativeEncoder encoder) {
+    public Hardware(SparkMax motor, RelativeEncoder encoder) {
       this.motor = motor;
       this.encoder = encoder;
     }
   }
 
-  private final CANSparkMax intakeMotor;
+  private final SparkMax intakeMotor;
   private final RelativeEncoder intakeEncoder;
+  private final SparkMaxConfig motorConfig = new SparkMaxConfig();
 
   private PIDController intakeController =
       new PIDController(IntakeConstants.INTAKE_KP.getValue(), 0.0, 0.0);
@@ -118,10 +122,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private double speedThreshold;
   private double currentThreshold;
 
-  // We need to save speed during the periodic function as a workaround to a SparkMax simulation
-  // limitation that motor speed is sometimes reset to 0 at times during the frame.
-  private double speed;
-
   /** Create a new IntakeSubsystem controlled by a Profiled PID COntroller . */
   public IntakeSubsystem(Hardware intakeHardware) {
     this.intakeMotor = intakeHardware.motor;
@@ -135,7 +135,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     RobotPreferences.initPreferencesArray(IntakeConstants.getIntakePreferences());
 
     initIntakeMotor();
-    initIntakeEncoder();
 
     // Set tolerances that will be used to determine when the intake is at the goal velocity.
     intakeController.setTolerance(IntakeConstants.INTAKE_TOLERANCE_RPM);
@@ -146,22 +145,20 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   private void initIntakeMotor() {
-    intakeMotor.restoreFactoryDefaults();
-    // Maybe we should print the faults if non-zero before clearing?
-    intakeMotor.clearFaults();
-    // Configure the motor to use EMF braking when idle and set voltage to 0.
-    intakeMotor.setIdleMode(IdleMode.kBrake);
-    DataLogManager.log("Intake motor firmware version:" + intakeMotor.getFirmwareString());
-  }
 
-  private void initIntakeEncoder() {
-    // Setup the encoder scale factors and reset encoder to 0. Since this is a relation encoder,
-    // intake position will only be correct if the intake is in the starting rest position when
-    // the subsystem is constructed.
-    intakeEncoder.setPositionConversionFactor(
+    motorConfig.idleMode(IdleMode.kBrake);
+    motorConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT);
+
+    // Setup the encoder scale factors
+    motorConfig.encoder.velocityConversionFactor(
         IntakeConstants.INTAKE_ROTATIONS_PER_ENCODER_ROTATION);
-    intakeEncoder.setVelocityConversionFactor(
-        IntakeConstants.INTAKE_ROTATIONS_PER_ENCODER_ROTATION);
+
+    intakeMotor.configure(
+        motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    intakeMotor.clearFaults();
+
+    DataLogManager.log("Intake motor firmware version:" + intakeMotor.getFirmwareString());
   }
 
   /**
@@ -170,8 +167,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
    * @return Hardware object containing all necessary devices for this subsystem
    */
   public static Hardware initializeHardware() {
-    CANSparkMax intakeMotor =
-        new CANSparkMax(IntakeConstants.INTAKE_MOTOR_PORT, MotorType.kBrushless);
+    SparkMax intakeMotor = new SparkMax(IntakeConstants.INTAKE_MOTOR_PORT, MotorType.kBrushless);
     RelativeEncoder intakeEncoder = intakeMotor.getEncoder();
 
     return new Hardware(intakeMotor, intakeEncoder);
@@ -181,10 +177,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
 
-    speed = intakeEncoder.getVelocity();
     SmartDashboard.putBoolean("Intake Enabled", intakeEnabled);
     SmartDashboard.putNumber("Intake Setpoint", intakeController.getSetpoint());
-    SmartDashboard.putNumber("Intake Speed", speed);
+    SmartDashboard.putNumber("Intake Speed", intakeEncoder.getVelocity());
     SmartDashboard.putNumber("Intake Voltage", intakeVoltageCommand);
     SmartDashboard.putNumber("Intake Temp", intakeMotor.getMotorTemperature());
     SmartDashboard.putNumber("Intake Current", intakeMotor.getOutputCurrent());
@@ -279,7 +274,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
    * to speed and the current hitting a threshold.
    */
   public boolean noteFullyLoaded() {
-    return ((Math.abs(speed) >= speedThreshold)
+    return ((Math.abs(intakeEncoder.getVelocity()) >= speedThreshold)
         && (intakeMotor.getOutputCurrent() > currentThreshold));
   }
 
@@ -333,6 +328,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   /** Returns the intake motor commanded voltage. */
   public double getIntakeVoltageCommand() {
     return intakeVoltageCommand;
+  }
+
+  /** Returns the motor for simulation. */
+  public SparkMax getMotor() {
+    return intakeMotor;
   }
 
   /**

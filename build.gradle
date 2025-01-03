@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.3.2"
+    id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-3"
     id 'com.diffplug.spotless' version '6.16.0'
     id "com.github.spotbugs" version "5.2.3"
     id "jacoco"
@@ -61,6 +61,7 @@ def includeDesktopSupport = true
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
+    annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
@@ -80,7 +81,7 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testImplementation 'org.assertj:assertj-core:3.24.2'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.mockito:mockito-core:3.+'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.1'
     compileOnly 'net.jcip:jcip-annotations:1.0'
     compileOnly 'com.github.spotbugs:spotbugs-annotations:4.7.3'
@@ -136,7 +137,7 @@ tasks.withType(JavaCompile) {
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "ToughTechs151_Crescendo2024"
+        property "sonar.projectKey", "ToughTechs151_MotorSpeedControl"
         property "sonar.organization", "toughtechs151"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.java.spotbugs.reportPaths", "${buildDir}/reports/spotbugs/main.xml"

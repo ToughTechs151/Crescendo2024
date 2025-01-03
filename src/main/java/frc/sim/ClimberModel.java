@@ -4,7 +4,7 @@
 
 package frc.sim;
 
-import edu.wpi.first.math.VecBuilder;
+import com.revrobotics.sim.SparkMaxSim;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -21,8 +21,8 @@ public class ClimberModel implements AutoCloseable {
   private final ClimberSubsystem climberSubsystem;
   private double simCurrentLeft = 0.0;
   private double simCurrentRight = 0.0;
-  private CANSparkMaxSim sparkLeftSim;
-  private CANSparkMaxSim sparkRightSim;
+  private SparkMaxSim sparkLeftSim;
+  private SparkMaxSim sparkRightSim;
 
   // The arm gearbox represents a gearbox containing one motor.
   private final DCMotor climberGearbox = DCMotor.getNEO(1);
@@ -41,7 +41,8 @@ public class ClimberModel implements AutoCloseable {
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
           ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
-          VecBuilder.fill(0.0005));
+          0.0005,
+          0.0);
 
   private final ElevatorSim climberRightSim =
       new ElevatorSim(
@@ -53,7 +54,8 @@ public class ClimberModel implements AutoCloseable {
           ClimberConstants.CLIMBER_MAX_PULL_METERS,
           true,
           ClimberConstants.CLIMBER_RETRACT_POSITION_METERS,
-          VecBuilder.fill(0.002));
+          0.0005,
+          0.0);
 
   // Create Mechanism2d visualizations of the climber mechanisms
   private final Mechanism2d mech2dLeft = new Mechanism2d(1, 1.2);
@@ -91,8 +93,8 @@ public class ClimberModel implements AutoCloseable {
   public void simulationInit() {
 
     // Setup simulations of the CANSparkMax and methods to set values
-    sparkLeftSim = new CANSparkMaxSim(ClimberConstants.LEFT_MOTOR_PORT);
-    sparkRightSim = new CANSparkMaxSim(ClimberConstants.RIGHT_MOTOR_PORT);
+    sparkLeftSim = new SparkMaxSim(climberSubsystem.getLeftMotor(), climberGearbox);
+    sparkRightSim = new SparkMaxSim(climberSubsystem.getRightMotor(), climberGearbox);
   }
 
   /** Update the simulation model. */
@@ -106,18 +108,19 @@ public class ClimberModel implements AutoCloseable {
     climberLeftSim.update(0.020);
     climberRightSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and save the current so it can be
-    // retrieved later.
-    sparkLeftSim.setPosition(
-        climberLeftSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
-    sparkRightSim.setPosition(
-        climberRightSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
-    sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
-    sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
+    // Finally, we  run the spark simulations, set our simulated encoder's readings and save the
+    // current so it can be retrieved later.
+    sparkLeftSim.iterate(climberLeftSim.getVelocityMetersPerSecond() / 325.0, 12.0, 0.02);
+    sparkRightSim.iterate(climberRightSim.getVelocityMetersPerSecond() / 325.0, 12.0, 0.02);
+
+    // sparkLeftSim.setPosition(
+    //     climberLeftSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
+    // sparkRightSim.setPosition(
+    //     climberRightSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
+    // sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
+    // sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
     simCurrentLeft = Math.abs(climberLeftSim.getCurrentDrawAmps());
     simCurrentRight = Math.abs(climberRightSim.getCurrentDrawAmps());
-    sparkLeftSim.setCurrent(simCurrentLeft);
-    sparkRightSim.setCurrent(simCurrentRight);
 
     // Update climber visualizations with position
     climberMech2dLeft.setLength(

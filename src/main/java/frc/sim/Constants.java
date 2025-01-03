@@ -50,8 +50,8 @@ public final class Constants {
     }
 
     public static final double CLIMBER_REDUCTION = ClimberConstants.GEAR_RATIO;
-    public static final double CLIMBER_DRUM_RADIUS = Units.inchesToMeters(2.0);
-    public static final double CARRIAGE_MASS = 4.0; // kg
+    public static final double CLIMBER_DRUM_RADIUS = Units.inchesToMeters(0.5);
+    public static final double CARRIAGE_MASS = 10.0; // kg
   }
 
   /** Launcher simulation constants. */
