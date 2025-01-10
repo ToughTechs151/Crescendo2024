@@ -4,10 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -226,10 +222,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       // Calculate the feedforward to move the arm at the desired velocity and offset
       // the effect of gravity at the desired position. Voltage for acceleration is not
       // used.
-      newFeedforward =
-          feedforward
-              .calculate(Radians.of(setpoint.position), RadiansPerSecond.of(setpoint.velocity))
-              .in(Volts);
+      newFeedforward = feedforward.calculate(setpoint.position, setpoint.velocity);
 
       // Add the feedforward to the PID output to get the motor output
       voltageCommand = output + newFeedforward;

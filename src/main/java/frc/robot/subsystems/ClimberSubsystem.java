@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -301,9 +298,8 @@ public class ClimberSubsystem extends SubsystemBase implements AutoCloseable {
 
       // Calculate the feedforward to move the climber at the desired velocity and offset
       // the effect of gravity. Voltage for acceleration is not used.
-      leftFeedforward = feedforward.calculate(MetersPerSecond.of(leftSetpoint.velocity)).in(Volts);
-      rightFeedforward =
-          feedforward.calculate(MetersPerSecond.of(rightSetpoint.velocity)).in(Volts);
+      leftFeedforward = feedforward.calculate(leftSetpoint.velocity);
+      rightFeedforward = feedforward.calculate(rightSetpoint.velocity);
 
       // Add the feedforward to the PID output to get the motor output
       leftVoltageCommand = leftPidOutput + leftFeedforward;
