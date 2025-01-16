@@ -90,10 +90,10 @@ public class DriveSubsystem extends SubsystemBase {
     // Common motor / encoder settings
     globalConfig.smartCurrentLimit(DriveConstants.CURRENT_LIMIT).idleMode(IdleMode.kCoast);
 
-    globalConfig.encoder.velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC);
-
-    // .encoder.positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
-    // Not working in 2025 Beta 3 for simulation
+    globalConfig
+        .encoder
+        .velocityConversionFactor(DriveConstants.RPM_TO_METERS_PER_SEC)
+        .positionConversionFactor(DriveConstants.METERS_PER_ENCODER_REV);
 
     // Unique settings per position. Set followers and invert right side so that positive voltages
     // result in both sides moving forward.
@@ -390,8 +390,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the left wheel distance in meters.
    */
   public double getLeftDistanceMeters() {
-    return frontLeftEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV;
-    // scale factor workaround for 2025 Beta 3
+    return frontLeftEncoder.getPosition();
   }
 
   /**
@@ -400,8 +399,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the right wheel distance in meters.
    */
   public double getRightDistanceMeters() {
-    return frontRightEncoder.getPosition() * DriveConstants.METERS_PER_ENCODER_REV;
-    // scale factor workaround for 2025 Beta 3
+    return frontRightEncoder.getPosition();
   }
 
   /**

@@ -79,9 +79,6 @@ public final class Constants {
         (WHEEL_DIAMETER_METERS * Math.PI) / GEAR_RATIO;
     public static final double RPM_TO_METERS_PER_SEC = METERS_PER_ENCODER_REV / 60;
 
-    // Fudge factor to get simulation speed correct with 2025 Beta
-    public static final double FUDGE = 325.0;
-
     public static final boolean SQUARE_INPUTS = true;
     public static final boolean ENABLE_BRAKE = false;
     public static final double DEADBAND = 0.05;

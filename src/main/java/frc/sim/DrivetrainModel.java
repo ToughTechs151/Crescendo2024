@@ -107,13 +107,6 @@ public class DrivetrainModel {
     frontRightSparkSim.iterate(drivetrainSimulator.getRightVelocityMetersPerSecond(), 12.0, 0.02);
     rearRightSparkSim.iterate(drivetrainSimulator.getRightVelocityMetersPerSecond(), 12.0, 0.02);
 
-    // SmartDashboard.putNumber("Dr Sim L Pos", drivetrainSimulator.getLeftPositionMeters());
-    // SmartDashboard.putNumber("Dr Sim R Pos", drivetrainSimulator.getRightPositionMeters());
-    // SmartDashboard.putNumber("Dr Sim L Vel",
-    // drivetrainSimulator.getLeftVelocityMetersPerSecond());
-    // SmartDashboard.putNumber("Dr Sim R Vel",
-    // drivetrainSimulator.getRightVelocityMetersPerSecond());
-
     // Set gyro angle with offset from the angle at last reset. Set the rate based on change in
     // angle since last iteration.
     double newAngle = -(drivetrainSimulator.getHeading().getDegrees() - startAngle);

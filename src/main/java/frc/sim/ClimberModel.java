@@ -110,15 +110,9 @@ public class ClimberModel implements AutoCloseable {
 
     // Finally, we  run the spark simulations, set our simulated encoder's readings and save the
     // current so it can be retrieved later.
-    sparkLeftSim.iterate(climberLeftSim.getVelocityMetersPerSecond() / 325.0, 12.0, 0.02);
-    sparkRightSim.iterate(climberRightSim.getVelocityMetersPerSecond() / 325.0, 12.0, 0.02);
+    sparkLeftSim.iterate(climberLeftSim.getVelocityMetersPerSecond(), 12.0, 0.02);
+    sparkRightSim.iterate(climberRightSim.getVelocityMetersPerSecond(), 12.0, 0.02);
 
-    // sparkLeftSim.setPosition(
-    //     climberLeftSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
-    // sparkRightSim.setPosition(
-    //     climberRightSim.getPositionMeters() - ClimberConstants.CLIMBER_OFFSET_METERS);
-    // sparkLeftSim.setVelocity(climberLeftSim.getVelocityMetersPerSecond());
-    // sparkRightSim.setVelocity(climberRightSim.getVelocityMetersPerSecond());
     simCurrentLeft = Math.abs(climberLeftSim.getCurrentDrawAmps());
     simCurrentRight = Math.abs(climberRightSim.getCurrentDrawAmps());
 

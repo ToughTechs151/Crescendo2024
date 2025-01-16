@@ -166,9 +166,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     // Setup the encoder scale factors. Since this is a relation encoder,
     // arm position will only be correct if the arm is in the starting rest position when
     // the subsystem is constructed.
-    // motorConfig.encoder.positionConversionFactor(ArmConstants.ARM_RAD_PER_ENCODER_ROTATION);
-    // Not working in 2025 Beta 3 for simulation
-    motorConfig.encoder.velocityConversionFactor(ArmConstants.RPM_TO_RAD_PER_SEC);
+    motorConfig
+        .encoder
+        .positionConversionFactor(ArmConstants.ARM_RAD_PER_ENCODER_ROTATION)
+        .velocityConversionFactor(ArmConstants.RPM_TO_RAD_PER_SEC);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motor.clearFaults();
@@ -349,9 +350,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public double getMeasurement() {
     // Add the offset from the starting point. The arm must be at this position at startup for
     // the relative encoder to provide a correct position.
-    return encoder.getPosition() * ArmConstants.ARM_RAD_PER_ENCODER_ROTATION
-        + ArmConstants.ARM_OFFSET_RADS;
-    // scale factor workaround for 2025 Beta 3
+    return encoder.getPosition() + ArmConstants.ARM_OFFSET_RADS;
   }
 
   /** Returns the Motor Commanded Voltage. */

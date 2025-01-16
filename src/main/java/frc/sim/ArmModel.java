@@ -93,9 +93,7 @@ public class ArmModel implements AutoCloseable {
     // Finally, we  run the spark simulation, set our simulated encoder's readings and save the
     // current so it can be retrieved later.
     SmartDashboard.putNumber("Sim Arm velocity", armSim.getVelocityRadPerSec());
-    sparkSim.iterate(armSim.getVelocityRadPerSec() / 325.0, 12.0, 0.02);
-    // sparkSim.setPosition(armSim.getAngleRads() - ArmConstants.ARM_OFFSET_RADS);
-    // sparkSim.setVelocity(armSim.getVelocityRadPerSec());
+    sparkSim.iterate(armSim.getVelocityRadPerSec(), 12.0, 0.02);
 
     simCurrent = Math.abs(armSim.getCurrentDrawAmps());
 

@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalMatchers;
@@ -104,8 +103,6 @@ class ArmSubsystemTest {
     assertThat(telemetryBooleanMap.get("Arm Enabled")).isFalse();
   }
 
-  // Disable due to bug in RevLib for 2025 Beta 3
-  @Disabled("RevLib bug")
   @Test
   @DisplayName("Test Motor and Encoder Sensors.")
   void testSensors() {
